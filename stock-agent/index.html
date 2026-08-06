@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StockPilot AI — Paper Trading Assistant</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --series: #2a78d6;
+    --series-soft: rgba(42,120,214,0.12);
+    --up: #006300;
+    --down: #d03b3b;
+    --accent: #2a78d6;
+    --accent-ink: #ffffff;
+    --warn-bg: #fdf6e3;
+    --warn-border: #eda100;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255,255,255,0.10);
+      --series: #3987e5;
+      --series-soft: rgba(57,135,229,0.16);
+      --up: #0ca30c;
+      --down: #e66767;
+      --accent: #3987e5;
+      --warn-bg: #2a2313;
+      --warn-border: #c98500;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  header.topbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 14px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .logo { font-size: 20px; font-weight: 700; }
+  .logo span { color: var(--accent); }
+  .badge {
+    font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+    background: var(--series-soft); color: var(--accent);
+  }
+  .topbar .cash { margin-left: auto; text-align: right; }
+  .topbar .cash .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .topbar .cash .value { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .disclaimer {
+    background: var(--warn-bg);
+    border-left: 4px solid var(--warn-border);
+    padding: 10px 20px; font-size: 13px; color: var(--ink-2);
+  }
+  main {
+    display: grid; gap: 16px; padding: 16px 20px 40px;
+    grid-template-columns: 300px minmax(0,1fr) 320px;
+    max-width: 1500px; margin: 0 auto;
+  }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr 1fr; } .col-right { grid-column: 1 / -1; } }
+  @media (max-width: 760px)  { main { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .card h2 { margin: 0 0 10px; font-size: 15px; }
+  .card h2 .sub { font-weight: 400; color: var(--muted); font-size: 12px; }
+  /* Watchlist */
+  .stock-row {
+    display: grid; grid-template-columns: 1fr 64px 82px; gap: 8px; align-items: center;
+    padding: 8px 8px; border-radius: 8px; cursor: pointer; border: 0;
+    background: transparent; width: 100%; text-align: left; font: inherit; color: inherit;
+  }
+  .stock-row:hover { background: var(--series-soft); }
+  .stock-row.active { background: var(--series-soft); outline: 1px solid var(--accent); }
+  .stock-row .sym { font-weight: 700; }
+  .stock-row .name { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stock-row .px { font-variant-numeric: tabular-nums; text-align: right; font-size: 13px; }
+  .stock-row .chg { font-variant-numeric: tabular-nums; text-align: right; font-size: 12px; font-weight: 600; }
+  .pos { color: var(--up); } .neg { color: var(--down); }
+  /* Detail */
+  .detail-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .detail-head h2 { font-size: 22px; margin: 0; }
+  .detail-head .big-px { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .detail-head .big-chg { font-weight: 600; }
+  .chart-wrap { position: relative; margin-top: 8px; }
+  .chart-wrap svg { display: block; width: 100%; height: auto; }
+  .tooltip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    white-space: nowrap; z-index: 5;
+  }
+  .tooltip .t-date { color: var(--muted); }
+  .tooltip .t-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px,1fr)); gap: 10px; margin-top: 14px; }
+  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .stat .value { font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* AI card */
+  .ai-card { margin-top: 16px; }
+  .rec-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .rec-pill {
+    font-weight: 700; font-size: 14px; padding: 4px 14px; border-radius: 999px; color: #fff;
+  }
+  .rec-BUY  { background: #0ca30c; }
+  .rec-SELL { background: #d03b3b; }
+  .rec-HOLD { background: #898781; }
+  .conf { font-size: 13px; color: var(--ink-2); }
+  .reasons { margin: 10px 0 0; padding-left: 20px; font-size: 13px; color: var(--ink-2); }
+  .reasons li { margin: 3px 0; }
+  /* Trade form */
+  .trade { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .trade input[type=number] {
+    width: 110px; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--baseline);
+    background: var(--surface); color: var(--ink); font: inherit;
+  }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; border: 0; font: inherit; font-weight: 700;
+    cursor: pointer; color: #fff;
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-buy { background: #0ca30c; }
+  .btn-sell { background: #d03b3b; }
+  .btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .trade-msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+  /* Portfolio */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; padding: 4px 6px; border-bottom: 1px solid var(--grid); }
+  td { padding: 6px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+  td.sym-cell { font-weight: 700; font-variant-numeric: normal; }
+  .hero { margin-bottom: 6px; }
+  .hero .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .hero .value { font-size: 26px; font-weight: 700; }
+  .hero .delta { font-size: 13px; font-weight: 600; }
+  /* Autopilot + feed */
+  .switch-row { display: flex; align-items: center; gap: 10px; }
+  .switch-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .feed { list-style: none; margin: 10px 0 0; padding: 0; font-size: 12.5px; max-height: 260px; overflow-y: auto; }
+  .feed li { padding: 7px 4px; border-bottom: 1px solid var(--grid); color: var(--ink-2); }
+  .feed li .time { color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
+  .feed li b { color: var(--ink); }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 4px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">Stock<span>Pilot</span> AI</div>
+  <span class="badge">Paper trading — virtual money</span>
+  <div class="cash">
+    <div class="label">Cash available</div>
+    <div class="value" id="cashValue">$0.00</div>
+  </div>
+</header>
+
+<div class="disclaimer">
+  <strong>Practice mode:</strong> all prices are simulated and all trades use virtual money — nothing here touches a real
+  brokerage account. The AI advisor explains its reasoning, but no AI can predict markets or guarantee a "right choice."
+  This is an educational tool, not financial advice.
+</div>
+
+<main>
+  <!-- LEFT: watchlist -->
+  <div class="col-left">
+    <div class="card">
+      <h2>Market watchlist <span class="sub">· updates live</span></h2>
+      <div id="watchlist"></div>
+    </div>
+  </div>
+
+  <!-- CENTER: detail + AI + trade -->
+  <div class="col-center">
+    <div class="card">
+      <div class="detail-head">
+        <h2 id="dSym">—</h2>
+        <span id="dName" style="color:var(--muted)"></span>
+        <span class="big-px" id="dPx"></span>
+        <span class="big-chg" id="dChg"></span>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <div class="tooltip" id="chartTip"><span class="t-date"></span><br><span class="t-val"></span></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">30-day change</div><div class="value" id="s30"></div></div>
+        <div class="stat"><div class="label">90-day high</div><div class="value" id="sHigh"></div></div>
+        <div class="stat"><div class="label">90-day low</div><div class="value" id="sLow"></div></div>
+        <div class="stat"><div class="label">Volatility</div><div class="value" id="sVol"></div></div>
+        <div class="stat"><div class="label">You own</div><div class="value" id="sOwn"></div></div>
+      </div>
+
+      <div class="card ai-card" style="background:var(--series-soft); border-color:transparent;">
+        <h2>🤖 AI advisor</h2>
+        <div class="rec-line">
+          <span class="rec-pill" id="recPill">—</span>
+          <span class="conf" id="recConf"></span>
+        </div>
+        <ul class="reasons" id="recReasons"></ul>
+      </div>
+
+      <div class="trade">
+        <input type="number" id="qty" min="1" step="1" value="10" aria-label="Number of shares" />
+        <button class="btn btn-buy" id="buyBtn">Buy</button>
+        <button class="btn btn-sell" id="sellBtn">Sell</button>
+        <span style="font-size:13px;color:var(--muted)" id="tradeCost"></span>
+      </div>
+      <div class="trade-msg" id="tradeMsg"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: portfolio + autopilot -->
+  <div class="col-right">
+    <div class="card">
+      <div class="hero">
+        <div class="label">Portfolio value</div>
+        <div class="value" id="pvValue">$0.00</div>
+        <div class="delta" id="pvDelta"></div>
+      </div>
+      <h2>Holdings</h2>
+      <div id="holdings"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>🤖 AI auto-pilot <span class="sub">· paper money only</span></h2>
+      <div class="switch-row">
+        <input type="checkbox" id="autoPilot" />
+        <label for="autoPilot">Let the AI trade automatically for me</label>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin:8px 0 0">
+        When on, the AI buys its strongest "Buy" picks (max 15% of portfolio each)
+        and sells holdings it rates "Sell." Every action is logged below.
+      </p>
+      <ul class="feed" id="aiFeed"></ul>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>Trade history</h2>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button class="btn btn-ghost" id="resetBtn" style="padding:5px 12px;font-size:12px">Reset account</button>
+      </div>
+      <ul class="feed" id="history"></ul>
+    </div>
+  </div>
+</main>
+
+<footer>
+  StockPilot AI · a practice trading sandbox · prices are simulated ·
+  <a href="../index.html">back to CoachStat</a>
+</footer>
+
+<script>
+"use strict";
+/* ============ Universe of famous stocks (simulated prices) ============ */
+const STOCKS = [
+  { sym: "AAPL",  name: "Apple",            base: 232, drift:  0.0004, vol: 0.014 },
+  { sym: "MSFT",  name: "Microsoft",        base: 448, drift:  0.0005, vol: 0.013 },
+  { sym: "NVDA",  name: "NVIDIA",           base: 138, drift:  0.0009, vol: 0.028 },
+  { sym: "GOOGL", name: "Alphabet",         base: 182, drift:  0.0004, vol: 0.016 },
+  { sym: "AMZN",  name: "Amazon",           base: 205, drift:  0.0005, vol: 0.018 },
+  { sym: "META",  name: "Meta Platforms",   base: 585, drift:  0.0006, vol: 0.020 },
+  { sym: "TSLA",  name: "Tesla",            base: 248, drift:  0.0002, vol: 0.034 },
+  { sym: "BRK.B", name: "Berkshire Hath.",  base: 462, drift:  0.0003, vol: 0.009 },
+  { sym: "JPM",   name: "JPMorgan Chase",   base: 244, drift:  0.0003, vol: 0.012 },
+  { sym: "V",     name: "Visa",             base: 312, drift:  0.0003, vol: 0.011 },
+  { sym: "NFLX",  name: "Netflix",          base: 892, drift:  0.0005, vol: 0.022 },
+  { sym: "DIS",   name: "Walt Disney",      base: 112, drift:  0.0001, vol: 0.016 },
+];
+const HISTORY_DAYS = 180;
+const TICK_MS = 2500;
+const START_CASH = 100000;
+
+/* Seeded RNG so every visitor sees a stable (but realistic) history */
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function gauss(rng) { // Box-Muller
+  const u = Math.max(rng(), 1e-9), v = rng();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function seedFrom(str) {
+  let h = 2166136261;
+  for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+/* Build price histories */
+const market = {};
+for (const s of STOCKS) {
+  const rng = mulberry32(seedFrom(s.sym));
+  const prices = [];
+  // walk backwards then forward so today's price lands near base
+  let p = s.base * (0.75 + rng() * 0.2);
+  for (let i = 0; i < HISTORY_DAYS; i++) {
+    p = Math.max(1, p * (1 + s.drift + gauss(rng) * s.vol));
+    prices.push(p);
+  }
+  // scale so last close = base
+  const k = s.base / prices[prices.length - 1];
+  market[s.sym] = { ...s, prices: prices.map(x => x * k), rng };
+}
+
+/* ============ Account state (persisted) ============ */
+const SAVE_KEY = "stockpilot-v1";
+let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], autoPilot: false };
+try {
+  const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+  if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
+} catch (e) { /* fresh start */ }
+function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+
+let selected = STOCKS[0].sym;
+
+/* ============ Helpers ============ */
+const $ = id => document.getElementById(id);
+const fmt$ = n => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+const fmtPct = n => (n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%";
+function price(sym) { const a = market[sym].prices; return a[a.length - 1]; }
+function dayChange(sym) {
+  const a = market[sym].prices;
+  return a[a.length - 1] / a[a.length - 2] - 1;
+}
+function now() {
+  return new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+}
+
+/* ============ AI advisor: transparent technical analysis ============ */
+function sma(arr, n) {
+  if (arr.length < n) return null;
+  let s = 0;
+  for (let i = arr.length - n; i < arr.length; i++) s += arr[i];
+  return s / n;
+}
+function rsi(arr, n = 14) {
+  if (arr.length < n + 1) return 50;
+  let up = 0, dn = 0;
+  for (let i = arr.length - n; i < arr.length; i++) {
+    const d = arr[i] - arr[i - 1];
+    if (d > 0) up += d; else dn -= d;
+  }
+  if (dn === 0) return 100;
+  return 100 - 100 / (1 + up / dn);
+}
+function volatility(arr, n = 30) {
+  const rets = [];
+  for (let i = Math.max(1, arr.length - n); i < arr.length; i++)
+    rets.push(arr[i] / arr[i - 1] - 1);
+  const mean = rets.reduce((a, b) => a + b, 0) / rets.length;
+  const varc = rets.reduce((a, b) => a + (b - mean) ** 2, 0) / rets.length;
+  return Math.sqrt(varc) * Math.sqrt(252);
+}
+function analyze(sym) {
+  const a = market[sym].prices;
+  const p = a[a.length - 1];
+  const s20 = sma(a, 20), s50 = sma(a, 50);
+  const r = rsi(a);
+  const mom30 = p / a[a.length - 31] - 1;
+  const vol = volatility(a);
+  const reasons = [];
+  let score = 0;
+
+  if (s20 > s50) { score += 1.2; reasons.push(`Short-term trend is up — the 20-day average ($${s20.toFixed(2)}) is above the 50-day ($${s50.toFixed(2)}).`); }
+  else           { score -= 1.2; reasons.push(`Short-term trend is down — the 20-day average ($${s20.toFixed(2)}) is below the 50-day ($${s50.toFixed(2)}).`); }
+
+  if (mom30 > 0.05)       { score += 1; reasons.push(`Strong momentum: up ${fmtPct(mom30)} over the last 30 days.`); }
+  else if (mom30 < -0.05) { score -= 1; reasons.push(`Weak momentum: down ${fmtPct(mom30)} over the last 30 days.`); }
+  else                    { reasons.push(`Momentum is flat (${fmtPct(mom30)} over 30 days).`); }
+
+  if (r < 30)      { score += 1; reasons.push(`RSI is ${r.toFixed(0)} — the stock looks oversold, which can precede a rebound.`); }
+  else if (r > 70) { score -= 1; reasons.push(`RSI is ${r.toFixed(0)} — the stock looks overbought and could pull back.`); }
+  else             { reasons.push(`RSI is ${r.toFixed(0)} — in a neutral range.`); }
+
+  if (vol > 0.45) { score -= 0.5; reasons.push(`High volatility (${(vol * 100).toFixed(0)}% annualized) — bigger swings, bigger risk.`); }
+
+  let rec = "HOLD";
+  if (score >= 1.5) rec = "BUY";
+  else if (score <= -1.5) rec = "SELL";
+  const confidence = Math.min(95, Math.round(55 + Math.abs(score) * 12));
+  return { rec, score, confidence, reasons, rsi: r, mom30, vol };
+}
+
+/* ============ Charts (SVG, hand-built) ============ */
+function sparkline(sym, w = 64, h = 24) {
+  const a = market[sym].prices.slice(-30);
+  const min = Math.min(...a), max = Math.max(...a), span = max - min || 1;
+  const pts = a.map((v, i) =>
+    `${(i / (a.length - 1) * w).toFixed(1)},${(h - 2 - (v - min) / span * (h - 4)).toFixed(1)}`
+  ).join(" ");
+  const up = a[a.length - 1] >= a[0];
+  const cls = up ? "pos" : "neg";
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
+    <polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5" class="${cls}" style="color:${up ? "var(--up)" : "var(--down)"}"/>
+  </svg>`;
+}
+
+let chartGeom = null;
+function drawChart(sym) {
+  const wrap = $("chartWrap");
+  const old = wrap.querySelector("svg");
+  if (old) old.remove();
+
+  const a = market[sym].prices.slice(-90);
+  const W = 720, H = 260, padL = 52, padR = 12, padT = 12, padB = 26;
+  const min = Math.min(...a), max = Math.max(...a);
+  const span = (max - min) || 1;
+  const x = i => padL + i / (a.length - 1) * (W - padL - padR);
+  const y = v => padT + (1 - (v - min) / span) * (H - padT - padB);
+
+  let grid = "", labels = "";
+  for (let g = 0; g <= 4; g++) {
+    const v = min + span * g / 4, yy = y(v);
+    grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
+    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)" style="font-variant-numeric:tabular-nums">$${v.toFixed(0)}</text>`;
+  }
+  const dayLabels = [-90, -60, -30, 0];
+  for (const d of dayLabels) {
+    const i = a.length - 1 + d;
+    if (i < 0) continue;
+    labels += `<text x="${x(i)}" y="${H - 8}" text-anchor="${d === 0 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${d === 0 ? "today" : d + "d"}</text>`;
+  }
+
+  const line = a.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const area = `${padL},${H - padB} ` + line + ` ${W - padR},${H - padB}`;
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `${sym} price over the last 90 days`);
+  svg.innerHTML = `
+    ${grid}
+    <polygon points="${area}" fill="var(--series-soft)"/>
+    <polyline points="${line}" fill="none" stroke="var(--series)" stroke-width="2"/>
+    <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1"/>
+    ${labels}
+    <line id="xhair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
+    <circle id="xdot" r="4" fill="var(--series)" stroke="var(--surface)" stroke-width="2" style="display:none"/>
+  `;
+  wrap.appendChild(svg);
+  chartGeom = { a, x, y, padL, padR, padT, padB, W, H, svg };
+}
+
+function chartHover(ev) {
+  if (!chartGeom) return;
+  const { a, x, y, padL, padR, W, svg } = chartGeom;
+  const rect = svg.getBoundingClientRect();
+  const px = (ev.clientX - rect.left) / rect.width * W;
+  const tip = $("chartTip");
+  const hair = svg.querySelector("#xhair"), dot = svg.querySelector("#xdot");
+  if (px < padL || px > W - padR) {
+    tip.style.display = "none"; hair.style.display = "none"; dot.style.display = "none";
+    return;
+  }
+  const i = Math.round((px - padL) / (W - padL - padR) * (a.length - 1));
+  const v = a[i], xx = x(i), yy = y(v);
+  hair.setAttribute("x1", xx); hair.setAttribute("x2", xx); hair.style.display = "";
+  dot.setAttribute("cx", xx); dot.setAttribute("cy", yy); dot.style.display = "";
+  const daysAgo = a.length - 1 - i;
+  tip.querySelector(".t-date").textContent = daysAgo === 0 ? "Today" : daysAgo + " days ago";
+  tip.querySelector(".t-val").textContent = fmt$(v);
+  tip.style.display = "block";
+  const wrapRect = $("chartWrap").getBoundingClientRect();
+  const tx = xx / W * rect.width;
+  tip.style.left = Math.min(wrapRect.width - 130, Math.max(0, tx + 12)) + "px";
+  tip.style.top = (yy / chartGeom.H * rect.height - 48) + "px";
+}
+function chartLeave() {
+  $("chartTip").style.display = "none";
+  if (chartGeom) {
+    chartGeom.svg.querySelector("#xhair").style.display = "none";
+    chartGeom.svg.querySelector("#xdot").style.display = "none";
+  }
+}
+
+/* ============ Rendering ============ */
+function renderWatchlist() {
+  const el = $("watchlist");
+  el.innerHTML = STOCKS.map(s => {
+    const chg = dayChange(s.sym);
+    return `<button class="stock-row${s.sym === selected ? " active" : ""}" data-sym="${s.sym}">
+      <span><span class="sym">${s.sym}</span><br><span class="name">${s.name}</span></span>
+      ${sparkline(s.sym)}
+      <span><span class="px">${fmt$(price(s.sym))}</span><br>
+      <span class="chg ${chg >= 0 ? "pos" : "neg"}">${fmtPct(chg)}</span></span>
+    </button>`;
+  }).join("");
+  el.querySelectorAll(".stock-row").forEach(b =>
+    b.addEventListener("click", () => { selected = b.dataset.sym; renderAll(); })
+  );
+}
+
+function renderDetail() {
+  const s = market[selected];
+  const p = price(selected), chg = dayChange(selected);
+  $("dSym").textContent = s.sym;
+  $("dName").textContent = s.name;
+  $("dPx").textContent = fmt$(p);
+  const chgEl = $("dChg");
+  chgEl.textContent = fmtPct(chg) + " today";
+  chgEl.className = "big-chg " + (chg >= 0 ? "pos" : "neg");
+
+  const a = s.prices;
+  const c30 = p / a[a.length - 31] - 1;
+  const last90 = a.slice(-90);
+  $("s30").textContent = fmtPct(c30);
+  $("s30").className = "value " + (c30 >= 0 ? "pos" : "neg");
+  $("sHigh").textContent = fmt$(Math.max(...last90));
+  $("sLow").textContent = fmt$(Math.min(...last90));
+  $("sVol").textContent = (volatility(a) * 100).toFixed(0) + "%";
+  const h = state.holdings[selected];
+  $("sOwn").textContent = h ? `${h.shares} sh` : "0 sh";
+
+  drawChart(selected);
+
+  const an = analyze(selected);
+  const pill = $("recPill");
+  pill.textContent = an.rec;
+  pill.className = "rec-pill rec-" + an.rec;
+  $("recConf").textContent = `${an.confidence}% confidence · based on trend, momentum, RSI & volatility`;
+  $("recReasons").innerHTML = an.reasons.map(r => `<li>${r}</li>`).join("");
+
+  updateTradeCost();
+}
+
+function updateTradeCost() {
+  const q = Math.max(0, parseInt($("qty").value || "0", 10));
+  $("tradeCost").textContent = q > 0 ? `≈ ${fmt$(q * price(selected))}` : "";
+}
+
+function renderPortfolio() {
+  $("cashValue").textContent = fmt$(state.cash);
+  let mv = 0, cost = 0;
+  const rows = Object.entries(state.holdings).map(([sym, h]) => {
+    const v = h.shares * price(sym);
+    mv += v; cost += h.shares * h.avgCost;
+    const pl = v - h.shares * h.avgCost;
+    return `<tr>
+      <td class="sym-cell">${sym}</td>
+      <td>${h.shares}</td>
+      <td>${fmt$(price(sym))}</td>
+      <td class="${pl >= 0 ? "pos" : "neg"}">${fmt$(pl)}</td>
+    </tr>`;
+  });
+  $("holdings").innerHTML = rows.length
+    ? `<table><thead><tr><th>Sym</th><th>Shares</th><th>Price</th><th>P&amp;L</th></tr></thead><tbody>${rows.join("")}</tbody></table>`
+    : `<div class="empty">No holdings yet — buy your first stock or turn on auto-pilot.</div>`;
+  const total = state.cash + mv;
+  $("pvValue").textContent = fmt$(total);
+  const totalPl = total - START_CASH;
+  const d = $("pvDelta");
+  d.textContent = `${totalPl >= 0 ? "▲" : "▼"} ${fmt$(Math.abs(totalPl))} (${fmtPct(totalPl / START_CASH)}) all-time`;
+  d.className = "delta " + (totalPl >= 0 ? "pos" : "neg");
+}
+
+function renderFeeds() {
+  $("aiFeed").innerHTML = state.aiFeed.length
+    ? state.aiFeed.slice(0, 30).map(f => `<li><span class="time">${f.t}</span>${f.msg}</li>`).join("")
+    : `<li class="empty">Auto-pilot actions will appear here.</li>`;
+  $("history").innerHTML = state.history.length
+    ? state.history.slice(0, 30).map(f => `<li><span class="time">${f.t}</span>${f.msg}</li>`).join("")
+    : `<li class="empty">No trades yet.</li>`;
+}
+
+function renderAll() { renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds(); save(); }
+
+/* ============ Trading ============ */
+function trade(sym, shares, side, byAI = false) {
+  const p = price(sym);
+  const msgEl = $("tradeMsg");
+  if (shares < 1) return;
+  if (side === "buy") {
+    const cost = shares * p;
+    if (cost > state.cash) {
+      if (!byAI) { msgEl.textContent = "Not enough cash for that order."; msgEl.className = "trade-msg neg"; }
+      return false;
+    }
+    state.cash -= cost;
+    const h = state.holdings[sym] || { shares: 0, avgCost: 0 };
+    h.avgCost = (h.avgCost * h.shares + cost) / (h.shares + shares);
+    h.shares += shares;
+    state.holdings[sym] = h;
+  } else {
+    const h = state.holdings[sym];
+    if (!h || h.shares < shares) {
+      if (!byAI) { msgEl.textContent = "You don't own that many shares."; msgEl.className = "trade-msg neg"; }
+      return false;
+    }
+    h.shares -= shares;
+    state.cash += shares * p;
+    if (h.shares === 0) delete state.holdings[sym];
+  }
+  const verb = side === "buy" ? "Bought" : "Sold";
+  const entry = { t: now(), msg: `${byAI ? "🤖 " : ""}<b>${verb} ${shares} ${sym}</b> @ ${fmt$(p)}` };
+  state.history.unshift(entry);
+  state.history = state.history.slice(0, 100);
+  if (!byAI) {
+    msgEl.textContent = `${verb} ${shares} shares of ${sym} at ${fmt$(p)}.`;
+    msgEl.className = "trade-msg pos";
+  }
+  return true;
+}
+
+/* ============ AI auto-pilot ============ */
+let autoCounter = 0;
+function runAutoPilot() {
+  if (!state.autoPilot) return;
+  autoCounter++;
+  if (autoCounter % 4 !== 0) return; // act every ~10s, not every tick
+
+  const analyses = STOCKS.map(s => ({ sym: s.sym, ...analyze(s.sym) }));
+  let mv = 0;
+  for (const [sym, h] of Object.entries(state.holdings)) mv += h.shares * price(sym);
+  const total = state.cash + mv;
+
+  // Sell anything rated SELL
+  for (const [sym, h] of Object.entries(state.holdings)) {
+    const an = analyses.find(a => a.sym === sym);
+    if (an && an.rec === "SELL" && h.shares > 0) {
+      if (trade(sym, h.shares, "sell", true)) {
+        state.aiFeed.unshift({ t: now(), msg: `Sold all <b>${sym}</b> — ${an.reasons[0]}` });
+      }
+    }
+  }
+  // Buy the strongest BUY not already at its cap
+  const buys = analyses.filter(a => a.rec === "BUY").sort((a, b) => b.score - a.score);
+  for (const an of buys) {
+    const p = price(an.sym);
+    const held = state.holdings[an.sym] ? state.holdings[an.sym].shares * p : 0;
+    const cap = total * 0.15;
+    const room = cap - held;
+    if (room < p) continue;
+    const shares = Math.floor(Math.min(room, state.cash * 0.5) / p);
+    if (shares >= 1 && trade(an.sym, shares, "buy", true)) {
+      state.aiFeed.unshift({ t: now(), msg: `Bought ${shares} <b>${an.sym}</b> (${an.confidence}% conf) — ${an.reasons[0]}` });
+      break; // one buy per cycle
+    }
+  }
+  state.aiFeed = state.aiFeed.slice(0, 100);
+}
+
+/* ============ Live ticks ============ */
+function tick() {
+  for (const s of STOCKS) {
+    const m = market[s.sym];
+    const p = m.prices[m.prices.length - 1];
+    // intraday-ish move: a fraction of daily vol per tick
+    const next = Math.max(1, p * (1 + s.drift / 20 + gauss(m.rng) * s.vol / 6));
+    m.prices.push(next);
+    if (m.prices.length > 400) m.prices.shift();
+  }
+  runAutoPilot();
+  renderAll();
+}
+
+/* ============ Wire up ============ */
+$("buyBtn").addEventListener("click", () => {
+  const q = parseInt($("qty").value || "0", 10);
+  if (trade(selected, q, "buy")) renderAll();
+});
+$("sellBtn").addEventListener("click", () => {
+  const q = parseInt($("qty").value || "0", 10);
+  if (trade(selected, q, "sell")) renderAll();
+});
+$("qty").addEventListener("input", updateTradeCost);
+$("autoPilot").addEventListener("change", e => {
+  state.autoPilot = e.target.checked;
+  state.aiFeed.unshift({ t: now(), msg: state.autoPilot ? "Auto-pilot <b>enabled</b> — the AI will now manage this paper portfolio." : "Auto-pilot <b>disabled</b>." });
+  renderAll();
+});
+$("resetBtn").addEventListener("click", () => {
+  if (!confirm("Reset your paper account back to $100,000? This clears holdings and history.")) return;
+  state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], autoPilot: false };
+  $("autoPilot").checked = false;
+  renderAll();
+});
+$("chartWrap").addEventListener("mousemove", chartHover);
+$("chartWrap").addEventListener("mouseleave", chartLeave);
+
+$("autoPilot").checked = state.autoPilot;
+renderAll();
+setInterval(tick, TICK_MS);
+</script>
+</body>
+</html>
