@@ -10,12 +10,13 @@ for setup. It does not touch real money unless explicitly enabled, and no
 AI can guarantee profitable decisions.
 
 ## StockPilot AI (paper trading app)
-`stock-agent/index.html` is a standalone stock trading practice app.
-By default it follows real market hours: Taiwan stocks move only during
-Taiwan trading hours (Mon–Fri 9:00–13:30 Taipei) and US stocks only during
-US hours (Mon–Fri 9:30–16:00 New York); closed markets can't be traded,
-and sessions missed while the page was closed are filled in on return.
-A Fast practice mode keeps both markets open with ~1-minute days. It has
+`stock-agent/index.html` is a standalone stock trading practice app with
+two zones, each with its own $100,000 virtual account and journal: a
+Practice zone where prices move all the time (~1-minute trading days), and
+a Real-hours zone where Taiwan stocks move only during Taiwan trading hours
+(Mon–Fri 9:00–13:30 Taipei) and US stocks only during US hours (Mon–Fri
+9:30–16:00 New York); closed markets can't be traded there, and sessions
+missed while the page was closed are filled in on return. It has
 a simulated market of 12 US and 8 Taiwan stocks (with trends, news headlines,
 whole-market moves, daily recaps and Taiwan's 10% price limit), a virtual
 $100,000 paper-trading account, a Coach that summarizes each stock and

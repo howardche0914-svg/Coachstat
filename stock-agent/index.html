@@ -372,7 +372,8 @@
   footer a { color: var(--accent); }
   @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
   /* ============ Market clock ============ */
-  .mode-seg { margin: 6px 0 8px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .zone-seg button { font-size: 13px; padding: 5px 12px; }
+  .zone-seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
   .clock .mline { display: block; color: var(--ink-2); }
   .clock .mline b { color: var(--ink); } .clock .mline b.pos { color: var(--up); }
   .clock .mhint { display: block; margin-top: 2px; }
@@ -439,6 +440,10 @@
     <button type="button" data-view="journal" aria-pressed="false"><span data-i18n="tab.journal">Journal</span><span class="count" id="journalCount"></span></button>
     <button type="button" data-view="learn" aria-pressed="false"><span data-i18n="tab.learn">Learn</span><span class="count" id="learnCount"></span></button>
   </nav>
+  <div class="seg zone-seg" role="group" aria-label="Practice area" data-i18n-aria="zone.aria">
+    <button type="button" data-zone="practice" aria-pressed="true"><span aria-hidden="true">🎮</span> <span data-i18n="zone.practice">Practice zone</span></button>
+    <button type="button" data-zone="real" aria-pressed="false"><span aria-hidden="true">🕘</span> <span data-i18n="zone.real">Real-hours zone</span></button>
+  </div>
   <select id="langSel" class="lang-select" aria-label="Language">
     <option value="en">English</option>
     <option value="zh">繁體中文</option>
@@ -463,10 +468,6 @@
           <button type="button" data-mkt="US" aria-pressed="false" data-i18n="wl.us">US</button>
           <button type="button" data-mkt="TW" aria-pressed="false" data-i18n="wl.tw">Taiwan</button>
         </div>
-      </div>
-      <div class="seg mode-seg" role="group" aria-label="Market clock" data-i18n-aria="mode.aria">
-        <button type="button" data-mode="real" aria-pressed="true" data-i18n="mode.real">Real market hours</button>
-        <button type="button" data-mode="fast" aria-pressed="false" data-i18n="mode.fast">Fast practice</button>
       </div>
       <div class="clock" id="simClock"></div>
       <div id="watchlist"></div>
@@ -669,7 +670,8 @@ const I18N = {
     // market + detail
     "mkt.US": "US", "mkt.TW": "Taiwan",
     "limit.up": "LIMIT UP", "limit.down": "LIMIT DOWN",
-    "chg.today": v => `${v.p} today`,
+    "chg.today": v => `${v.p} today`, "chg.last": v => `${v.p} last session`,
+    "fx.closed": v => `Market closed · last close ${v.pc}`,
     "fx.tw": v => `Taiwan Stock Exchange · ≈ ${v.usd} per share at NT$${v.rate} = US$1 (simulated rate) · today's limit ${v.lo} to ${v.hi}`,
     "fx.us": v => `Previous close ${v.pc}`,
     "chart.legend": "— price   - - 20-day average", "chart.today": "today", "chart.days": v => `${v.d}d`,
@@ -835,14 +837,14 @@ const I18N = {
     "chart.dialog": v => `${v.sym} price chart`,
     "cm.change": "Change", "cm.high": "High", "cm.low": "Low", "cm.ma20": "20-day avg", "cm.ma50": "50-day avg",
     "cm.hint": "Hover over the chart to see the price on any day. Triangles mark your trades in this stock.",
-    "mode.aria": "Market clock", "mode.real": "Real market hours", "mode.fast": "Fast practice",
-    "mode.realHint": "Prices move only while the real Taiwan and US markets are open (holidays not included). Prices are still simulated.",
-    "mode.fastHint": "simulated trading day, about 1 minute long; both markets are always open",
+    "zone.aria": "Practice area", "zone.practice": "Practice zone", "zone.real": "Real-hours zone",
+    "mode.realHint": "Real-hours zone: each market moves only during its real trading hours (holidays not included). Prices are still simulated. This zone has its own $100,000 account and journal.",
+    "mode.fastHint": "Practice zone: prices move all the time, and each trading day lasts about 1 minute. This zone has its own $100,000 account and journal.",
     "tz.TW": "Taipei time", "tz.US": "New York time",
     "ms.open": v => `${v.flag} ${v.m}: <b class="pos">open</b> · closes ${v.close} ${v.tz}${v.local}`,
     "ms.closed": v => `${v.flag} ${v.m}: <b>closed</b> · opens ${v.when} ${v.tz}${v.local}`,
     "ms.local": v => ` (your time: ${v.t})`,
-    "ms.closedTrade": v => `The ${v.m} market is closed right now. It is open ${v.hours}. Switch to Fast practice to trade any time.`,
+    "ms.closedTrade": v => `The ${v.m} market is closed right now. It is open ${v.hours}. To trade any time, switch to the Practice zone.`,
     "hours.TW": "Monday to Friday, 9:00–13:30 Taipei time", "hours.US": "Monday to Friday, 9:30–16:00 New York time",
     "recap.mkt": v => `📊 <b>${v.m} market closed:</b> average ${v.avg}. Biggest mover: <b>${v.sym}</b> ${v.c}.`,
     "punct.stop": ".", "marker.buy": v => `You bought ${v.n} @ ${v.px}`, "marker.sell": v => `You sold ${v.n} @ ${v.px}`,
@@ -879,7 +881,8 @@ const I18N = {
 
     "mkt.US": "美股", "mkt.TW": "台股",
     "limit.up": "漲停", "limit.down": "跌停",
-    "chg.today": v => `今日 ${v.p}`,
+    "chg.today": v => `今日 ${v.p}`, "chg.last": v => `上個交易日 ${v.p}`,
+    "fx.closed": v => `休市中 · 收盤價 ${v.pc}`,
     "fx.tw": v => `台灣證券交易所 · 每股約 ${v.usd}（以 NT$${v.rate} = US$1 模擬匯率計算）· 今日漲跌停價 ${v.lo} 至 ${v.hi}`,
     "fx.us": v => `昨收 ${v.pc}`,
     "chart.legend": "— 價格   - - 20 日均線", "chart.today": "今天", "chart.days": v => `${v.d}天`,
@@ -1039,14 +1042,14 @@ const I18N = {
     "chart.dialog": v => `${v.sym} 走勢圖`,
     "cm.change": "區間漲跌", "cm.high": "最高", "cm.low": "最低", "cm.ma20": "20 日均線", "cm.ma50": "50 日均線",
     "cm.hint": "把滑鼠移到走勢圖上，可以看到每一天的價格。三角形標示你在這檔股票的交易。",
-    "mode.aria": "市場時鐘", "mode.real": "真實交易時間", "mode.fast": "快速練習",
-    "mode.realHint": "只有在台股和美股真實開盤的時間，價格才會變動（未計入國定假日）。價格仍然是模擬的。",
-    "mode.fastHint": "模擬交易日，每天約 1 分鐘；兩個市場一直開盤",
+    "zone.aria": "練習區域", "zone.practice": "練習區", "zone.real": "真實練習區",
+    "mode.realHint": "真實練習區：每個市場只在真實交易時間變動（未計入國定假日）。價格仍然是模擬的。這個區有自己的 $100,000 帳戶和交易日誌。",
+    "mode.fastHint": "練習區：價格隨時都在變動，每個交易日約 1 分鐘。這個區有自己的 $100,000 帳戶和交易日誌。",
     "tz.TW": "台北時間", "tz.US": "紐約時間",
     "ms.open": v => `${v.flag} ${v.m}：<b class="pos">開盤中</b> · ${v.close} 收盤（${v.tz}）${v.local}`,
     "ms.closed": v => `${v.flag} ${v.m}：<b>休市</b> · ${v.when} 開盤（${v.tz}）${v.local}`,
     "ms.local": v => `，你的時間 ${v.t}`,
-    "ms.closedTrade": v => `${v.m}現在休市。開盤時間：${v.hours}。想隨時練習，可以切換到「快速練習」。`,
+    "ms.closedTrade": v => `${v.m}現在休市。開盤時間：${v.hours}。想隨時交易，可以切換到「練習區」。`,
     "hours.TW": "週一至週五 9:00–13:30（台北時間）", "hours.US": "週一至週五 9:30–16:00（紐約時間）",
     "recap.mkt": v => `📊 <b>${v.m}收盤：</b>平均 ${v.avg}。漲跌最大：<b>${v.sym}</b> ${v.c}。`,
     "punct.stop": "。", "marker.buy": v => `你買進 ${v.n} 股 @ ${v.px}`, "marker.sell": v => `你賣出 ${v.n} 股 @ ${v.px}`,
@@ -1056,8 +1059,9 @@ const I18N = {
 /* ============ Simplified Chinese ============ */
 // 简体中文 reuses the Traditional Chinese text and converts it character by character.
 const TS_MAP = {"並":"并","亞":"亚","來":"来","個":"个","們":"们","債":"债","僅":"仅","價":"价","億":"亿","優":"优","內":"内","兩":"两","別":"别","則":"则","剛":"刚","劃":"划","勁":"劲","動":"动","務":"务","勢":"势","匯":"汇","區":"区","卻":"却","參":"参","問":"问","啟":"启","單":"单","嗎":"吗","國":"国","圍":"围","圓":"圆","圖":"图","報":"报","場":"场","壞":"坏","夠":"够","奮":"奋","學":"学","實":"实","將":"将","專":"专","尋":"寻","對":"对","師":"师","帳":"帐","帶":"带","幣":"币","幫":"帮","幾":"几","廠":"厂","張":"张","強":"强","彈":"弹","彙":"汇","後":"后","從":"从","慣":"惯","慮":"虑","憂":"忧","應":"应","懼":"惧","戰":"战","戶":"户","換":"换","損":"损","擁":"拥","擊":"击","擔":"担","據":"据","擬":"拟","擴":"扩","擺":"摆","攤":"摊","數":"数","斷":"断","於":"于","時":"时","暫":"暂","會":"会","東":"东","條":"条","業":"业","榮":"荣","構":"构","標":"标","樣":"样","機":"机","檔":"档","檢":"检","權":"权","歐":"欧","歡":"欢","氣":"气","決":"决","沒":"没","況":"况","減":"减","測":"测","準":"准","溫":"温","漲":"涨","濟":"济","瀏":"浏","灣":"湾","為":"为","無":"无","熱":"热","營":"营","狀":"状","獲":"获","現":"现","產":"产","畫":"画","當":"当","發":"发","盡":"尽","盤":"盘","眾":"众","確":"确","碼":"码","礎":"础","種":"种","稱":"称","積":"积","穩":"稳","筆":"笔","範":"范","篩":"筛","簡":"简","籃":"篮","籌":"筹","籤":"签","紀":"纪","約":"约","紅":"红","紐":"纽","純":"纯","級":"级","組":"组","結":"结","給":"给","經":"经","綠":"绿","網":"网","線":"线","緩":"缓","練":"练","縮":"缩","總":"总","繼":"继","續":"续","義":"义","習":"习","聞":"闻","聯":"联","聽":"听","脹":"胀","臺":"台","與":"与","興":"兴","舊":"旧","華":"华","萬":"万","蓋":"盖","蘋":"苹","處":"处","虛":"虚","號":"号","虧":"亏","衝":"冲","裡":"里","見":"见","規":"规","視":"视","覺":"觉","覽":"览","觀":"观","訂":"订","計":"计","訊":"讯","討":"讨","託":"托","記":"记","訟":"讼","設":"设","許":"许","訴":"诉","評":"评","詞":"词","試":"试","話":"话","該":"该","誌":"志","誤":"误","說":"说","誰":"谁","課":"课","調":"调","談":"谈","論":"论","謹":"谨","證":"证","議":"议","變":"变","讓":"让","財":"财","貨":"货","貴":"贵","貶":"贬","買":"买","貸":"贷","費":"费","資":"资","賠":"赔","賣":"卖","賴":"赖","賺":"赚","贏":"赢","趨":"趋","跡":"迹","蹤":"踪","軟":"软","較":"较","輕":"轻","輝":"辉","輸":"输","轉":"转","這":"这","連":"连","週":"周","進":"进","運":"运","過":"过","達":"达","違":"违","遜":"逊","遠":"远","選":"选","還":"还","邊":"边","銀":"银","銷":"销","錄":"录","錢":"钱","錯":"错","鎖":"锁","鐘":"钟","長":"长","門":"门","閉":"闭","開":"开","間":"间","關":"关","陣":"阵","陸":"陆","際":"际","隨":"随","險":"险","雖":"虽","雙":"双","雜":"杂","雞":"鸡","難":"难","電":"电","靜":"静","響":"响","頁":"页","頂":"顶","順":"顺","預":"预","頭":"头","題":"题","額":"额","顏":"颜","顛":"颠","類":"类","顯":"显","風":"风","飆":"飙","飛":"飞","餘":"余","馬":"马","駕":"驾","駛":"驶","騙":"骗","驗":"验","體":"体","鴻":"鸿","麼":"么","點":"点"};
+const TS_WORDS = [["帐户", "账户"], ["帐号", "账号"]];  // words where the usual simplified form differs from char-by-char
 function toS(x) {
-  if (typeof x === "string") { let o = ""; for (const ch of x) o += TS_MAP[ch] || ch; return o; }
+  if (typeof x === "string") { let o = ""; for (const ch of x) o += TS_MAP[ch] || ch; for (const [a, b] of TS_WORDS) o = o.split(a).join(b); return o; }
   if (Array.isArray(x)) return x.map(toS);
   if (x && typeof x === "object") { const o = {}; for (const k in x) o[k] = toS(x[k]); return o; }
   return x;
@@ -1767,33 +1771,50 @@ function buildHistory() {
   return recent;
 }
 
-/* ============ Saved state ============ */
-const SAVE_KEY = "stockpilot-v1";
-const MARKET_KEY = "stockpilot-market-v2";
+/* ============ Saved state: two zones, each with its own market and account ============ */
+// "practice": prices move all the time (1-minute days). "real": follows real market hours.
+const ZONES = ["practice", "real"];
+const ZONE_KEY = "stockpilot-zone";
 const LEARN_KEY = "stockpilot-learn-v1";
+const zoneKeys = z => ({ s: `stockpilot-${z}-state`, m: `stockpilot-${z}-market` });
+let zone = load(ZONE_KEY);
+if (!ZONES.includes(zone)) zone = "practice";
+const freshState = () => ({ cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "fast", dayStartTotal: null });
+const freshSim = () => ({ day: 1, tick: 0, ticks: 0, sess: { US: { date: null, open: false }, TW: { date: null, open: false } } });
+let state = freshState(), sim = freshSim();
 
-let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "real", dayStartTotal: null };
-const saved = load(SAVE_KEY);
-if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
-for (const k of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[k])) state[k] = [];
-for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
+function loadZone(z) {
+  const k = zoneKeys(z);
+  // the practice zone picks up progress saved by earlier versions of the app
+  const saved = load(k.s) || (z === "practice" ? load("stockpilot-v1") : null);
+  const savedMarket = load(k.m) || (z === "practice" ? load("stockpilot-market-v2") : null);
+  state = freshState();
+  if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
+  state.mode = z === "real" ? "real" : "fast";
+  for (const key of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[key])) state[key] = [];
+  for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
 
-let sim = { day: 1, tick: 0, ticks: 0, sess: { US: { date: null, open: false }, TW: { date: null, open: false } } };
-const savedMarket = load(MARKET_KEY);
-const marketOk = savedMarket && savedMarket.s && STOCKS.every(s => savedMarket.s[s.sym] && Array.isArray(savedMarket.s[s.sym].d));
-if (marketOk) {
-  sim = { ...sim, day: savedMarket.day || 1, tick: savedMarket.tick || 0, ticks: savedMarket.ticks || 0, sess: savedMarket.sess || sim.sess };
-  for (const s of STOCKS) {
-    const m = market[s.sym], v = savedMarket.s[s.sym];
-    m.daily = v.d; m.raw = v.r; m.mu = v.mu || 0; m.closes = v.c || 0; m.closedNow = !!v.cl;
-    m.px = m.closedNow ? m.daily[m.daily.length - 1] : roundPx(s.sym, m.raw);
+  sim = freshSim();
+  for (const s of STOCKS) { market[s.sym].closes = 0; market[s.sym].closedNow = false; }
+  const ok = savedMarket && savedMarket.s && STOCKS.every(s => savedMarket.s[s.sym] && Array.isArray(savedMarket.s[s.sym].d));
+  if (ok) {
+    sim = { ...sim, day: savedMarket.day || 1, tick: savedMarket.tick || 0, ticks: savedMarket.ticks || 0,
+            sess: z === "real" && savedMarket.sess ? savedMarket.sess : sim.sess };
+    for (const s of STOCKS) {
+      const m = market[s.sym], v = savedMarket.s[s.sym];
+      m.daily = [...v.d]; m.raw = v.r; m.mu = v.mu || 0; m.closes = v.c || 0;
+      m.closedNow = z === "real" && !!v.cl;
+      m.px = m.closedNow ? m.daily[m.daily.length - 1] : roundPx(s.sym, m.raw);
+    }
+  } else {
+    const recent = buildHistory();
+    if (!state.news.length) {
+      state.news = recent.sort((x, y) => x.ago - y.ago).slice(0, 6)
+        .map(n => ({ kind: "co", sym: n.sym, pos: n.chg > 0, i: n.i, chg: n.chg, ago: n.ago + 1, dayNum: -n.ago }));
+    }
   }
-} else {
-  const recent = buildHistory();
-  if (!state.news.length) {
-    state.news = recent.sort((a, b) => a.ago - b.ago).slice(0, 6)
-      .map(n => ({ kind: "co", sym: n.sym, pos: n.chg > 0, i: n.i, chg: n.chg, ago: n.ago + 1, dayNum: -n.ago }));
-  }
+  if (z === "real") syncReal();
+  if (state.dayStartTotal == null) state.dayStartTotal = portfolioTotals().total;
 }
 function saveMarket() {
   const s = {};
@@ -1801,9 +1822,9 @@ function saveMarket() {
     const m = market[st.sym];
     s[st.sym] = { d: m.daily.slice(-260), r: +m.raw.toFixed(4), mu: +m.mu.toFixed(6), c: m.closes || 0, cl: m.closedNow ? 1 : 0 };
   }
-  store(MARKET_KEY, { day: sim.day, tick: sim.tick, ticks: sim.ticks, sess: sim.sess, s });
+  store(zoneKeys(zone).m, { day: sim.day, tick: sim.tick, ticks: sim.ticks, sess: sim.sess, s });
 }
-function save() { store(SAVE_KEY, state); }
+function save() { store(zoneKeys(zone).s, state); }
 
 let learn = { done: {}, current: "basics", pane: "lessons", vcat: "all" };
 const savedLearn = load(LEARN_KEY);
@@ -2105,7 +2126,7 @@ function renderZoom() {
   $("cmTitle").textContent = sym;
   $("cmName").textContent = nameOf(sym);
   $("cmPx").textContent = fmtP(sym, p);
-  $("cmChg").textContent = t("chg.today", { p: fmtPct(chg) });
+  $("cmChg").textContent = t(market[sym].closedNow ? "chg.last" : "chg.today", { p: fmtPct(chg) });
   $("cmChg").className = "big-chg " + (chg >= 0 ? "pos" : "neg");
   $("chartModal").querySelector(".cm-box").setAttribute("aria-label", t("chart.dialog", { sym }));
   $("cmStats").innerHTML = [
@@ -2134,7 +2155,7 @@ function closeZoom() {
 function renderWatchlist() {
   document.querySelectorAll(".seg button[data-mkt]").forEach(b =>
     b.setAttribute("aria-pressed", String(b.dataset.mkt === state.mktFilter)));
-  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
+  document.querySelectorAll("[data-zone]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.zone === zone)));
   $("simClock").innerHTML = state.mode === "real"
     ? `${marketLine("TW")}${marketLine("US")}<span class="mhint">${t("mode.realHint")}</span>`
     : `${t("clock", { d: sim.day, time: simTime(sim.tick) })} · ${t("mode.fastHint")}`;
@@ -2158,10 +2179,10 @@ function renderDetail() {
   $("dName").textContent = nameOf(selected);
   $("dPx").textContent = fmtP(selected, p);
   const chgEl = $("dChg");
-  chgEl.textContent = t("chg.today", { p: fmtPct(chg) });
+  chgEl.textContent = t(s.closedNow ? "chg.last" : "chg.today", { p: fmtPct(chg) });
   chgEl.className = "big-chg " + (chg >= 0 ? "pos" : "neg");
   const pc = prevClose(selected);
-  $("dFx").textContent = s.mkt === "TW"
+  $("dFx").textContent = s.closedNow ? t("fx.closed", { pc: fmtP(selected, pc) }) : s.mkt === "TW"
     ? t("fx.tw", { usd: fmt$(usd(selected)), rate: MARKETS.TW.perUSD, lo: fmtP(selected, roundPx(selected, pc * (1 - TW_LIMIT))), hi: fmtP(selected, roundPx(selected, pc * (1 + TW_LIMIT))) })
     : t("fx.us", { pc: fmtP(selected, pc) });
 
@@ -2524,18 +2545,17 @@ function tickReal() {
     moveStocks(pool, f, Math.sqrt(TICK_MS / sessionMs), shock);
   }
 }
-function setMode(m) {
-  if (m === state.mode) return;
-  state.mode = m;
-  if (m === "real") {
-    sim.sess = { US: { date: null, open: false }, TW: { date: null, open: false } };
-    syncReal();
-  } else {
-    for (const s of STOCKS) market[s.sym].closedNow = false;
-    sim.tick = 0;
-  }
-  saveMarket();
+function setZone(z) {
+  if (z === zone || !ZONES.includes(z)) return;
+  save(); saveMarket();
+  zone = z;
+  store(ZONE_KEY, z);
+  loadZone(z);
+  closeZoom();
+  $("autoPilot").checked = state.autoPilot;
+  $("tradeMsg").textContent = "";
   renderAll();
+  showView(currentView);
 }
 
 function tick() {
@@ -2885,7 +2905,7 @@ document.addEventListener("click", e => {
   const el = sel => e.target.closest(sel);
   let b;
   if ((b = el("[data-lesson]"))) { learn.current = b.dataset.lesson; learn.pane = "lessons"; saveLearn(); showView("learn"); window.scrollTo({ top: 0 }); return; }
-  if ((b = el("[data-mode]"))) { setMode(b.dataset.mode); return; }
+  if ((b = el("[data-zone]"))) { setZone(b.dataset.zone); return; }
   if ((b = el("[data-range]"))) { state.chartRange = b.dataset.range; save(); renderDetail(); if (zoomOpen()) renderZoom(); return; }
   if ((b = el("[data-goto]"))) { showView(b.dataset.goto); window.scrollTo({ top: 0 }); return; }
   if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
@@ -2916,8 +2936,7 @@ $("chartModal").addEventListener("click", e => { if (e.target === $("chartModal"
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeZoom(); });
 window.addEventListener("resize", () => { if (zoomOpen()) renderZoom(); });
 
-if (state.mode === "real") syncReal();
-if (state.dayStartTotal == null) state.dayStartTotal = portfolioTotals().total;
+loadZone(zone);
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
 renderAll();
