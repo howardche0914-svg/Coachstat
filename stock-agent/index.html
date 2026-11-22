@@ -371,6 +371,12 @@
   footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
   footer a { color: var(--accent); }
   @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
+  /* ============ Market clock ============ */
+  .mode-seg { margin: 6px 0 8px; width: fit-content; max-width: 100%; flex-wrap: wrap; }
+  .clock .mline { display: block; color: var(--ink-2); }
+  .clock .mline b { color: var(--ink); } .clock .mline b.pos { color: var(--up); }
+  .clock .mhint { display: block; margin-top: 2px; }
+
   /* ============ Chart range + zoom ============ */
   .chart-tools { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .btn-sm { padding: 4px 12px; font-size: 13px; }
@@ -457,6 +463,10 @@
           <button type="button" data-mkt="US" aria-pressed="false" data-i18n="wl.us">US</button>
           <button type="button" data-mkt="TW" aria-pressed="false" data-i18n="wl.tw">Taiwan</button>
         </div>
+      </div>
+      <div class="seg mode-seg" role="group" aria-label="Market clock" data-i18n-aria="mode.aria">
+        <button type="button" data-mode="real" aria-pressed="true" data-i18n="mode.real">Real market hours</button>
+        <button type="button" data-mode="fast" aria-pressed="false" data-i18n="mode.fast">Fast practice</button>
       </div>
       <div class="clock" id="simClock"></div>
       <div id="watchlist"></div>
@@ -634,7 +644,7 @@ const I18N = {
     cash: "Cash available",
     disclaimer: "<strong>Practice mode:</strong> prices and news are simulated. They behave like a real market (trends, news, whole-market moves), but they are not real, and every trade uses virtual money. The coach teaches common rules of thumb; no one can predict markets. This is an educational tool, not financial advice.",
     "wl.title": "Market watchlist", "wl.filter": "Filter by market", "wl.all": "All", "wl.us": "US", "wl.tw": "Taiwan",
-    clock: v => `<b>Day ${v.d} · ${v.time}</b> · simulated trading day, about 1 minute long`,
+    clock: v => `<b>Day ${v.d} · ${v.time}</b>`,
     stamp: v => `Day ${v.d} · ${v.time}`,
     "stat.30d": "30-day change", "stat.high": "90-day high", "stat.low": "90-day low", "stat.vol": "Volatility", "stat.own": "You own",
     shares: v => `${v.n} sh`,
@@ -825,6 +835,16 @@ const I18N = {
     "chart.dialog": v => `${v.sym} price chart`,
     "cm.change": "Change", "cm.high": "High", "cm.low": "Low", "cm.ma20": "20-day avg", "cm.ma50": "50-day avg",
     "cm.hint": "Hover over the chart to see the price on any day. Triangles mark your trades in this stock.",
+    "mode.aria": "Market clock", "mode.real": "Real market hours", "mode.fast": "Fast practice",
+    "mode.realHint": "Prices move only while the real Taiwan and US markets are open (holidays not included). Prices are still simulated.",
+    "mode.fastHint": "simulated trading day, about 1 minute long; both markets are always open",
+    "tz.TW": "Taipei time", "tz.US": "New York time",
+    "ms.open": v => `${v.flag} ${v.m}: <b class="pos">open</b> · closes ${v.close} ${v.tz}${v.local}`,
+    "ms.closed": v => `${v.flag} ${v.m}: <b>closed</b> · opens ${v.when} ${v.tz}${v.local}`,
+    "ms.local": v => ` (your time: ${v.t})`,
+    "ms.closedTrade": v => `The ${v.m} market is closed right now. It is open ${v.hours}. Switch to Fast practice to trade any time.`,
+    "hours.TW": "Monday to Friday, 9:00–13:30 Taipei time", "hours.US": "Monday to Friday, 9:30–16:00 New York time",
+    "recap.mkt": v => `📊 <b>${v.m} market closed:</b> average ${v.avg}. Biggest mover: <b>${v.sym}</b> ${v.c}.`,
     "punct.stop": ".", "marker.buy": v => `You bought ${v.n} @ ${v.px}`, "marker.sell": v => `You sold ${v.n} @ ${v.px}`,
   },
 
@@ -835,7 +855,7 @@ const I18N = {
     cash: "可用現金",
     disclaimer: "<strong>練習模式：</strong>價格和新聞都是模擬的。它們的變化方式像真實市場（趨勢、新聞、整體市場波動），但並不是真的，所有交易都使用虛擬資金。教練教的是常見的經驗法則，沒有人能預測市場。這是學習工具，不是投資建議。",
     "wl.title": "市場觀察清單", "wl.filter": "依市場篩選", "wl.all": "全部", "wl.us": "美股", "wl.tw": "台股",
-    clock: v => `<b>第 ${v.d} 天 · ${v.time}</b> · 模擬交易日，每天約 1 分鐘`,
+    clock: v => `<b>第 ${v.d} 天 · ${v.time}</b>`,
     stamp: v => `第 ${v.d} 天 · ${v.time}`,
     "stat.30d": "30 日漲跌", "stat.high": "90 日最高", "stat.low": "90 日最低", "stat.vol": "波動度", "stat.own": "持有",
     shares: v => `${v.n} 股`,
@@ -1019,6 +1039,16 @@ const I18N = {
     "chart.dialog": v => `${v.sym} 走勢圖`,
     "cm.change": "區間漲跌", "cm.high": "最高", "cm.low": "最低", "cm.ma20": "20 日均線", "cm.ma50": "50 日均線",
     "cm.hint": "把滑鼠移到走勢圖上，可以看到每一天的價格。三角形標示你在這檔股票的交易。",
+    "mode.aria": "市場時鐘", "mode.real": "真實交易時間", "mode.fast": "快速練習",
+    "mode.realHint": "只有在台股和美股真實開盤的時間，價格才會變動（未計入國定假日）。價格仍然是模擬的。",
+    "mode.fastHint": "模擬交易日，每天約 1 分鐘；兩個市場一直開盤",
+    "tz.TW": "台北時間", "tz.US": "紐約時間",
+    "ms.open": v => `${v.flag} ${v.m}：<b class="pos">開盤中</b> · ${v.close} 收盤（${v.tz}）${v.local}`,
+    "ms.closed": v => `${v.flag} ${v.m}：<b>休市</b> · ${v.when} 開盤（${v.tz}）${v.local}`,
+    "ms.local": v => `，你的時間 ${v.t}`,
+    "ms.closedTrade": v => `${v.m}現在休市。開盤時間：${v.hours}。想隨時練習，可以切換到「快速練習」。`,
+    "hours.TW": "週一至週五 9:00–13:30（台北時間）", "hours.US": "週一至週五 9:30–16:00（紐約時間）",
+    "recap.mkt": v => `📊 <b>${v.m}收盤：</b>平均 ${v.avg}。漲跌最大：<b>${v.sym}</b> ${v.c}。`,
     "punct.stop": "。", "marker.buy": v => `你買進 ${v.n} 股 @ ${v.px}`, "marker.sell": v => `你賣出 ${v.n} 股 @ ${v.px}`,
   },
 };
@@ -1679,7 +1709,7 @@ const randInt = n => Math.floor(Math.random() * n);
 const market = {};
 for (const s of STOCKS) {
   market[s.sym] = {
-    ...s,
+    ...s, closes: 0, closedNow: false,
     idio: Math.sqrt(Math.max(
       s.vol ** 2 - (s.beta * MARKETS[s.mkt].vol) ** 2 - SECTORS[s.sector] ** 2,
       (0.3 * s.vol) ** 2)),
@@ -1742,20 +1772,21 @@ const SAVE_KEY = "stockpilot-v1";
 const MARKET_KEY = "stockpilot-market-v2";
 const LEARN_KEY = "stockpilot-learn-v1";
 
-let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", dayStartTotal: null };
+let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "real", dayStartTotal: null };
 const saved = load(SAVE_KEY);
 if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
 for (const k of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[k])) state[k] = [];
 for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
 
-let sim = { day: 1, tick: 0 };
+let sim = { day: 1, tick: 0, ticks: 0, sess: { US: { date: null, open: false }, TW: { date: null, open: false } } };
 const savedMarket = load(MARKET_KEY);
 const marketOk = savedMarket && savedMarket.s && STOCKS.every(s => savedMarket.s[s.sym] && Array.isArray(savedMarket.s[s.sym].d));
 if (marketOk) {
-  sim = { day: savedMarket.day || 1, tick: savedMarket.tick || 0 };
+  sim = { ...sim, day: savedMarket.day || 1, tick: savedMarket.tick || 0, ticks: savedMarket.ticks || 0, sess: savedMarket.sess || sim.sess };
   for (const s of STOCKS) {
     const m = market[s.sym], v = savedMarket.s[s.sym];
-    m.daily = v.d; m.raw = v.r; m.mu = v.mu || 0; m.px = roundPx(s.sym, m.raw);
+    m.daily = v.d; m.raw = v.r; m.mu = v.mu || 0; m.closes = v.c || 0; m.closedNow = !!v.cl;
+    m.px = m.closedNow ? m.daily[m.daily.length - 1] : roundPx(s.sym, m.raw);
   }
 } else {
   const recent = buildHistory();
@@ -1768,9 +1799,9 @@ function saveMarket() {
   const s = {};
   for (const st of STOCKS) {
     const m = market[st.sym];
-    s[st.sym] = { d: m.daily.slice(-260), r: +m.raw.toFixed(4), mu: +m.mu.toFixed(6) };
+    s[st.sym] = { d: m.daily.slice(-260), r: +m.raw.toFixed(4), mu: +m.mu.toFixed(6), c: m.closes || 0, cl: m.closedNow ? 1 : 0 };
   }
-  store(MARKET_KEY, { day: sim.day, tick: sim.tick, s });
+  store(MARKET_KEY, { day: sim.day, tick: sim.tick, ticks: sim.ticks, sess: sim.sess, s });
 }
 function save() { store(SAVE_KEY, state); }
 
@@ -1796,22 +1827,30 @@ function fmtP(sym, v) {
 }
 function price(sym) { return market[sym].px; }
 function prevClose(sym) { const d = market[sym].daily; return d[d.length - 1]; }
-function series(sym) { return [...market[sym].daily, market[sym].px]; }   // daily closes + today's price
+// daily closes + today's live price (a closed market has no live point)
+function series(sym) { const m = market[sym]; return m.closedNow ? [...m.daily] : [...m.daily, m.px]; }
 function usd(sym) { return price(sym) / mktOf(sym).perUSD; }
-function dayChange(sym) { return price(sym) / prevClose(sym) - 1; }
+function dayChange(sym) {
+  const m = market[sym], d = m.daily;
+  if (m.closedNow && d.length > 1) return d[d.length - 1] / d[d.length - 2] - 1;  // last session's move
+  return price(sym) / prevClose(sym) - 1;
+}
 function simTime(tick) {
   const mins = 9 * 60 + 30 + tick * 15;
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, "0")}`;
 }
 const stampText = (d, tk) => t("stamp", { d, time: simTime(tk) });
-const itemTime = it => it.d != null ? stampText(it.d, it.tk) : (it.t || "");
+const LOCALE = () => ({ en: "en-US", zh: "zh-TW", zhs: "zh-CN" })[lang];
+const fmtTs = ts => new Date(ts).toLocaleString(LOCALE(), { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+const stampNow = () => state.mode === "real" ? { ts: Date.now() } : { d: sim.day, tk: sim.tick };
+const itemTime = it => it.ts ? fmtTs(it.ts) : it.d != null ? stampText(it.d, it.tk) : (it.t || "");
 function portfolioTotals() {
   let mv = 0;
   for (const [sym, h] of Object.entries(state.holdings)) mv += h.shares * usd(sym);
   return { mv, total: state.cash + mv };
 }
 function atLimit(sym) {
-  if (market[sym].mkt !== "TW") return 0;
+  if (market[sym].mkt !== "TW" || market[sym].closedNow) return 0;
   const pc = prevClose(sym), p = price(sym);
   if (p >= roundPx(sym, pc * (1 + TW_LIMIT)) - 1e-9) return 1;
   if (p <= roundPx(sym, pc * (1 - TW_LIMIT)) + 1e-9) return -1;
@@ -1890,7 +1929,7 @@ function coach(sym) {
   summary += t("c.vol", { w: an.vol < 0.2 ? 0 : an.vol < 0.4 ? 1 : 2, p: (an.vol * 100).toFixed(0) });
   const lim = atLimit(sym);
   if (lim) summary += t("c.limit", { up: lim > 0 });
-  const news = state.news.find(n => n.sym === sym && n.dayNum >= sim.day - 2);
+  const news = state.news.find(n => n.sym === sym && (n.cn != null ? market[sym].closes - n.cn <= 2 : n.dayNum >= sim.day - 2));
   if (news) summary += t("c.news", { h: newsHeadline(news), c: fmtPct(news.chg) });
 
   const h = state.holdings[sym];
@@ -1996,7 +2035,8 @@ function drawChart(sym, wrapId, big) {
 
   // your trades in this stock, placed on the day they happened
   const marks = state.journal.filter(e => e.sym === sym && e.by === "you").map(e => {
-    const i = (all.length - 1) - (sim.day - e.day) - off;
+    const back = e.cn != null ? (market[sym].closes - e.cn) - (market[sym].closedNow ? 1 : 0) : sim.day - e.day;
+    const i = (all.length - 1) - back - off;
     if (i < 0 || i > last) return "";
     const xx = x(i), yy = y(e.px), buy = e.side === "buy", s = big ? 7 : 5;
     const pts = buy ? `${xx},${yy + 3} ${xx - s},${yy + 3 + s * 1.6} ${xx + s},${yy + 3 + s * 1.6}`
@@ -2094,7 +2134,10 @@ function closeZoom() {
 function renderWatchlist() {
   document.querySelectorAll(".seg button[data-mkt]").forEach(b =>
     b.setAttribute("aria-pressed", String(b.dataset.mkt === state.mktFilter)));
-  $("simClock").innerHTML = t("clock", { d: sim.day, time: simTime(sim.tick) });
+  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === state.mode)));
+  $("simClock").innerHTML = state.mode === "real"
+    ? `${marketLine("TW")}${marketLine("US")}<span class="mhint">${t("mode.realHint")}</span>`
+    : `${t("clock", { d: sim.day, time: simTime(sim.tick) })} · ${t("mode.fastHint")}`;
   const list = STOCKS.filter(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
   $("watchlist").innerHTML = list.map(s => {
     const chg = dayChange(s.sym), lim = atLimit(s.sym);
@@ -2190,6 +2233,10 @@ function renderFeeds() {
     : `<li class="empty">${t("hist.empty")}</li>`;
   $("newsFeed").innerHTML = state.news.length
     ? state.news.slice(0, 40).map(n => {
+        if (n.recapM) {
+          const r = n.recapM;
+          return `<li class="recap"><span class="time">${itemTime(n)}</span>${t("recap.mkt", { m: t("mkt." + r.mk), avg: colored(r.avg, fmtPct(r.avg)), sym: r.sym, c: fmtPct(r.c) })}</li>`;
+        }
         if (n.recap) {
           const r = n.recap;
           if (typeof r === "string") return `<li class="recap"><span class="time">${n.t || ""}</span>${r}</li>`;
@@ -2216,6 +2263,10 @@ function trade(sym, shares, side, byAI = false) {
   const p = price(sym), pu = usd(sym);
   const msgEl = $("tradeMsg");
   if (!(shares >= 1)) return false;
+  if (!canTrade(sym)) {
+    if (!byAI) { const mk = market[sym].mkt; msgEl.textContent = t("ms.closedTrade", { m: t("mkt." + mk), hours: t("hours." + mk) }); msgEl.className = "trade-msg neg"; }
+    return false;
+  }
   const pre = snapshot(sym);
   if (side === "buy") {
     const cost = shares * pu;
@@ -2238,7 +2289,7 @@ function trade(sym, shares, side, byAI = false) {
     state.cash += shares * pu;
     if (h.shares === 0) delete state.holdings[sym];
   }
-  state.history.unshift({ d: sim.day, tk: sim.tick, side, shares, sym, px: p, ai: byAI });
+  state.history.unshift({ ...stampNow(), side, shares, sym, px: p, ai: byAI });
   state.history = state.history.slice(0, 100);
   const j = recordTrade({ sym, side, shares, byAI, pre, px: p, pu });
   if (!byAI) {
@@ -2255,12 +2306,12 @@ function runAutoPilot() {
   if (!state.autoPilot) return;
   autoCounter++;
   if (autoCounter % 4 !== 0) return; // act every ~10s, not every tick
-  const analyses = STOCKS.map(s => ({ sym: s.sym, ...analyze(s.sym) }));
+  const analyses = STOCKS.filter(s => canTrade(s.sym)).map(s => ({ sym: s.sym, ...analyze(s.sym) }));
   const { total } = portfolioTotals();
   for (const [sym, h] of Object.entries(state.holdings)) {
     const an = analyses.find(a => a.sym === sym);
     if (an && an.rec === "SELL" && h.shares > 0 && trade(sym, h.shares, "sell", true)) {
-      state.aiFeed.unshift({ d: sim.day, tk: sim.tick, k: "ap.sold", v: { sym }, r: an.reasons[0] });
+      state.aiFeed.unshift({ ...stampNow(), k: "ap.sold", v: { sym }, r: an.reasons[0] });
     }
   }
   const buys = analyses.filter(a => a.rec === "BUY").sort((a, b) => b.score - a.score);
@@ -2272,7 +2323,7 @@ function runAutoPilot() {
     const spendable = state.cash - total * 0.10; // always keep 10% of the portfolio in cash
     const shares = Math.floor(Math.min(room, spendable, state.cash * 0.5) / pu);
     if (shares >= 1 && shares * pu >= total * 0.01 && trade(an.sym, shares, "buy", true)) { // skip tiny buys
-      state.aiFeed.unshift({ d: sim.day, tk: sim.tick, k: "ap.bought", v: { n: shares, sym: an.sym, c: an.confidence }, r: an.reasons[0] });
+      state.aiFeed.unshift({ ...stampNow(), k: "ap.bought", v: { n: shares, sym: an.sym, c: an.confidence }, r: an.reasons[0] });
       break; // one buy per cycle
     }
   }
@@ -2281,7 +2332,7 @@ function runAutoPilot() {
 
 /* ============ Live market ============ */
 function addNews(item) {
-  state.news.unshift({ d: sim.day, tk: sim.tick, dayNum: sim.day, tickNum: sim.tick, ...item });
+  state.news.unshift({ ...stampNow(), dayNum: sim.day, tickNum: sim.tick, tc: sim.ticks, cn: item.sym ? market[item.sym].closes : undefined, ...item });
   state.news = state.news.slice(0, 60);
 }
 
@@ -2296,6 +2347,7 @@ function closeDay() {
     const m = market[s.sym];
     m.daily.push(m.px);
     if (m.daily.length > 260) m.daily.shift();
+    m.closes = (m.closes || 0) + 1;
     updateTrend(m, gauss);
   }
   sim.day++;
@@ -2303,32 +2355,36 @@ function closeDay() {
   state.dayStartTotal = total;
 }
 
-function tick() {
-  const scale = 1 / Math.sqrt(TICKS_PER_DAY);
-  const f = drawFactors(gauss);
+// One piece of random news. `pool` = stocks that may be hit; `rate` scales how often.
+function maybeNews(pool, rate) {
   const shock = {};
   const r = Math.random();
-  if (r < 0.03) {            // company news
-    const s = STOCKS[randInt(STOCKS.length)];
+  const mks = [...new Set(pool.map(s => s.mkt))];
+  if (r < 0.03 * rate) {             // company news
+    const s = pool[randInt(pool.length)];
     const pos = Math.random() < 0.55;
     const size = (pos ? 1 : -1) * (0.02 + Math.random() * 0.045);
     shock[s.sym] = size;
     addNews({ kind: "co", sym: s.sym, pos, i: randInt(5), chg: size });
-  } else if (r < 0.038) {    // industry news
-    const secs = Object.keys(SECTORS).filter(k => k !== "fund");
+  } else if (r < 0.038 * rate) {     // industry news
+    const secs = [...new Set(pool.map(s => s.sector))].filter(k => k !== "fund");
+    if (!secs.length) return shock;
     const sec = secs[randInt(secs.length)];
     const pos = Math.random() < 0.5;
     const size = (pos ? 1 : -1) * (0.012 + Math.random() * 0.02);
-    for (const s of STOCKS) if (s.sector === sec) shock[s.sym] = size;
+    for (const s of pool) if (s.sector === sec) shock[s.sym] = size;
     addNews({ kind: "sec", sec, pos, chg: size });
-  } else if (r < 0.044) {    // whole-market news
-    const mk = Math.random() < 0.5 ? "US" : "TW";
+  } else if (r < 0.044 * rate) {     // whole-market news
+    const mk = mks[randInt(mks.length)];
     const pos = Math.random() < 0.5;
     const size = (pos ? 1 : -1) * (0.006 + Math.random() * 0.012);
-    for (const s of STOCKS) if (s.mkt === mk) shock[s.sym] = size * s.beta;
+    for (const s of pool) if (s.mkt === mk) shock[s.sym] = size * s.beta;
     addNews({ kind: "mkt", mk, pos, i: randInt(2), chg: size });
   }
-  for (const s of STOCKS) {
+  return shock;
+}
+function moveStocks(pool, f, scale, shock) {
+  for (const s of pool) {
     const m = market[s.sym];
     let raw = m.raw * (1 + periodReturn(m, f, scale, gauss) + (shock[s.sym] || 0));
     if (s.mkt === "TW") {
@@ -2338,8 +2394,153 @@ function tick() {
     m.raw = Math.max(1, raw);
     m.px = roundPx(s.sym, m.raw);
   }
+}
+
+/* ---- Fast practice: both markets open, ~1-minute days ---- */
+function tickFast() {
+  const shock = maybeNews(STOCKS, 1);
+  moveStocks(STOCKS, drawFactors(gauss), 1 / Math.sqrt(TICKS_PER_DAY), shock);
   sim.tick++;
   if (sim.tick >= TICKS_PER_DAY) closeDay();
+}
+
+/* ---- Real market hours ---- */
+const HOURS = {
+  TW: { tz: "Asia/Taipei",      open: 9 * 60,      close: 13 * 60 + 30, flag: "🇹🇼" },
+  US: { tz: "America/New_York", open: 9 * 60 + 30, close: 16 * 60,      flag: "🇺🇸" },
+};
+const WD = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+function mktStatus(mk, now = new Date()) {
+  const H = HOURS[mk];
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: H.tz, weekday: "short", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+    .formatToParts(now).map(x => [x.type, x.value]));
+  const wd = WD[p.weekday], mins = (+p.hour % 24) * 60 + (+p.minute);
+  const weekday = wd >= 1 && wd <= 5;
+  return { wd, mins, weekday, date: `${p.year}-${p.month}-${p.day}`, open: weekday && mins >= H.open && mins < H.close };
+}
+const addDays = (ds, k) => { const d = new Date(ds + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return d.toISOString().slice(0, 10); };
+const isWeekday = ds => { const w = new Date(ds + "T00:00:00Z").getUTCDay(); return w >= 1 && w <= 5; };
+function lastCompleted(mk, st) {     // date of the most recent session that has already closed
+  if (st.weekday && st.mins >= HOURS[mk].close) return st.date;
+  let d = addDays(st.date, -1);
+  while (!isWeekday(d)) d = addDays(d, -1);
+  return d;
+}
+function nextOpen(mk, st) {
+  const H = HOURS[mk];
+  for (let k = 0; k < 8; k++) {
+    const wd = (st.wd + k) % 7;
+    if (wd >= 1 && wd <= 5 && (k > 0 || st.mins < H.open)) return new Date(Date.now() + ((k * 1440 + H.open - st.mins) * 60 - new Date().getSeconds()) * 1000);
+  }
+  return new Date();
+}
+const fmtIn = (date, tz, wd) => new Intl.DateTimeFormat(LOCALE(), { ...(tz ? { timeZone: tz } : {}), ...(wd ? { weekday: "short" } : {}), hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date);
+function marketLine(mk) {
+  const st = mktStatus(mk), H = HOURS[mk];
+  const at = st.open ? new Date(Date.now() + (H.close - st.mins) * 60000) : nextOpen(mk, st);
+  const there = fmtIn(at, H.tz, !st.open), here = fmtIn(at, null, !st.open);
+  const v = { flag: H.flag, m: t("mkt." + mk), tz: t("tz." + mk), local: there === here ? "" : t("ms.local", { t: here }) };
+  return `<span class="mline">${st.open ? t("ms.open", { ...v, close: there }) : t("ms.closed", { ...v, when: there })}</span>`;
+}
+const canTrade = sym => state.mode !== "real" || !!sim.sess[market[sym].mkt].open;
+const poolOf = mk => STOCKS.filter(s => s.mkt === mk);
+
+function closeMarket(mk) {
+  const pool = poolOf(mk);
+  for (const s of pool) {
+    const m = market[s.sym];
+    m.daily.push(m.px);
+    if (m.daily.length > 260) m.daily.shift();
+    m.closes = (m.closes || 0) + 1;
+    m.closedNow = true;
+    updateTrend(m, gauss);
+  }
+  const ch = pool.map(s => ({ sym: s.sym, c: dayChange(s.sym) }));
+  const avg = ch.reduce((a, b) => a + b.c, 0) / ch.length;
+  const top = ch.sort((a, b) => Math.abs(b.c) - Math.abs(a.c))[0];
+  state.news.unshift({ ts: Date.now(), dayNum: sim.day, recapM: { mk, avg, sym: top.sym, c: top.c } });
+  state.news = state.news.slice(0, 60);
+}
+function simulateDay(mk) {           // a whole session that passed while the page was closed
+  const f = drawFactors(gauss);
+  for (const s of poolOf(mk)) {
+    const m = market[s.sym];
+    let r = periodReturn(m, f, 1, gauss);
+    if (s.mkt === "TW") r = Math.max(-TW_LIMIT, Math.min(TW_LIMIT, r));
+    m.raw = Math.max(1, m.raw * (1 + r));
+    m.px = roundPx(s.sym, m.raw);
+    m.daily.push(m.px);
+    if (m.daily.length > 260) m.daily.shift();
+    m.closes = (m.closes || 0) + 1;
+    m.closedNow = true;
+    updateTrend(m, gauss);
+  }
+}
+function catchUp(mk, from, to) {     // sessions after `from`, up to and including `to`
+  if (!from || from >= to) return;
+  let d = addDays(from, 1), n = 0;
+  while (d <= to && n < 60) { if (isWeekday(d)) { simulateDay(mk); n++; } d = addDays(d, 1); }
+}
+function openMarket(mk, date) {
+  for (const s of poolOf(mk)) {
+    const m = market[s.sym];
+    let raw = m.raw * (1 + 0.004 * gauss());   // small overnight gap at the open
+    if (s.mkt === "TW") { const pc = prevClose(s.sym); raw = Math.max(pc * (1 - TW_LIMIT), Math.min(pc * (1 + TW_LIMIT), raw)); }
+    m.raw = raw; m.px = roundPx(s.sym, raw); m.closedNow = false;
+  }
+  sim.sess[mk] = { date, open: true };
+}
+function syncReal() {                // bring each market in line with the real clock
+  for (const mk of ["TW", "US"]) {
+    const st = mktStatus(mk), s = sim.sess[mk];
+    if (s.open && (!st.open || s.date !== st.date)) { closeMarket(mk); s.open = false; }
+    if (st.open) {
+      if (s.date !== st.date) { catchUp(mk, s.date, addDays(st.date, -1)); openMarket(mk, st.date); }
+    } else {
+      const lc = lastCompleted(mk, st);
+      if (!s.date) {
+        s.date = lc;
+        for (const x of poolOf(mk)) {
+          const m = market[x.sym];
+          if (m.closedNow) continue;
+          // coming from fast practice mid-day: today's price becomes the latest close
+          if (m.px !== m.daily[m.daily.length - 1]) { m.daily.push(m.px); m.closes = (m.closes || 0) + 1; }
+          m.closedNow = true;
+        }
+      }
+      else if (s.date < lc) { catchUp(mk, s.date, lc); s.date = lc; }
+    }
+  }
+}
+function tickReal() {
+  syncReal();
+  const f = drawFactors(gauss);
+  for (const mk of ["TW", "US"]) {
+    if (!sim.sess[mk].open) continue;
+    const H = HOURS[mk], sessionMs = (H.close - H.open) * 60000;
+    const pool = poolOf(mk);
+    // about 3 company stories, 1 industry story and half a market story per session
+    const shock = maybeNews(pool, 100 * TICK_MS / sessionMs);
+    moveStocks(pool, f, Math.sqrt(TICK_MS / sessionMs), shock);
+  }
+}
+function setMode(m) {
+  if (m === state.mode) return;
+  state.mode = m;
+  if (m === "real") {
+    sim.sess = { US: { date: null, open: false }, TW: { date: null, open: false } };
+    syncReal();
+  } else {
+    for (const s of STOCKS) market[s.sym].closedNow = false;
+    sim.tick = 0;
+  }
+  saveMarket();
+  renderAll();
+}
+
+function tick() {
+  sim.ticks = (sim.ticks || 0) + 1;
+  if (state.mode === "real") tickReal(); else tickFast();
   runAutoPilot();
   saveMarket();
   renderAll();
@@ -2350,7 +2551,8 @@ function tick() {
 /* ============ Trade journal: record every step and review it ============ */
 function snapshot(sym) {
   const an = analyze(sym), h = state.holdings[sym], { total } = portfolioTotals();
-  const news = state.news.find(n => n.sym === sym && n.dayNum === sim.day && n.tickNum != null && sim.tick - n.tickNum <= 4);
+  const win = state.mode === "real" ? 120 : 4;   // "just came out": 4 fast ticks, or about 5 real minutes
+  const news = state.news.find(n => n.sym === sym && (n.tc != null ? sim.ticks - n.tc <= win : n.dayNum === sim.day && n.tickNum != null && sim.tick - n.tickNum <= 4));
   return {
     an, total, dayChg: dayChange(sym),
     posPct: h ? h.shares * usd(sym) / total : 0,
@@ -2416,7 +2618,8 @@ function recordTrade({ sym, side, shares, byAI, pre, px, pu }) {
   const an = pre.an;
   const entry = {
     id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
-    sym, side, shares, px, pu, day: sim.day, tick: sim.tick, by: byAI ? "auto" : "you",
+    sym, side, shares, px, pu, day: sim.day, tick: sim.tick, ...(state.mode === "real" ? { ts: Date.now() } : {}),
+    cn: market[sym].closes || 0, by: byAI ? "auto" : "you",
     grade: gradeOf(checks), checks,
     seen: { up: an.s20 > an.s50, rsi: an.rsi, mom30: an.mom30, vol: an.vol, dayChg: pre.dayChg,
             posPct: side === "buy" ? post.posPct : pre.posPct, pl: pre.pl, news: pre.news ? pre.news.n : null },
@@ -2427,7 +2630,7 @@ function recordTrade({ sym, side, shares, byAI, pre, px, pu }) {
 }
 
 function outcome(e) {
-  const days = (sim.day - e.day) + (sim.tick - e.tick) / TICKS_PER_DAY;
+  const days = e.cn != null ? market[e.sym].closes - e.cn : (sim.day - e.day) + (sim.tick - e.tick) / TICKS_PER_DAY;
   if (days < 1) return { text: t("o.early"), kind: null };
   const now = price(e.sym), chg = now / e.px - 1;
   const v = { who: t("o.who." + e.by), sym: e.sym, move: `${fmtP(e.sym, e.px)} → ${fmtP(e.sym, now)}`, amt: fmt$(Math.abs(usd(e.sym) - e.pu) * e.shares) };
@@ -2483,7 +2686,7 @@ function renderJournal() {
       <div class="j-top">
         <span class="side-pill side-${e.side}">${t("rec." + (e.side === "buy" ? "BUY" : "SELL"))}</span>
         <b>${t("shares", { n: e.shares })} ${e.sym}</b> @ ${fmtP(e.sym, e.px)}
-        <span class="time">${e.t || stampText(e.day, e.tick)}</span>
+        <span class="time">${e.ts ? fmtTs(e.ts) : (e.t || stampText(e.day, e.tick))}</span>
         <span class="who">${t("who." + e.by)}</span>
         <span class="grade grade-${g}">${t("g." + g)}</span>
       </div>
@@ -2642,7 +2845,7 @@ $("sellBtn").addEventListener("click", () => { if (trade(selected, parseInt($("q
 $("qty").addEventListener("input", updateTradeCost);
 $("autoPilot").addEventListener("change", e => {
   state.autoPilot = e.target.checked;
-  state.aiFeed.unshift({ d: sim.day, tk: sim.tick, k: state.autoPilot ? "ap.on" : "ap.off", v: {} });
+  state.aiFeed.unshift({ ...stampNow(), k: state.autoPilot ? "ap.on" : "ap.off", v: {} });
   renderAll();
 });
 
@@ -2682,6 +2885,7 @@ document.addEventListener("click", e => {
   const el = sel => e.target.closest(sel);
   let b;
   if ((b = el("[data-lesson]"))) { learn.current = b.dataset.lesson; learn.pane = "lessons"; saveLearn(); showView("learn"); window.scrollTo({ top: 0 }); return; }
+  if ((b = el("[data-mode]"))) { setMode(b.dataset.mode); return; }
   if ((b = el("[data-range]"))) { state.chartRange = b.dataset.range; save(); renderDetail(); if (zoomOpen()) renderZoom(); return; }
   if ((b = el("[data-goto]"))) { showView(b.dataset.goto); window.scrollTo({ top: 0 }); return; }
   if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
@@ -2712,6 +2916,7 @@ $("chartModal").addEventListener("click", e => { if (e.target === $("chartModal"
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeZoom(); });
 window.addEventListener("resize", () => { if (zoomOpen()) renderZoom(); });
 
+if (state.mode === "real") syncReal();
 if (state.dayStartTotal == null) state.dayStartTotal = portfolioTotals().total;
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
