@@ -10,9 +10,11 @@ for setup. It does not touch real money unless explicitly enabled, and no
 AI can guarantee profitable decisions.
 
 ## StockPilot AI (paper trading app)
-`stock-agent/index.html` is a standalone AI stock trading practice app:
-a simulated market of famous stocks, a virtual $100,000 paper-trading account,
-an AI advisor that explains buy/sell/hold recommendations, and an optional
-AI auto-pilot that trades the paper portfolio automatically. All prices are
-simulated and no real money or brokerage account is involved. Open the file
-in any browser — no build step or server needed.
+`stock-agent/index.html` is a standalone stock trading practice app:
+a simulated market of 12 US and 8 Taiwan stocks (with trends, news headlines,
+whole-market moves, daily recaps and Taiwan's 10% price limit), a virtual
+$100,000 paper-trading account, a Coach that summarizes each stock and
+suggests what a careful trader might do, an optional auto-pilot, and a Learn
+tab with 12 beginner lessons and quizzes. All prices and news are simulated
+and no real money or brokerage account is involved. Open the file in any
+browser — no build step or server needed.

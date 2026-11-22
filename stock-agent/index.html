@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>StockPilot AI — Paper Trading Assistant</title>
+<title>StockPilot AI</title>
 <style>
+  /* Layout: sticky top bar with Trade / Learn tabs; Trade = 3-column trading desk, Learn = lesson list + lesson panel */
   :root {
     color-scheme: light;
     --page: #f9f9f7;
@@ -19,13 +20,15 @@
     --series-soft: rgba(42,120,214,0.12);
     --up: #006300;
     --down: #d03b3b;
+    --up-soft: rgba(0,99,0,0.10);
+    --down-soft: rgba(208,59,59,0.10);
     --accent: #2a78d6;
     --accent-ink: #ffffff;
     --warn-bg: #fdf6e3;
     --warn-border: #eda100;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       color-scheme: dark;
       --page: #0d0d0d;
       --surface: #1a1a19;
@@ -39,25 +42,53 @@
       --series-soft: rgba(57,135,229,0.16);
       --up: #0ca30c;
       --down: #e66767;
+      --up-soft: rgba(12,163,12,0.16);
+      --down-soft: rgba(230,103,103,0.16);
       --accent: #3987e5;
       --warn-bg: #2a2313;
       --warn-border: #c98500;
     }
   }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --series: #3987e5;
+    --series-soft: rgba(57,135,229,0.16);
+    --up: #0ca30c;
+    --down: #e66767;
+    --up-soft: rgba(12,163,12,0.16);
+    --down-soft: rgba(230,103,103,0.16);
+    --accent: #3987e5;
+    --warn-bg: #2a2313;
+    --warn-border: #c98500;
+  }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     background: var(--page);
     color: var(--ink);
     line-height: 1.5;
   }
+  body::before {
+    content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+    z-index: 11; background: var(--surface);
+  }
+  button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   header.topbar {
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    padding: 14px 20px;
+    padding: 12px 20px;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    position: sticky; top: 0; z-index: 10;
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
   }
   .logo { font-size: 20px; font-weight: 700; }
   .logo span { color: var(--accent); }
@@ -65,6 +96,13 @@
     font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
     background: var(--series-soft); color: var(--accent);
   }
+  .tabs { display: flex; gap: 4px; background: var(--page); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+  .tabs button {
+    border: 0; background: transparent; color: var(--ink-2); font: inherit; font-weight: 600; font-size: 14px;
+    padding: 6px 16px; border-radius: 7px; cursor: pointer;
+  }
+  .tabs button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .tabs .count { font-size: 11px; color: var(--muted); font-weight: 600; margin-left: 4px; }
   .topbar .cash { margin-left: auto; text-align: right; }
   .topbar .cash .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .topbar .cash .value { font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -75,11 +113,12 @@
   }
   main {
     display: grid; gap: 16px; padding: 16px 20px 40px;
-    grid-template-columns: 300px minmax(0,1fr) 320px;
+    grid-template-columns: 320px minmax(0,1fr) 320px;
     max-width: 1500px; margin: 0 auto;
   }
   @media (max-width: 1100px) { main { grid-template-columns: 1fr 1fr; } .col-right { grid-column: 1 / -1; } }
   @media (max-width: 760px)  { main { grid-template-columns: 1fr; } }
+  .col-left, .col-center, .col-right { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -88,24 +127,49 @@
   }
   .card h2 { margin: 0 0 10px; font-size: 15px; }
   .card h2 .sub { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .help {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 17px; height: 17px; border-radius: 50%; border: 1px solid var(--baseline);
+    background: transparent; color: var(--muted); font: inherit; font-size: 11px; font-weight: 700;
+    cursor: pointer; padding: 0; margin-left: 4px; vertical-align: 1px; text-transform: none; letter-spacing: 0;
+  }
+  .help:hover { border-color: var(--accent); color: var(--accent); }
   /* Watchlist */
+  .wl-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .wl-head h2 { margin: 0; }
+  .clock { font-size: 12px; color: var(--muted); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .clock b { color: var(--ink-2); font-weight: 600; }
+  .seg { display: flex; gap: 2px; background: var(--page); border: 1px solid var(--border); border-radius: 8px; padding: 2px; }
+  .seg button {
+    border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 6px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.12); }
   .stock-row {
-    display: grid; grid-template-columns: 1fr 64px 82px; gap: 8px; align-items: center;
+    display: grid; grid-template-columns: minmax(0,1fr) 64px 94px; gap: 8px; align-items: center;
     padding: 8px 8px; border-radius: 8px; cursor: pointer; border: 0;
     background: transparent; width: 100%; text-align: left; font: inherit; color: inherit;
   }
   .stock-row:hover { background: var(--series-soft); }
   .stock-row.active { background: var(--series-soft); outline: 1px solid var(--accent); }
   .stock-row .sym { font-weight: 700; }
-  .stock-row .name { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mkt-tag {
+    font-size: 10px; font-weight: 700; color: var(--muted); border: 1px solid var(--grid);
+    border-radius: 4px; padding: 0 4px; margin-left: 4px; vertical-align: 1px;
+  }
+  .limit-tag { font-size: 10px; font-weight: 700; border-radius: 4px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; color: #fff; }
+  .limit-up { background: var(--up); } .limit-down { background: var(--down); }
+  .stock-row .name { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .stock-row .px { font-variant-numeric: tabular-nums; text-align: right; font-size: 13px; }
   .stock-row .chg { font-variant-numeric: tabular-nums; text-align: right; font-size: 12px; font-weight: 600; }
+  .stock-row .right { text-align: right; }
   .pos { color: var(--up); } .neg { color: var(--down); }
   /* Detail */
   .detail-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
   .detail-head h2 { font-size: 22px; margin: 0; }
   .detail-head .big-px { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .detail-head .big-chg { font-weight: 600; }
+  .detail-head .big-chg { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fx-note { font-size: 12px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
   .chart-wrap { position: relative; margin-top: 8px; }
   .chart-wrap svg { display: block; width: 100%; height: auto; }
   .tooltip {
@@ -119,18 +183,31 @@
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px,1fr)); gap: 10px; margin-top: 14px; }
   .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .stat .value { font-weight: 700; font-variant-numeric: tabular-nums; }
-  /* AI card */
-  .ai-card { margin-top: 16px; }
+  /* Coach card */
+  .coach-card { margin-top: 16px; background: var(--series-soft); border-color: transparent; }
   .rec-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .rec-pill {
-    font-weight: 700; font-size: 14px; padding: 4px 14px; border-radius: 999px; color: #fff;
+    font-weight: 700; font-size: 13px; padding: 3px 12px; border-radius: 999px; color: #fff;
   }
-  .rec-BUY  { background: #0ca30c; }
-  .rec-SELL { background: #d03b3b; }
-  .rec-HOLD { background: #898781; }
+  .rec-BUY  { background: #0a7f0a; }
+  .rec-SELL { background: #c23333; }
+  .rec-HOLD { background: #6f6e69; }
   .conf { font-size: 13px; color: var(--ink-2); }
-  .reasons { margin: 10px 0 0; padding-left: 20px; font-size: 13px; color: var(--ink-2); }
+  .coach-summary { font-size: 14px; color: var(--ink); margin: 10px 0 12px; max-width: 75ch; }
+  .coach-h { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .coach-actions { margin: 0; padding-left: 20px; font-size: 14px; color: var(--ink); }
+  .coach-actions li { margin: 5px 0; }
+  .lesson-link {
+    border: 0; background: transparent; padding: 0; font: inherit; font-size: 12.5px; font-weight: 600;
+    color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; margin-left: 4px;
+  }
+  details.signals { margin-top: 10px; font-size: 13px; }
+  details.signals summary { cursor: pointer; color: var(--ink-2); font-weight: 600; }
+  .reasons { margin: 6px 0 0; padding-left: 20px; font-size: 13px; color: var(--ink-2); }
   .reasons li { margin: 3px 0; }
+  .coach-note { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+  .coach-line { font-size: 13px; color: var(--ink-2); margin: 4px 0 12px; padding: 8px 10px; border-radius: 8px; background: var(--series-soft); }
+  .coach-line b { color: var(--ink); }
   /* Trade form */
   .trade { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
   .trade input[type=number] {
@@ -142,9 +219,11 @@
     cursor: pointer; color: #fff;
   }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
-  .btn-buy { background: #0ca30c; }
-  .btn-sell { background: #d03b3b; }
+  .btn-buy { background: #0a7f0a; }
+  .btn-sell { background: #c23333; }
   .btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-danger-ghost { background: transparent; color: var(--down); border: 1px solid var(--down); }
   .trade-msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
   /* Portfolio */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -153,18 +232,101 @@
   td.sym-cell { font-weight: 700; font-variant-numeric: normal; }
   .hero { margin-bottom: 6px; }
   .hero .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .hero .value { font-size: 26px; font-weight: 700; }
+  .hero .value { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
   .hero .delta { font-size: 13px; font-weight: 600; }
-  /* Autopilot + feed */
+  /* Autopilot + feeds */
   .switch-row { display: flex; align-items: center; gap: 10px; }
   .switch-row input { width: 18px; height: 18px; accent-color: var(--accent); }
   .feed { list-style: none; margin: 10px 0 0; padding: 0; font-size: 12.5px; max-height: 260px; overflow-y: auto; }
   .feed li { padding: 7px 4px; border-bottom: 1px solid var(--grid); color: var(--ink-2); }
   .feed li .time { color: var(--muted); margin-right: 6px; font-variant-numeric: tabular-nums; }
   .feed li b { color: var(--ink); }
+  .feed li b.pos { color: var(--up); } .feed li b.neg { color: var(--down); }
+  .news-feed { max-height: 300px; }
+  .news-feed li.recap { background: var(--series-soft); border-radius: 6px; border-bottom-color: transparent; margin: 4px 0; }
+  .news-sym {
+    border: 1px solid var(--grid); background: transparent; color: var(--ink); font: inherit; font-size: 11.5px; font-weight: 700;
+    border-radius: 4px; padding: 0 5px; margin-right: 4px; cursor: pointer;
+  }
+  .news-sym:hover { border-color: var(--accent); color: var(--accent); }
   .empty { color: var(--muted); font-size: 13px; padding: 8px 4px; }
+
+  /* ============ Learn view ============ */
+  .learn {
+    display: grid; gap: 16px; padding: 16px 20px 40px;
+    grid-template-columns: 300px minmax(0,1fr);
+    max-width: 1180px; margin: 0 auto; align-items: start;
+  }
+  @media (max-width: 860px) { .learn { grid-template-columns: 1fr; } }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); margin-bottom: 6px; }
+  .progress-label b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .progress { height: 6px; background: var(--grid); border-radius: 999px; overflow: hidden; margin-bottom: 12px; }
+  .progress > div { height: 100%; background: var(--accent); border-radius: 999px; transition: width .3s; }
+  .lesson-list { display: flex; flex-direction: column; gap: 2px; }
+  .lesson-btn {
+    display: grid; grid-template-columns: 26px minmax(0,1fr); gap: 10px; align-items: center;
+    width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink);
+    font: inherit; font-size: 13.5px; padding: 8px; border-radius: 8px; cursor: pointer;
+  }
+  .lesson-btn:hover { background: var(--series-soft); }
+  .lesson-btn[aria-current="true"] { background: var(--series-soft); outline: 1px solid var(--accent); }
+  .lesson-num {
+    width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--baseline);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  }
+  .lesson-btn.done .lesson-num { background: var(--up); border-color: var(--up); color: #fff; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .lesson-panel { min-width: 0; padding: 24px; }
+  .eyebrow { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .lesson-panel h2 { font-size: 24px; margin: 4px 0 14px; text-wrap: balance; line-height: 1.25; }
+  .lesson-body { font-size: 15px; color: var(--ink-2); max-width: 68ch; }
+  .lesson-body p { margin: 0 0 12px; }
+  .lesson-body ul { margin: 0 0 12px; padding-left: 20px; }
+  .lesson-body li { margin: 4px 0; }
+  .lesson-body b, .lesson-body strong { color: var(--ink); }
+  .lesson-body b.pos { color: var(--up); } .lesson-body b.neg { color: var(--down); }
+  .lesson-body h3 { font-size: 15px; color: var(--ink); margin: 18px 0 6px; }
+  .key-idea {
+    border-left: 3px solid var(--accent); background: var(--series-soft);
+    padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 14.5px; color: var(--ink);
+  }
+  .live-box {
+    border: 1px dashed var(--baseline); border-radius: 10px; padding: 12px 14px; margin: 14px 0;
+    font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  }
+  .live-box .live-label {
+    display: block; font-size: 11px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px;
+  }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 14px 0; }
+  .fact { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .fact .fact-k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  .fact .fact-v { font-size: 14px; color: var(--ink); margin-top: 2px; }
+  .checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 14px 0; }
+  .checklist > div { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .checklist h4 { margin: 0 0 6px; font-size: 14px; color: var(--ink); }
+  .checklist ul { margin: 0; padding-left: 18px; font-size: 14px; }
+  .quiz { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--grid); }
+  .quiz h3 { font-size: 15px; margin: 0 0 4px; }
+  .quiz .q { font-size: 15px; color: var(--ink); margin: 0 0 10px; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt {
+    text-align: left; font: inherit; font-size: 14px; color: var(--ink);
+    background: var(--surface); border: 1px solid var(--baseline); border-radius: 8px;
+    padding: 10px 12px; cursor: pointer;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-opt.right { border-color: var(--up); background: var(--up-soft); }
+  .quiz-opt.wrong { border-color: var(--down); background: var(--down-soft); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-feedback { font-size: 14px; margin-top: 10px; min-height: 20px; }
+  .lesson-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
+  .lesson-nav .spacer { flex: 1; }
+
   footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
   footer a { color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
 </style>
 </head>
 <body>
@@ -172,6 +334,10 @@
 <header class="topbar">
   <div class="logo">Stock<span>Pilot</span> AI</div>
   <span class="badge">Paper trading — virtual money</span>
+  <nav class="tabs" aria-label="Sections">
+    <button type="button" id="tabTrade" data-view="trade" aria-pressed="true">Trade</button>
+    <button type="button" id="tabLearn" data-view="learn" aria-pressed="false">Learn<span class="count" id="learnCount"></span></button>
+  </nav>
   <div class="cash">
     <div class="label">Cash available</div>
     <div class="value" id="cashValue">$0.00</div>
@@ -179,21 +345,29 @@
 </header>
 
 <div class="disclaimer">
-  <strong>Practice mode:</strong> all prices are simulated and all trades use virtual money — nothing here touches a real
-  brokerage account. The AI advisor explains its reasoning, but no AI can predict markets or guarantee a "right choice."
+  <strong>Practice mode:</strong> prices and news are simulated. They behave like a real market (trends, news, whole-market moves),
+  but they are not real, and every trade uses virtual money. The coach teaches common rules of thumb; no one can predict markets.
   This is an educational tool, not financial advice.
 </div>
 
-<main>
+<main id="tradeView">
   <!-- LEFT: watchlist -->
   <div class="col-left">
     <div class="card">
-      <h2>Market watchlist <span class="sub">· updates live</span></h2>
+      <div class="wl-head">
+        <h2>Market watchlist</h2>
+        <div class="seg" role="group" aria-label="Filter by market">
+          <button type="button" data-mkt="ALL" aria-pressed="true">All</button>
+          <button type="button" data-mkt="US" aria-pressed="false">US</button>
+          <button type="button" data-mkt="TW" aria-pressed="false">Taiwan</button>
+        </div>
+      </div>
+      <div class="clock" id="simClock"></div>
       <div id="watchlist"></div>
     </div>
   </div>
 
-  <!-- CENTER: detail + AI + trade -->
+  <!-- CENTER: detail + coach + trade, then news -->
   <div class="col-center">
     <div class="card">
       <div class="detail-head">
@@ -202,24 +376,32 @@
         <span class="big-px" id="dPx"></span>
         <span class="big-chg" id="dChg"></span>
       </div>
+      <div class="fx-note" id="dFx"></div>
       <div class="chart-wrap" id="chartWrap">
         <div class="tooltip" id="chartTip"><span class="t-date"></span><br><span class="t-val"></span></div>
       </div>
       <div class="stats">
-        <div class="stat"><div class="label">30-day change</div><div class="value" id="s30"></div></div>
+        <div class="stat"><div class="label">30-day change<button type="button" class="help" data-lesson="chart" aria-label="Learn about price charts">?</button></div><div class="value" id="s30"></div></div>
         <div class="stat"><div class="label">90-day high</div><div class="value" id="sHigh"></div></div>
         <div class="stat"><div class="label">90-day low</div><div class="value" id="sLow"></div></div>
-        <div class="stat"><div class="label">Volatility</div><div class="value" id="sVol"></div></div>
+        <div class="stat"><div class="label">Volatility<button type="button" class="help" data-lesson="risk" aria-label="Learn about volatility">?</button></div><div class="value" id="sVol"></div></div>
         <div class="stat"><div class="label">You own</div><div class="value" id="sOwn"></div></div>
       </div>
 
-      <div class="card ai-card" style="background:var(--series-soft); border-color:transparent;">
-        <h2>🤖 AI advisor</h2>
+      <div class="card coach-card">
+        <h2>🧭 Coach <span class="sub">· what's happening and what to consider</span><button type="button" class="help" data-lesson="whenact" aria-label="Learn when to buy and sell">?</button></h2>
         <div class="rec-line">
           <span class="rec-pill" id="recPill">—</span>
           <span class="conf" id="recConf"></span>
         </div>
-        <ul class="reasons" id="recReasons"></ul>
+        <p class="coach-summary" id="coachSummary"></p>
+        <div class="coach-h">What a careful trader might do</div>
+        <ul class="coach-actions" id="coachActions"></ul>
+        <details class="signals">
+          <summary>Show the signals behind this</summary>
+          <ul class="reasons" id="recReasons"></ul>
+        </details>
+        <p class="coach-note">These are common rules of thumb for practice. Prices here are partly random, so even good rules lose sometimes.</p>
       </div>
 
       <div class="trade">
@@ -230,34 +412,40 @@
       </div>
       <div class="trade-msg" id="tradeMsg"></div>
     </div>
+
+    <div class="card">
+      <h2>📰 Market news <span class="sub">· simulated headlines</span><button type="button" class="help" data-lesson="news" aria-label="Learn how news moves prices">?</button></h2>
+      <ul class="feed news-feed" id="newsFeed"></ul>
+    </div>
   </div>
 
   <!-- RIGHT: portfolio + autopilot -->
   <div class="col-right">
     <div class="card">
       <div class="hero">
-        <div class="label">Portfolio value</div>
+        <div class="label">Portfolio value (US$)</div>
         <div class="value" id="pvValue">$0.00</div>
         <div class="delta" id="pvDelta"></div>
       </div>
-      <h2>Holdings</h2>
+      <p class="coach-line" id="portfolioCoach"></p>
+      <h2>Holdings<button type="button" class="help" data-lesson="pnl" aria-label="Learn about profit and loss">?</button></h2>
       <div id="holdings"></div>
     </div>
 
-    <div class="card" style="margin-top:16px">
-      <h2>🤖 AI auto-pilot <span class="sub">· paper money only</span></h2>
+    <div class="card">
+      <h2>🤖 AI auto-pilot <span class="sub">· paper money only</span><button type="button" class="help" data-lesson="diversify" aria-label="Learn about position sizing">?</button></h2>
       <div class="switch-row">
         <input type="checkbox" id="autoPilot" />
         <label for="autoPilot">Let the AI trade automatically for me</label>
       </div>
       <p style="font-size:12.5px;color:var(--muted);margin:8px 0 0">
-        When on, the AI buys its strongest "Buy" picks (max 15% of portfolio each)
-        and sells holdings it rates "Sell." Every action is logged below.
+        When on, the AI buys its strongest "Buy" picks (max 15% of portfolio each,
+        always keeping 10% in cash) and sells holdings it rates "Sell." Every action is logged below.
       </p>
       <ul class="feed" id="aiFeed"></ul>
     </div>
 
-    <div class="card" style="margin-top:16px">
+    <div class="card">
       <h2>Trade history</h2>
       <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
         <button class="btn btn-ghost" id="resetBtn" style="padding:5px 12px;font-size:12px">Reset account</button>
@@ -267,33 +455,63 @@
   </div>
 </main>
 
+<section class="learn" id="learnView" hidden>
+  <aside class="card">
+    <h2>Stock market basics</h2>
+    <div class="progress-label"><span>Your progress</span><b id="progressText">0 of 12</b></div>
+    <div class="progress" role="progressbar" aria-label="Lessons completed" id="progressBar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div id="progressFill" style="width:0%"></div></div>
+    <div class="lesson-list" id="lessonList"></div>
+  </aside>
+  <article class="card lesson-panel" id="lessonPanel" aria-live="polite"></article>
+</section>
+
 <footer>
-  StockPilot AI · a practice trading sandbox · prices are simulated ·
+  StockPilot AI · a practice trading sandbox · prices and news are simulated ·
   <a href="../index.html">back to CoachStat</a>
 </footer>
 
 <script>
 "use strict";
-/* ============ Universe of famous stocks (simulated prices) ============ */
+/* ============ Markets ============ */
+// Cash is kept in US dollars. Taiwan stocks are priced in New Taiwan dollars
+// and converted at a fixed, simulated exchange rate.
+const MARKETS = {
+  US: { label: "US",     cur: "$",   perUSD: 1,  vol: 0.009 },
+  TW: { label: "Taiwan", cur: "NT$", perUSD: 32, vol: 0.010 },
+};
+// Daily volatility of each industry's shared moves
+const SECTORS = { chips: 0.014, tech: 0.008, finance: 0.007, consumer: 0.008, shipping: 0.016, telecom: 0.003, fund: 0 };
+
+/* ============ Universe (starting prices are rough, simulated levels) ============ */
 const STOCKS = [
-  { sym: "AAPL",  name: "Apple",            base: 232, drift:  0.0004, vol: 0.014 },
-  { sym: "MSFT",  name: "Microsoft",        base: 448, drift:  0.0005, vol: 0.013 },
-  { sym: "NVDA",  name: "NVIDIA",           base: 138, drift:  0.0009, vol: 0.028 },
-  { sym: "GOOGL", name: "Alphabet",         base: 182, drift:  0.0004, vol: 0.016 },
-  { sym: "AMZN",  name: "Amazon",           base: 205, drift:  0.0005, vol: 0.018 },
-  { sym: "META",  name: "Meta Platforms",   base: 585, drift:  0.0006, vol: 0.020 },
-  { sym: "TSLA",  name: "Tesla",            base: 248, drift:  0.0002, vol: 0.034 },
-  { sym: "BRK.B", name: "Berkshire Hath.",  base: 462, drift:  0.0003, vol: 0.009 },
-  { sym: "JPM",   name: "JPMorgan Chase",   base: 244, drift:  0.0003, vol: 0.012 },
-  { sym: "V",     name: "Visa",             base: 312, drift:  0.0003, vol: 0.011 },
-  { sym: "NFLX",  name: "Netflix",          base: 892, drift:  0.0005, vol: 0.022 },
-  { sym: "DIS",   name: "Walt Disney",      base: 112, drift:  0.0001, vol: 0.016 },
+  { sym: "AAPL",  name: "Apple",              short: "Apple",       base: 232,  drift: 0.0003, vol: 0.015, beta: 1.0, sector: "tech",     mkt: "US" },
+  { sym: "MSFT",  name: "Microsoft",          short: "Microsoft",   base: 448,  drift: 0.0004, vol: 0.014, beta: 0.9, sector: "tech",     mkt: "US" },
+  { sym: "NVDA",  name: "NVIDIA",             short: "NVIDIA",      base: 138,  drift: 0.0007, vol: 0.028, beta: 1.6, sector: "chips",    mkt: "US" },
+  { sym: "GOOGL", name: "Alphabet",           short: "Alphabet",    base: 182,  drift: 0.0003, vol: 0.017, beta: 1.1, sector: "tech",     mkt: "US" },
+  { sym: "AMZN",  name: "Amazon",             short: "Amazon",      base: 205,  drift: 0.0004, vol: 0.019, beta: 1.2, sector: "tech",     mkt: "US" },
+  { sym: "META",  name: "Meta Platforms",     short: "Meta",        base: 585,  drift: 0.0005, vol: 0.021, beta: 1.3, sector: "tech",     mkt: "US" },
+  { sym: "TSLA",  name: "Tesla",              short: "Tesla",       base: 248,  drift: 0.0002, vol: 0.034, beta: 1.8, sector: "consumer", mkt: "US" },
+  { sym: "BRK.B", name: "Berkshire Hath.",    short: "Berkshire",   base: 462,  drift: 0.0003, vol: 0.010, beta: 0.6, sector: "finance",  mkt: "US" },
+  { sym: "JPM",   name: "JPMorgan Chase",     short: "JPMorgan",    base: 244,  drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance",  mkt: "US" },
+  { sym: "V",     name: "Visa",               short: "Visa",        base: 312,  drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",  mkt: "US" },
+  { sym: "NFLX",  name: "Netflix",            short: "Netflix",     base: 892,  drift: 0.0004, vol: 0.023, beta: 1.2, sector: "consumer", mkt: "US" },
+  { sym: "DIS",   name: "Walt Disney",        short: "Disney",      base: 112,  drift: 0.0001, vol: 0.016, beta: 1.0, sector: "consumer", mkt: "US" },
+  { sym: "2330",  name: "台積電 TSMC",          short: "TSMC",        base: 1085, drift: 0.0005, vol: 0.020, beta: 1.1, sector: "chips",    mkt: "TW" },
+  { sym: "2317",  name: "鴻海 Hon Hai",         short: "Hon Hai",     base: 212,  drift: 0.0003, vol: 0.022, beta: 1.0, sector: "tech",     mkt: "TW" },
+  { sym: "2454",  name: "聯發科 MediaTek",      short: "MediaTek",    base: 1340, drift: 0.0004, vol: 0.024, beta: 1.2, sector: "chips",    mkt: "TW" },
+  { sym: "2308",  name: "台達電 Delta",         short: "Delta",       base: 405,  drift: 0.0004, vol: 0.019, beta: 1.0, sector: "tech",     mkt: "TW" },
+  { sym: "2412",  name: "中華電 Chunghwa Tel",  short: "Chunghwa Telecom", base: 126, drift: 0.0001, vol: 0.006, beta: 0.3, sector: "telecom", mkt: "TW" },
+  { sym: "2881",  name: "富邦金 Fubon",         short: "Fubon",       base: 88,   drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance",  mkt: "TW" },
+  { sym: "2603",  name: "長榮 Evergreen",       short: "Evergreen",   base: 198,  drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping", mkt: "TW" },
+  { sym: "0050",  name: "元大台灣50 ETF",       short: "Taiwan 50 ETF", base: 192, drift: 0.0003, vol: 0.011, beta: 1.0, sector: "fund",   mkt: "TW" },
 ];
 const HISTORY_DAYS = 180;
 const TICK_MS = 2500;
+const TICKS_PER_DAY = 26;   // one tick = 15 simulated minutes, 9:30 to 16:00
 const START_CASH = 100000;
+const TW_LIMIT = 0.10;      // Taiwan daily price limit: ±10% from previous close
 
-/* Seeded RNG so every visitor sees a stable (but realistic) history */
+/* ============ Random numbers ============ */
 function mulberry32(a) {
   return function() {
     a |= 0; a = (a + 0x6D2B79F5) | 0;
@@ -302,40 +520,141 @@ function mulberry32(a) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-function gauss(rng) { // Box-Muller
+function gaussWith(rng) { // Box-Muller
   const u = Math.max(rng(), 1e-9), v = rng();
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
-function seedFrom(str) {
-  let h = 2166136261;
-  for (const c of str) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
-  return h >>> 0;
-}
+const gauss = () => gaussWith(Math.random);
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-/* Build price histories */
+/* ============ Price helpers ============ */
 const market = {};
 for (const s of STOCKS) {
-  const rng = mulberry32(seedFrom(s.sym));
-  const prices = [];
-  // walk backwards then forward so today's price lands near base
-  let p = s.base * (0.75 + rng() * 0.2);
-  for (let i = 0; i < HISTORY_DAYS; i++) {
-    p = Math.max(1, p * (1 + s.drift + gauss(rng) * s.vol));
-    prices.push(p);
-  }
-  // scale so last close = base
-  const k = s.base / prices[prices.length - 1];
-  market[s.sym] = { ...s, prices: prices.map(x => x * k), rng };
+  market[s.sym] = {
+    ...s,
+    idio: Math.sqrt(Math.max(
+      s.vol ** 2 - (s.beta * MARKETS[s.mkt].vol) ** 2 - SECTORS[s.sector] ** 2,
+      (0.3 * s.vol) ** 2)),
+  };
+}
+function twTick(p) { return p < 10 ? 0.01 : p < 50 ? 0.05 : p < 100 ? 0.1 : p < 500 ? 0.5 : p < 1000 ? 1 : 5; }
+function roundPx(sym, p) {
+  if (market[sym].mkt === "TW") { const t = twTick(p); return +(Math.round(p / t) * t).toFixed(2); }
+  return Math.round(p * 100) / 100;
 }
 
-/* ============ Account state (persisted) ============ */
+// Shared moves for one period: a global factor links the US and Taiwan markets.
+function drawFactors(rnd) {
+  const g = rnd();
+  const f = { US: 0.6 * g + 0.8 * rnd(), TW: 0.6 * g + 0.8 * rnd(), sector: {} };
+  for (const k of Object.keys(SECTORS)) f.sector[k] = rnd();
+  return f;
+}
+// Return of one stock over one period. `scale` = sqrt of the fraction of a day.
+function periodReturn(m, f, scale, rnd) {
+  const frac = scale * scale;
+  return (m.drift + m.mu) * frac
+    + scale * (m.beta * MARKETS[m.mkt].vol * f[m.mkt] + SECTORS[m.sector] * f.sector[m.sector] + m.idio * rnd());
+}
+function updateTrend(m, rnd) { m.mu = 0.96 * m.mu + 0.0006 * rnd(); } // trends persist for weeks, then fade
+
+/* ============ News ============ */
+const NEWS = {
+  pos: ["{n} beats profit expectations", "{n} wins a big new contract", "Analysts raise their price target for {n}",
+        "{n} launches a popular new product", "{n} raises its sales forecast"],
+  neg: ["{n} misses profit expectations", "{n} cuts its sales forecast", "Regulators open an investigation into {n}",
+        "{n} loses a major customer", "Analysts downgrade {n}"],
+  sectorPos: { chips: "Demand for AI chips jumps", shipping: "Global shipping rates climb", finance: "Banks report strong lending",
+               tech: "Tech spending picks up", consumer: "Shoppers spend more than expected", telecom: "Telecom subscriptions grow" },
+  sectorNeg: { chips: "Chip orders slow down", shipping: "Global shipping rates fall", finance: "Loan defaults rise",
+               tech: "Companies cut tech spending", consumer: "Shoppers pull back on spending", telecom: "Telecom price war heats up" },
+  mktPos: { US: ["The Federal Reserve signals lower interest rates", "A strong jobs report lifts US stocks"],
+            TW: ["Taiwan export orders jump", "Foreign investors buy Taiwan stocks"] },
+  mktNeg: { US: ["US inflation comes in hotter than expected", "Worries about a slowing US economy hit stocks"],
+            TW: ["Taiwan export orders fall", "Foreign investors sell Taiwan stocks"] },
+};
+
+/* ============ Build 180 days of history (seeded, so everyone starts the same) ============ */
+function buildHistory() {
+  const rng = mulberry32(20261122);
+  const rnd = () => gaussWith(rng);
+  const raw = {};
+  for (const s of STOCKS) { market[s.sym].mu = 0; raw[s.sym] = [s.base * (0.8 + rng() * 0.2)]; }
+  const recentNews = [];
+  for (let d = 1; d < HISTORY_DAYS; d++) {
+    const f = drawFactors(rnd);
+    for (const s of STOCKS) {
+      const m = market[s.sym];
+      updateTrend(m, rnd);
+      let r = periodReturn(m, f, 1, rnd);
+      if (rng() < 0.012) { // occasional company news gap
+        const shock = (rng() < 0.55 ? 1 : -1) * (0.03 + rng() * 0.05);
+        r += shock;
+        if (d >= HISTORY_DAYS - 6) recentNews.push({ sym: s.sym, shock, daysAgo: HISTORY_DAYS - 1 - d });
+      }
+      if (s.mkt === "TW") r = Math.max(-TW_LIMIT, Math.min(TW_LIMIT, r));
+      const arr = raw[s.sym];
+      arr.push(Math.max(1, arr[arr.length - 1] * (1 + r)));
+    }
+  }
+  for (const s of STOCKS) {
+    const arr = raw[s.sym], k = s.base / arr[arr.length - 1];
+    const m = market[s.sym];
+    m.daily = arr.map(x => roundPx(s.sym, x * k));
+    m.raw = m.daily[m.daily.length - 1];
+    m.px = m.raw;
+    m.mu = m.mu * 0.5;
+  }
+  return recentNews;
+}
+
+/* ============ Saved state (wrapped: storage can be unavailable) ============ */
+function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
+function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* storage unavailable */ } }
+
 const SAVE_KEY = "stockpilot-v1";
-let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], autoPilot: false };
-try {
-  const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-  if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
-} catch (e) { /* fresh start */ }
-function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+const MARKET_KEY = "stockpilot-market-v2";
+const LEARN_KEY = "stockpilot-learn-v1";
+
+let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], autoPilot: false, mktFilter: "ALL", dayStartTotal: null };
+const saved = load(SAVE_KEY);
+if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
+if (!Array.isArray(state.news)) state.news = [];
+for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
+
+let sim = { day: 1, tick: 0 };
+const savedMarket = load(MARKET_KEY);
+const marketOk = savedMarket && savedMarket.s && STOCKS.every(s => savedMarket.s[s.sym] && Array.isArray(savedMarket.s[s.sym].d));
+if (marketOk) {
+  sim = { day: savedMarket.day || 1, tick: savedMarket.tick || 0 };
+  for (const s of STOCKS) {
+    const m = market[s.sym], v = savedMarket.s[s.sym];
+    m.daily = v.d; m.raw = v.r; m.mu = v.mu || 0; m.px = roundPx(s.sym, m.raw);
+  }
+} else {
+  const recent = buildHistory();
+  if (!state.news.length) {
+    state.news = recent.sort((a, b) => a.daysAgo - b.daysAgo).slice(0, 6).map(n => ({
+      t: n.daysAgo === 0 ? "Yesterday" : `${n.daysAgo + 1} days ago`, dayNum: 1 - n.daysAgo - 1,
+      sym: n.sym, chg: n.shock,
+      headline: pick(n.shock > 0 ? NEWS.pos : NEWS.neg).replace("{n}", market[n.sym].short),
+    }));
+  }
+}
+function saveMarket() {
+  const s = {};
+  for (const st of STOCKS) {
+    const m = market[st.sym];
+    s[st.sym] = { d: m.daily.slice(-260), r: +m.raw.toFixed(4), mu: +m.mu.toFixed(6) };
+  }
+  store(MARKET_KEY, { day: sim.day, tick: sim.tick, s });
+}
+function save() { store(SAVE_KEY, state); }
+
+let learn = { done: {}, current: "basics" };
+const savedLearn = load(LEARN_KEY);
+if (savedLearn && typeof savedLearn.done === "object") learn = { ...learn, ...savedLearn };
+function saveLearn() { store(LEARN_KEY, learn); }
 
 let selected = STOCKS[0].sym;
 
@@ -343,16 +662,36 @@ let selected = STOCKS[0].sym;
 const $ = id => document.getElementById(id);
 const fmt$ = n => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 const fmtPct = n => (n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%";
-function price(sym) { const a = market[sym].prices; return a[a.length - 1]; }
-function dayChange(sym) {
-  const a = market[sym].prices;
-  return a[a.length - 1] / a[a.length - 2] - 1;
+const mktOf = sym => MARKETS[market[sym].mkt];
+const cur = sym => mktOf(sym).cur;
+function fmtP(sym, v) {
+  return cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-function now() {
-  return new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+function price(sym) { return market[sym].px; }
+function prevClose(sym) { const d = market[sym].daily; return d[d.length - 1]; }
+function series(sym) { return [...market[sym].daily, market[sym].px]; }   // daily closes + today's price
+function usd(sym) { return price(sym) / mktOf(sym).perUSD; }
+function dayChange(sym) { return price(sym) / prevClose(sym) - 1; }
+function simTime(tick = sim.tick) {
+  const mins = 9 * 60 + 30 + tick * 15;
+  return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, "0")}`;
+}
+function stamp() { return `Day ${sim.day} · ${simTime()}`; }
+function now() { return stamp(); }
+function portfolioTotals() {
+  let mv = 0;
+  for (const [sym, h] of Object.entries(state.holdings)) mv += h.shares * usd(sym);
+  return { mv, total: state.cash + mv };
+}
+function atLimit(sym) {
+  if (market[sym].mkt !== "TW") return 0;
+  const pc = prevClose(sym), p = price(sym);
+  if (p >= roundPx(sym, pc * (1 + TW_LIMIT)) - 1e-9) return 1;
+  if (p <= roundPx(sym, pc * (1 - TW_LIMIT)) + 1e-9) return -1;
+  return 0;
 }
 
-/* ============ AI advisor: transparent technical analysis ============ */
+/* ============ Signals ============ */
 function sma(arr, n) {
   if (arr.length < n) return null;
   let s = 0;
@@ -371,14 +710,14 @@ function rsi(arr, n = 14) {
 }
 function volatility(arr, n = 30) {
   const rets = [];
-  for (let i = Math.max(1, arr.length - n); i < arr.length; i++)
-    rets.push(arr[i] / arr[i - 1] - 1);
+  for (let i = Math.max(1, arr.length - n); i < arr.length; i++) rets.push(arr[i] / arr[i - 1] - 1);
   const mean = rets.reduce((a, b) => a + b, 0) / rets.length;
   const varc = rets.reduce((a, b) => a + (b - mean) ** 2, 0) / rets.length;
   return Math.sqrt(varc) * Math.sqrt(252);
 }
 function analyze(sym) {
-  const a = market[sym].prices;
+  const a = series(sym);
+  const c = cur(sym);
   const p = a[a.length - 1];
   const s20 = sma(a, 20), s50 = sma(a, 50);
   const r = rsi(a);
@@ -387,37 +726,95 @@ function analyze(sym) {
   const reasons = [];
   let score = 0;
 
-  if (s20 > s50) { score += 1.2; reasons.push(`Short-term trend is up — the 20-day average ($${s20.toFixed(2)}) is above the 50-day ($${s50.toFixed(2)}).`); }
-  else           { score -= 1.2; reasons.push(`Short-term trend is down — the 20-day average ($${s20.toFixed(2)}) is below the 50-day ($${s50.toFixed(2)}).`); }
+  if (s20 > s50) { score += 1.2; reasons.push(`Trend is up: the 20-day average (${c}${s20.toFixed(2)}) is above the 50-day (${c}${s50.toFixed(2)}).`); }
+  else           { score -= 1.2; reasons.push(`Trend is down: the 20-day average (${c}${s20.toFixed(2)}) is below the 50-day (${c}${s50.toFixed(2)}).`); }
 
   if (mom30 > 0.05)       { score += 1; reasons.push(`Strong momentum: up ${fmtPct(mom30)} over the last 30 days.`); }
   else if (mom30 < -0.05) { score -= 1; reasons.push(`Weak momentum: down ${fmtPct(mom30)} over the last 30 days.`); }
   else                    { reasons.push(`Momentum is flat (${fmtPct(mom30)} over 30 days).`); }
 
-  if (r < 30)      { score += 1; reasons.push(`RSI is ${r.toFixed(0)} — the stock looks oversold, which can precede a rebound.`); }
-  else if (r > 70) { score -= 1; reasons.push(`RSI is ${r.toFixed(0)} — the stock looks overbought and could pull back.`); }
-  else             { reasons.push(`RSI is ${r.toFixed(0)} — in a neutral range.`); }
+  if (r < 30)      { score += 1; reasons.push(`RSI is ${r.toFixed(0)}: the stock looks oversold, which can come before a bounce.`); }
+  else if (r > 70) { score -= 1; reasons.push(`RSI is ${r.toFixed(0)}: the stock looks overbought and could pull back.`); }
+  else             { reasons.push(`RSI is ${r.toFixed(0)}, in the normal range.`); }
 
-  if (vol > 0.45) { score -= 0.5; reasons.push(`High volatility (${(vol * 100).toFixed(0)}% annualized) — bigger swings, bigger risk.`); }
+  if (vol > 0.45) { score -= 0.5; reasons.push(`High volatility (${(vol * 100).toFixed(0)}% a year): bigger swings, bigger risk.`); }
 
   let rec = "HOLD";
   if (score >= 1.5) rec = "BUY";
   else if (score <= -1.5) rec = "SELL";
   const confidence = Math.min(95, Math.round(55 + Math.abs(score) * 12));
-  return { rec, score, confidence, reasons, rsi: r, mom30, vol };
+  return { rec, score, confidence, reasons, rsi: r, mom30, vol, s20, s50 };
+}
+
+/* ============ Coach: plain-language summary + what to consider ============ */
+const why = id => `<button type="button" class="lesson-link" data-lesson="${id}">Why?</button>`;
+
+function coach(sym) {
+  const an = analyze(sym), m = market[sym];
+  const up = an.s20 > an.s50;
+  const volWord = an.vol < 0.2 ? "small" : an.vol < 0.4 ? "medium-sized" : "large";
+  let summary = `${m.short} has been in ${up ? "an uptrend" : "a downtrend"}: ${an.mom30 >= 0 ? "up" : "down"} ${Math.abs(an.mom30 * 100).toFixed(1)}% over 30 days, with the 20-day average ${up ? "above" : "below"} the 50-day.`;
+  if (an.rsi > 70) summary += ` RSI is ${an.rsi.toFixed(0)}, so it has risen fast and may be overbought.`;
+  else if (an.rsi < 30) summary += ` RSI is ${an.rsi.toFixed(0)}, so it has fallen fast and may be oversold.`;
+  else summary += ` RSI is ${an.rsi.toFixed(0)}, in the normal range.`;
+  summary += ` Its price swings are ${volWord} (${(an.vol * 100).toFixed(0)}% a year).`;
+  const lim = atLimit(sym);
+  if (lim) summary += ` It is at Taiwan's daily ${lim > 0 ? "upper" : "lower"} price limit, so it can't move further ${lim > 0 ? "up" : "down"} today.`;
+  const news = state.news.find(n => n.sym === sym && n.dayNum >= sim.day - 2);
+  if (news) summary += ` Recent news: “${news.headline}” (${fmtPct(news.chg)}).`;
+
+  const h = state.holdings[sym];
+  const { total } = portfolioTotals();
+  const acts = [];
+  if (h) {
+    const pl = usd(sym) / h.avgCost - 1;
+    const posPct = h.shares * usd(sym) / total;
+    if (pl <= -0.08) acts.push(`You're down ${Math.abs(pl * 100).toFixed(1)}% on this stock. Many traders use a <b>stop-loss</b>: they sell if a stock falls about 7–10% below what they paid, so a small loss can't turn into a big one. ${why("whenact")}`);
+    if (pl >= 0.15) acts.push(`You're up ${(pl * 100).toFixed(1)}%. Selling part of it would <b>lock in some profit</b> while keeping the rest in case it keeps rising. ${why("whenact")}`);
+    if (posPct > 0.2) acts.push(`This stock is ${(posPct * 100).toFixed(0)}% of your portfolio. That's a lot in one place; trimming it would lower your risk. ${why("diversify")}`);
+    if (!acts.length) {
+      acts.push(up
+        ? `The trend is still up while you own it. <b>Holding</b> and letting a winner run is reasonable. Keep your stop-loss in mind. ${why("whenact")}`
+        : `The trend has turned down while you own it. Ask whether your reason for buying still holds. If not, <b>selling</b> is reasonable. ${why("ma")}`);
+    }
+  } else {
+    if (up && an.rsi <= 70) acts.push(`The trend and RSI line up for a <b>buy</b>. A careful trader would start small (about 5–10% of the portfolio) and decide in advance at what price they'd sell if they're wrong. ${why("whenact")}`);
+    else if (up) acts.push(`It has climbed fast. Instead of <b>chasing</b> it, a careful trader might wait for a pullback before buying. ${why("rsi")}`);
+    else if (an.rsi < 30) acts.push(`It has fallen hard and looks oversold. Bounces happen, but buying a falling stock is risky (traders call it "catching a falling knife"). <b>Waiting</b> for the trend to turn up is safer. ${why("rsi")}`);
+    else acts.push(`The trend is down. Most beginners do better <b>waiting</b> until the trend turns up before buying. ${why("ma")}`);
+  }
+  if (an.vol > 0.40 && acts.length < 3) acts.push(`This stock swings a lot, so use a <b>smaller amount</b> than usual if you trade it. ${why("risk")}`);
+  if (news && acts.length < 3) acts.push(`Don't trade just because of a headline: prices react within seconds, so the move has usually already happened. ${why("news")}`);
+  return { an, summary, actions: acts.slice(0, 3) };
+}
+
+function portfolioCoach() {
+  const { total } = portfolioTotals();
+  const rows = Object.entries(state.holdings)
+    .map(([sym, h]) => ({ sym, v: h.shares * usd(sym), pl: usd(sym) / h.avgCost - 1 }))
+    .sort((a, b) => b.v - a.v);
+  if (!rows.length) return `<b>Coach:</b> you haven't bought anything yet. Look for a stock in an uptrend, start small, and decide ahead of time when you'd sell.`;
+  const big = rows[0], bigPct = big.v / total;
+  if (bigPct > 0.25) return `<b>Coach:</b> ${big.sym} is ${(bigPct * 100).toFixed(0)}% of your portfolio. If it fell 20%, your whole account would drop about ${(bigPct * 20).toFixed(1)}%. Consider trimming it.`;
+  const loser = rows.filter(r => r.pl <= -0.08).sort((a, b) => a.pl - b.pl)[0];
+  if (loser) return `<b>Coach:</b> ${loser.sym} is down ${Math.abs(loser.pl * 100).toFixed(1)}% from what you paid. Check your stop-loss plan for it.`;
+  if (rows.length < 4) return `<b>Coach:</b> you own ${rows.length} stock${rows.length === 1 ? "" : "s"}. Spreading across 5 or more lowers your risk.`;
+  const mkts = new Set(rows.map(r => market[r.sym].mkt));
+  if (mkts.size === 1) return `<b>Coach:</b> all your stocks are in the ${MARKETS[[...mkts][0]].label} market. Adding some from the other market spreads your risk.`;
+  if (state.cash / total > 0.7) return `<b>Coach:</b> ${(state.cash / total * 100).toFixed(0)}% of your money is still cash. Cash is safe, but it doesn't grow.`;
+  return `<b>Coach:</b> your money is spread across ${rows.length} stocks in two markets. Keep each position small and stick to your sell rules.`;
 }
 
 /* ============ Charts (SVG, hand-built) ============ */
 function sparkline(sym, w = 64, h = 24) {
-  const a = market[sym].prices.slice(-30);
+  const a = series(sym).slice(-30);
   const min = Math.min(...a), max = Math.max(...a), span = max - min || 1;
   const pts = a.map((v, i) =>
     `${(i / (a.length - 1) * w).toFixed(1)},${(h - 2 - (v - min) / span * (h - 4)).toFixed(1)}`
   ).join(" ");
   const up = a[a.length - 1] >= a[0];
-  const cls = up ? "pos" : "neg";
   return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
-    <polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5" class="${cls}" style="color:${up ? "var(--up)" : "var(--down)"}"/>
+    <polyline points="${pts}" fill="none" stroke="${up ? "var(--up)" : "var(--down)"}" stroke-width="1.5"/>
   </svg>`;
 }
 
@@ -427,8 +824,9 @@ function drawChart(sym) {
   const old = wrap.querySelector("svg");
   if (old) old.remove();
 
-  const a = market[sym].prices.slice(-90);
-  const W = 720, H = 260, padL = 52, padR = 12, padT = 12, padB = 26;
+  const c = cur(sym);
+  const a = series(sym).slice(-91);
+  const W = 720, H = 260, padL = 62, padR = 12, padT = 12, padB = 26;
   const min = Math.min(...a), max = Math.max(...a);
   const span = (max - min) || 1;
   const x = i => padL + i / (a.length - 1) * (W - padL - padR);
@@ -438,38 +836,49 @@ function drawChart(sym) {
   for (let g = 0; g <= 4; g++) {
     const v = min + span * g / 4, yy = y(v);
     grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
-    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)" style="font-variant-numeric:tabular-nums">$${v.toFixed(0)}</text>`;
+    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${c}${v.toFixed(0)}</text>`;
   }
-  const dayLabels = [-90, -60, -30, 0];
-  for (const d of dayLabels) {
+  for (const d of [-90, -60, -30, 0]) {
     const i = a.length - 1 + d;
     if (i < 0) continue;
     labels += `<text x="${x(i)}" y="${H - 8}" text-anchor="${d === 0 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${d === 0 ? "today" : d + "d"}</text>`;
   }
+  // 20-day moving average line, so learners can see the trend signal
+  const ma = a.map((_, i) => {
+    const all = series(sym), j = all.length - a.length + i;
+    if (j < 19) return null;
+    let s = 0; for (let k = j - 19; k <= j; k++) s += all[k];
+    return s / 20;
+  });
+  const maPts = ma.map((v, i) => v == null ? null : `${x(i).toFixed(1)},${y(Math.min(max, Math.max(min, v))).toFixed(1)}`).filter(Boolean).join(" ");
 
   const line = a.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
   const area = `${padL},${H - padB} ` + line + ` ${W - padR},${H - padB}`;
+  const last = a.length - 1;
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `${sym} price over the last 90 days`);
+  svg.setAttribute("aria-label", `${sym} price over the last 90 days, with its 20-day average`);
   svg.innerHTML = `
     ${grid}
     <polygon points="${area}" fill="var(--series-soft)"/>
+    <polyline points="${maPts}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
     <polyline points="${line}" fill="none" stroke="var(--series)" stroke-width="2"/>
+    <circle cx="${x(last)}" cy="${y(a[last])}" r="3.5" fill="var(--series)"/>
     <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1"/>
     ${labels}
+    <text x="${padL + 6}" y="${padT + 12}" font-size="11" fill="var(--muted)">— price   - - 20-day average</text>
     <line id="xhair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
     <circle id="xdot" r="4" fill="var(--series)" stroke="var(--surface)" stroke-width="2" style="display:none"/>
   `;
   wrap.appendChild(svg);
-  chartGeom = { a, x, y, padL, padR, padT, padB, W, H, svg };
+  chartGeom = { sym, a, x, y, padL, padR, padT, padB, W, H, svg };
 }
 
 function chartHover(ev) {
   if (!chartGeom) return;
-  const { a, x, y, padL, padR, W, svg } = chartGeom;
+  const { sym, a, x, y, padL, padR, W, svg } = chartGeom;
   const rect = svg.getBoundingClientRect();
   const px = (ev.clientX - rect.left) / rect.width * W;
   const tip = $("chartTip");
@@ -483,12 +892,12 @@ function chartHover(ev) {
   hair.setAttribute("x1", xx); hair.setAttribute("x2", xx); hair.style.display = "";
   dot.setAttribute("cx", xx); dot.setAttribute("cy", yy); dot.style.display = "";
   const daysAgo = a.length - 1 - i;
-  tip.querySelector(".t-date").textContent = daysAgo === 0 ? "Today" : daysAgo + " days ago";
-  tip.querySelector(".t-val").textContent = fmt$(v);
+  tip.querySelector(".t-date").textContent = daysAgo === 0 ? "Today (live)" : daysAgo === 1 ? "Yesterday's close" : daysAgo + " days ago";
+  tip.querySelector(".t-val").textContent = fmtP(sym, v);
   tip.style.display = "block";
   const wrapRect = $("chartWrap").getBoundingClientRect();
   const tx = xx / W * rect.width;
-  tip.style.left = Math.min(wrapRect.width - 130, Math.max(0, tx + 12)) + "px";
+  tip.style.left = Math.min(wrapRect.width - 140, Math.max(0, tx + 12)) + "px";
   tip.style.top = (yy / chartGeom.H * rect.height - 48) + "px";
 }
 function chartLeave() {
@@ -499,21 +908,23 @@ function chartLeave() {
   }
 }
 
-/* ============ Rendering ============ */
+/* ============ Rendering: trade view ============ */
 function renderWatchlist() {
+  document.querySelectorAll(".seg button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.mkt === state.mktFilter)));
+  $("simClock").innerHTML = `<b>Day ${sim.day} · ${simTime()}</b> · simulated trading day, about 1 minute long`;
+  const list = STOCKS.filter(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
   const el = $("watchlist");
-  el.innerHTML = STOCKS.map(s => {
-    const chg = dayChange(s.sym);
+  el.innerHTML = list.map(s => {
+    const chg = dayChange(s.sym), lim = atLimit(s.sym);
     return `<button class="stock-row${s.sym === selected ? " active" : ""}" data-sym="${s.sym}">
-      <span><span class="sym">${s.sym}</span><br><span class="name">${s.name}</span></span>
+      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt === "TW" ? '<span class="mkt-tag">TW</span>' : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">LIMIT</span>` : ""}
+      <span class="name">${s.name}</span></span>
       ${sparkline(s.sym)}
-      <span><span class="px">${fmt$(price(s.sym))}</span><br>
+      <span class="right"><span class="px">${fmtP(s.sym, price(s.sym))}</span><br>
       <span class="chg ${chg >= 0 ? "pos" : "neg"}">${fmtPct(chg)}</span></span>
     </button>`;
   }).join("");
-  el.querySelectorAll(".stock-row").forEach(b =>
-    b.addEventListener("click", () => { selected = b.dataset.sym; renderAll(); })
-  );
 }
 
 function renderDetail() {
@@ -521,62 +932,69 @@ function renderDetail() {
   const p = price(selected), chg = dayChange(selected);
   $("dSym").textContent = s.sym;
   $("dName").textContent = s.name;
-  $("dPx").textContent = fmt$(p);
+  $("dPx").textContent = fmtP(selected, p);
   const chgEl = $("dChg");
   chgEl.textContent = fmtPct(chg) + " today";
   chgEl.className = "big-chg " + (chg >= 0 ? "pos" : "neg");
+  $("dFx").textContent = s.mkt === "TW"
+    ? `Taiwan Stock Exchange · ≈ ${fmt$(usd(selected))} per share at NT$${MARKETS.TW.perUSD} = US$1 (simulated rate) · daily limit ${fmtP(selected, roundPx(selected, prevClose(selected) * (1 - TW_LIMIT)))} to ${fmtP(selected, roundPx(selected, prevClose(selected) * (1 + TW_LIMIT)))}`
+    : `Previous close ${fmtP(selected, prevClose(selected))}`;
 
-  const a = s.prices;
+  const a = series(selected);
   const c30 = p / a[a.length - 31] - 1;
-  const last90 = a.slice(-90);
+  const last90 = a.slice(-91);
   $("s30").textContent = fmtPct(c30);
   $("s30").className = "value " + (c30 >= 0 ? "pos" : "neg");
-  $("sHigh").textContent = fmt$(Math.max(...last90));
-  $("sLow").textContent = fmt$(Math.min(...last90));
+  $("sHigh").textContent = fmtP(selected, Math.max(...last90));
+  $("sLow").textContent = fmtP(selected, Math.min(...last90));
   $("sVol").textContent = (volatility(a) * 100).toFixed(0) + "%";
   const h = state.holdings[selected];
   $("sOwn").textContent = h ? `${h.shares} sh` : "0 sh";
 
   drawChart(selected);
 
-  const an = analyze(selected);
+  const co = coach(selected);
   const pill = $("recPill");
-  pill.textContent = an.rec;
-  pill.className = "rec-pill rec-" + an.rec;
-  $("recConf").textContent = `${an.confidence}% confidence · based on trend, momentum, RSI & volatility`;
-  $("recReasons").innerHTML = an.reasons.map(r => `<li>${r}</li>`).join("");
+  pill.textContent = "Signals: " + co.an.rec;
+  pill.className = "rec-pill rec-" + co.an.rec;
+  $("recConf").textContent = `signal strength ${co.an.confidence}%`;
+  $("coachSummary").textContent = co.summary;
+  $("coachActions").innerHTML = co.actions.map(a => `<li>${a}</li>`).join("");
+  $("recReasons").innerHTML = co.an.reasons.map(r => `<li>${r}</li>`).join("");
 
   updateTradeCost();
 }
 
 function updateTradeCost() {
   const q = Math.max(0, parseInt($("qty").value || "0", 10));
-  $("tradeCost").textContent = q > 0 ? `≈ ${fmt$(q * price(selected))}` : "";
+  if (q <= 0) { $("tradeCost").textContent = ""; return; }
+  const native = fmtP(selected, q * price(selected));
+  $("tradeCost").textContent = market[selected].mkt === "TW"
+    ? `≈ ${native} (≈ ${fmt$(q * usd(selected))})`
+    : `≈ ${native}`;
 }
 
 function renderPortfolio() {
   $("cashValue").textContent = fmt$(state.cash);
-  let mv = 0, cost = 0;
   const rows = Object.entries(state.holdings).map(([sym, h]) => {
-    const v = h.shares * price(sym);
-    mv += v; cost += h.shares * h.avgCost;
-    const pl = v - h.shares * h.avgCost;
+    const pl = h.shares * usd(sym) - h.shares * h.avgCost;
     return `<tr>
       <td class="sym-cell">${sym}</td>
       <td>${h.shares}</td>
-      <td>${fmt$(price(sym))}</td>
+      <td>${fmtP(sym, price(sym))}</td>
       <td class="${pl >= 0 ? "pos" : "neg"}">${fmt$(pl)}</td>
     </tr>`;
   });
   $("holdings").innerHTML = rows.length
-    ? `<table><thead><tr><th>Sym</th><th>Shares</th><th>Price</th><th>P&amp;L</th></tr></thead><tbody>${rows.join("")}</tbody></table>`
+    ? `<table><thead><tr><th>Sym</th><th>Shares</th><th>Price</th><th>P&amp;L (US$)</th></tr></thead><tbody>${rows.join("")}</tbody></table>`
     : `<div class="empty">No holdings yet — buy your first stock or turn on auto-pilot.</div>`;
-  const total = state.cash + mv;
+  const { total } = portfolioTotals();
   $("pvValue").textContent = fmt$(total);
   const totalPl = total - START_CASH;
   const d = $("pvDelta");
   d.textContent = `${totalPl >= 0 ? "▲" : "▼"} ${fmt$(Math.abs(totalPl))} (${fmtPct(totalPl / START_CASH)}) all-time`;
   d.className = "delta " + (totalPl >= 0 ? "pos" : "neg");
+  $("portfolioCoach").innerHTML = portfolioCoach();
 }
 
 function renderFeeds() {
@@ -586,24 +1004,29 @@ function renderFeeds() {
   $("history").innerHTML = state.history.length
     ? state.history.slice(0, 30).map(f => `<li><span class="time">${f.t}</span>${f.msg}</li>`).join("")
     : `<li class="empty">No trades yet.</li>`;
+  $("newsFeed").innerHTML = state.news.length
+    ? state.news.slice(0, 40).map(n => n.recap
+        ? `<li class="recap"><span class="time">${n.t}</span>${n.recap}</li>`
+        : `<li><span class="time">${n.t}</span>${n.sym ? `<button type="button" class="news-sym" data-sym="${n.sym}">${n.sym}</button>` : `<b>${n.mktLabel || ""}</b> `}${n.headline} <b class="${n.chg >= 0 ? "pos" : "neg"}">${fmtPct(n.chg)}</b></li>`).join("")
+    : `<li class="empty">Headlines will appear here as news breaks.</li>`;
 }
 
 function renderAll() { renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds(); save(); }
 
 /* ============ Trading ============ */
 function trade(sym, shares, side, byAI = false) {
-  const p = price(sym);
+  const p = price(sym), pu = usd(sym);
   const msgEl = $("tradeMsg");
-  if (shares < 1) return;
+  if (!(shares >= 1)) return false;
   if (side === "buy") {
-    const cost = shares * p;
+    const cost = shares * pu;
     if (cost > state.cash) {
       if (!byAI) { msgEl.textContent = "Not enough cash for that order."; msgEl.className = "trade-msg neg"; }
       return false;
     }
     state.cash -= cost;
     const h = state.holdings[sym] || { shares: 0, avgCost: 0 };
-    h.avgCost = (h.avgCost * h.shares + cost) / (h.shares + shares);
+    h.avgCost = (h.avgCost * h.shares + cost) / (h.shares + shares); // avg cost per share, in US$
     h.shares += shares;
     state.holdings[sym] = h;
   } else {
@@ -613,15 +1036,14 @@ function trade(sym, shares, side, byAI = false) {
       return false;
     }
     h.shares -= shares;
-    state.cash += shares * p;
+    state.cash += shares * pu;
     if (h.shares === 0) delete state.holdings[sym];
   }
   const verb = side === "buy" ? "Bought" : "Sold";
-  const entry = { t: now(), msg: `${byAI ? "🤖 " : ""}<b>${verb} ${shares} ${sym}</b> @ ${fmt$(p)}` };
-  state.history.unshift(entry);
+  state.history.unshift({ t: now(), msg: `${byAI ? "🤖 " : ""}<b>${verb} ${shares} ${sym}</b> @ ${fmtP(sym, p)}` });
   state.history = state.history.slice(0, 100);
   if (!byAI) {
-    msgEl.textContent = `${verb} ${shares} shares of ${sym} at ${fmt$(p)}.`;
+    msgEl.textContent = `${verb} ${shares} shares of ${sym} at ${fmtP(sym, p)}.`;
     msgEl.className = "trade-msg pos";
   }
   return true;
@@ -635,11 +1057,8 @@ function runAutoPilot() {
   if (autoCounter % 4 !== 0) return; // act every ~10s, not every tick
 
   const analyses = STOCKS.map(s => ({ sym: s.sym, ...analyze(s.sym) }));
-  let mv = 0;
-  for (const [sym, h] of Object.entries(state.holdings)) mv += h.shares * price(sym);
-  const total = state.cash + mv;
+  const { total } = portfolioTotals();
 
-  // Sell anything rated SELL
   for (const [sym, h] of Object.entries(state.holdings)) {
     const an = analyses.find(a => a.sym === sym);
     if (an && an.rec === "SELL" && h.shares > 0) {
@@ -648,35 +1067,516 @@ function runAutoPilot() {
       }
     }
   }
-  // Buy the strongest BUY not already at its cap
   const buys = analyses.filter(a => a.rec === "BUY").sort((a, b) => b.score - a.score);
   for (const an of buys) {
-    const p = price(an.sym);
-    const held = state.holdings[an.sym] ? state.holdings[an.sym].shares * p : 0;
-    const cap = total * 0.15;
-    const room = cap - held;
-    if (room < p) continue;
-    const shares = Math.floor(Math.min(room, state.cash * 0.5) / p);
+    const pu = usd(an.sym);
+    const held = state.holdings[an.sym] ? state.holdings[an.sym].shares * pu : 0;
+    const room = total * 0.15 - held;
+    if (room < pu) continue;
+    const spendable = state.cash - total * 0.10; // always keep 10% of the portfolio in cash
+    const shares = Math.floor(Math.min(room, spendable, state.cash * 0.5) / pu);
     if (shares >= 1 && trade(an.sym, shares, "buy", true)) {
-      state.aiFeed.unshift({ t: now(), msg: `Bought ${shares} <b>${an.sym}</b> (${an.confidence}% conf) — ${an.reasons[0]}` });
+      state.aiFeed.unshift({ t: now(), msg: `Bought ${shares} <b>${an.sym}</b> (signal ${an.confidence}%) — ${an.reasons[0]}` });
       break; // one buy per cycle
     }
   }
   state.aiFeed = state.aiFeed.slice(0, 100);
 }
 
-/* ============ Live ticks ============ */
-function tick() {
+/* ============ Live market ============ */
+function addNews(item) {
+  state.news.unshift({ t: stamp(), dayNum: sim.day, ...item });
+  state.news = state.news.slice(0, 60);
+}
+
+function closeDay() {
+  const { total } = portfolioTotals();
+  const avg = mk => {
+    const xs = STOCKS.filter(s => s.mkt === mk).map(s => dayChange(s.sym));
+    return xs.reduce((a, b) => a + b, 0) / xs.length;
+  };
+  const movers = STOCKS.map(s => ({ sym: s.sym, c: dayChange(s.sym) })).sort((a, b) => Math.abs(b.c) - Math.abs(a.c));
+  const start = state.dayStartTotal || total;
+  const pd = total - start;
+  const us = avg("US"), tw = avg("TW");
+  state.news.unshift({
+    t: `Day ${sim.day} close`, dayNum: sim.day,
+    recap: `📊 <b>Day ${sim.day} recap:</b> US stocks <b class="${us >= 0 ? "pos" : "neg"}">${fmtPct(us)}</b>, Taiwan <b class="${tw >= 0 ? "pos" : "neg"}">${fmtPct(tw)}</b> on average. ` +
+           `Your portfolio <b class="${pd >= 0 ? "pos" : "neg"}">${pd >= 0 ? "+" : "−"}${fmt$(Math.abs(pd))}</b> today. ` +
+           `Biggest mover: <b>${movers[0].sym}</b> ${fmtPct(movers[0].c)}.`,
+  });
+  state.news = state.news.slice(0, 60);
   for (const s of STOCKS) {
     const m = market[s.sym];
-    const p = m.prices[m.prices.length - 1];
-    // intraday-ish move: a fraction of daily vol per tick
-    const next = Math.max(1, p * (1 + s.drift / 20 + gauss(m.rng) * s.vol / 6));
-    m.prices.push(next);
-    if (m.prices.length > 400) m.prices.shift();
+    m.daily.push(m.px);
+    if (m.daily.length > 260) m.daily.shift();
+    updateTrend(m, gauss);
   }
+  sim.day++;
+  sim.tick = 0;
+  state.dayStartTotal = total;
+}
+
+function tick() {
+  const scale = 1 / Math.sqrt(TICKS_PER_DAY);
+  const f = drawFactors(gauss);
+  const shock = {};
+  const r = Math.random();
+  if (r < 0.03) {            // company news
+    const s = pick(STOCKS);
+    const sign = Math.random() < 0.55 ? 1 : -1;
+    const size = sign * (0.02 + Math.random() * 0.045);
+    shock[s.sym] = size;
+    addNews({ sym: s.sym, chg: size, headline: pick(sign > 0 ? NEWS.pos : NEWS.neg).replace("{n}", s.short) });
+  } else if (r < 0.038) {    // industry news
+    const sec = pick(Object.keys(SECTORS).filter(k => k !== "fund"));
+    const sign = Math.random() < 0.5 ? 1 : -1;
+    const size = sign * (0.012 + Math.random() * 0.02);
+    for (const s of STOCKS) if (s.sector === sec) shock[s.sym] = size;
+    addNews({ chg: size, mktLabel: "Industry:", headline: (sign > 0 ? NEWS.sectorPos : NEWS.sectorNeg)[sec] });
+  } else if (r < 0.044) {    // whole-market news
+    const mk = Math.random() < 0.5 ? "US" : "TW";
+    const sign = Math.random() < 0.5 ? 1 : -1;
+    const size = sign * (0.006 + Math.random() * 0.012);
+    for (const s of STOCKS) if (s.mkt === mk) shock[s.sym] = size * s.beta;
+    addNews({ chg: size, mktLabel: `${MARKETS[mk].label} market:`, headline: pick((sign > 0 ? NEWS.mktPos : NEWS.mktNeg)[mk]) });
+  }
+
+  for (const s of STOCKS) {
+    const m = market[s.sym];
+    let raw = m.raw * (1 + periodReturn(m, f, scale, gauss) + (shock[s.sym] || 0));
+    if (s.mkt === "TW") {
+      const pc = prevClose(s.sym);
+      raw = Math.max(pc * (1 - TW_LIMIT), Math.min(pc * (1 + TW_LIMIT), raw));
+    }
+    m.raw = Math.max(1, raw);
+    m.px = roundPx(s.sym, m.raw);
+  }
+
+  sim.tick++;
+  if (sim.tick >= TICKS_PER_DAY) closeDay();
   runAutoPilot();
+  saveMarket();
   renderAll();
+}
+
+/* ============ Lessons ============ */
+const live = html => `<div class="live-box"><span class="live-label">In the simulator right now</span>${html}</div>`;
+const key = html => `<div class="key-idea"><b>Key idea:</b> ${html}</div>`;
+
+const LESSONS = [
+  {
+    id: "basics", title: "What is a stock?",
+    body: () => `
+      <p>A company is owned by its <b>shareholders</b>. A <b>stock</b>, also called a <b>share</b>, is one small slice of that ownership. Apple has roughly 15 billion shares, so owning one share means owning a very tiny piece of Apple.</p>
+      <p>Companies first sell shares to raise money. After that, people buy and sell shares with each other on a <b>stock exchange</b>, such as Nasdaq and the New York Stock Exchange in the US, or the Taiwan Stock Exchange.</p>
+      <p>The price changes all day because buyers and sellers keep agreeing on new prices. When more people want to buy than sell, the price goes up. When more want to sell, it goes down.</p>
+      ${key("a stock price is what buyers and sellers agree a slice of the company is worth right now.")}
+      ${live(`The watchlist has <b>${STOCKS.length} stocks</b>: ${STOCKS.filter(s => s.mkt === "US").length} from the US and ${STOCKS.filter(s => s.mkt === "TW").length} from Taiwan. Each one has a short code called a <b>ticker</b>: AAPL is Apple, and 2330 is TSMC.`)}`,
+    quiz: {
+      q: "What does owning one share of a company mean?",
+      opts: ["You own a small piece of the company", "You lent the company money and it pays you back with interest", "You work for the company"],
+      a: 0,
+      why: "A share is part ownership. Lending money to a company is called a bond, which is a different kind of investment.",
+    },
+    tryIt: { label: "Browse the watchlist" },
+  },
+  {
+    id: "buysell", title: "Buying and selling shares",
+    body: () => {
+      const s = selected, p = price(s);
+      const tw = market[s].mkt === "TW" ? ` That is about <b>${fmt$(10 * usd(s))}</b> in US dollars.` : "";
+      return `
+      <p>To buy, you pick a stock and how many shares you want. The cost is the number of shares times the price.</p>
+      <p>You make money if you later sell for <b>more</b> than you paid, and lose money if you sell for <b>less</b>. Until you sell, any gain or loss exists only on paper and can still change.</p>
+      ${key("cost = shares × price. Profit = (sell price − buy price) × shares.")}
+      ${live(`${s} costs <b>${fmtP(s, p)}</b> per share, so 10 shares would cost <b>${fmtP(s, 10 * p)}</b>.${tw}`)}`;
+    },
+    quiz: {
+      q: "You buy 5 shares at $100 each and later sell them at $120 each. What is your profit?",
+      opts: ["$20", "$100", "$600"],
+      a: 1,
+      why: "Each share gained $20, and you had 5 of them: (120 − 100) × 5 = $100. The $600 is the total you get back when you sell.",
+    },
+    tryIt: { label: "Buy 1 share", qty: 1 },
+  },
+  {
+    id: "pnl", title: "Profit, loss and portfolio value",
+    body: () => {
+      const { mv, total } = portfolioTotals();
+      const n = Object.keys(state.holdings).length;
+      const change = total - START_CASH;
+      return `
+      <p>Your <b>portfolio</b> is everything in your account: your cash plus all the stocks you own.</p>
+      <p><b>P&amp;L</b> stands for profit and loss. The Holdings table compares each stock's current value with your <b>average cost</b>, which is what you paid per share on average across all your buys.</p>
+      <ul>
+        <li><b>Unrealized</b> P&amp;L is a gain or loss on stocks you still own. It changes every time the price moves.</li>
+        <li><b>Realized</b> P&amp;L is locked in once you sell.</li>
+      </ul>
+      ${key("portfolio value = cash + the current value of every stock you own.")}
+      ${live(`You have <b>${fmt$(state.cash)}</b> in cash and <b>${fmt$(mv)}</b> in ${n} stock${n === 1 ? "" : "s"}, for a total of <b>${fmt$(total)}</b>. That is <b class="${change >= 0 ? "pos" : "neg"}">${change >= 0 ? "up" : "down"} ${fmt$(Math.abs(change))}</b> from the $100,000 you started with.`)}`;
+    },
+    quiz: {
+      q: "You buy the same number of shares twice: once at $50 and once at $70. What is your average cost per share?",
+      opts: ["$50", "$60", "$70"],
+      a: 1,
+      why: "Equal amounts bought at $50 and $70 average out to $60 per share.",
+    },
+    tryIt: { label: "Look at your holdings" },
+  },
+  {
+    id: "chart", title: "Reading a price chart",
+    body: () => {
+      const s = selected, a = series(s), p = price(s);
+      const last90 = a.slice(-91), lo = Math.min(...last90), hi = Math.max(...last90);
+      const where = Math.round((p - lo) / ((hi - lo) || 1) * 100);
+      const c30 = p / a[a.length - 31] - 1;
+      return `
+      <p>The chart on the Trade tab shows the price over the last 90 trading days. The left side is older and the dot on the right edge is today's live price.</p>
+      <p>Look at the direction over weeks, not single days. A line that climbs from left to right is an <b>uptrend</b>. One that slides down is a <b>downtrend</b>. Prices wiggle every day, so one bad day on its own tells you very little.</p>
+      <p>The <b>90-day high and low</b> show the range the price has moved in. A price near the high has been rising, and a price near the low has been falling.</p>
+      ${key("zoom out. The trend over weeks matters more than today's move.")}
+      ${live(`${s} is <b class="${c30 >= 0 ? "pos" : "neg"}">${fmtPct(c30)}</b> over 30 days. Its 90-day range is ${fmtP(s, lo)} to ${fmtP(s, hi)}, and today it sits <b>${where}%</b> of the way up from the low.`)}`;
+    },
+    quiz: {
+      q: "A stock fell 2% today but is up 15% over the last three months. What is the bigger picture?",
+      opts: ["It has been in an uptrend, and today is a small dip", "It is crashing and should be sold right away", "Charts can't tell you anything"],
+      a: 0,
+      why: "A 2% dip inside a 15% climb is normal day-to-day noise. The longer trend is still up.",
+    },
+    tryIt: { label: "Hover over the chart" },
+  },
+  {
+    id: "news", title: "How news moves prices",
+    body: () => {
+      const latest = state.news.find(n => !n.recap);
+      const ups = STOCKS.filter(s => dayChange(s.sym) > 0).length;
+      return `
+      <p>Prices move the most when there is news. There are three main kinds:</p>
+      <ul>
+        <li><b>Company news</b> such as profit reports, new products or lawsuits. It moves one stock, sometimes a lot in a single day.</li>
+        <li><b>Industry news</b> affects similar companies together. When demand for AI chips jumps, NVIDIA, TSMC and MediaTek often rise together.</li>
+        <li><b>Market-wide news</b> such as interest rates, inflation or the economy. It moves almost every stock at once.</li>
+      </ul>
+      <p>Prices react within seconds, so by the time you read a headline the move has usually already happened. Buying <i>because</i> of a headline you just saw is a common beginner mistake.</p>
+      ${key("news moves prices fast. By the time you hear it, it's usually already in the price.")}
+      ${live(`${latest ? `Latest headline: <b>${latest.headline}</b> (${fmtPct(latest.chg)}). ` : ""}Right now <b>${ups} of ${STOCKS.length}</b> stocks are up today. Watch the Market news card on the Trade tab to see how headlines move prices.`)}`;
+    },
+    quiz: {
+      q: "The central bank unexpectedly raises interest rates. What usually happens?",
+      opts: ["Most stocks move at the same time, often down", "Only bank stocks move", "Nothing; stocks ignore interest rates"],
+      a: 0,
+      why: "Interest rates affect the whole economy, so news like this moves almost every stock. Higher rates usually push prices down.",
+    },
+    tryIt: { label: "Read the market news" },
+  },
+  {
+    id: "ma", title: "Trends and moving averages",
+    body: () => {
+      const s = selected, an = analyze(s), c = cur(s);
+      const up = an.s20 > an.s50;
+      return `
+      <p>A <b>moving average</b> is the average closing price over the last few days. It smooths out daily wiggles so the trend is easier to see. The dashed line on the chart is the 20-day average.</p>
+      <ul>
+        <li>The <b>20-day average</b> shows the recent trend.</li>
+        <li>The <b>50-day average</b> shows the longer trend.</li>
+      </ul>
+      <p>When the 20-day average is above the 50-day, recent prices are higher than older ones, which suggests an uptrend. When it is below, it suggests a downtrend. Trends in real markets often last for weeks, which is why traders watch them.</p>
+      ${key("20-day above 50-day suggests an uptrend so far. It doesn't promise what comes next.")}
+      ${live(`For ${s}, the 20-day average is <b>${c}${an.s20.toFixed(2)}</b> and the 50-day is <b>${c}${an.s50.toFixed(2)}</b>, so the trend looks <b class="${up ? "pos" : "neg"}">${up ? "up" : "down"}</b>.`)}`;
+    },
+    quiz: {
+      q: "A stock's 20-day average is $105 and its 50-day average is $98. What does that suggest?",
+      opts: ["Recent prices are higher than before: an uptrend", "Recent prices are lower than before: a downtrend", "The stock is guaranteed to keep rising"],
+      a: 0,
+      why: "The recent average is higher than the longer one, so the trend has been up. It describes the past; it isn't a guarantee.",
+    },
+    tryIt: { label: "See the trend on the chart" },
+  },
+  {
+    id: "rsi", title: "Momentum and RSI",
+    body: () => {
+      const s = selected, an = analyze(s);
+      const zone = an.rsi > 70 ? "overbought" : an.rsi < 30 ? "oversold" : "neutral";
+      return `
+      <p><b>Momentum</b> is how strongly a price has moved recently. The coach looks at the change over the last 30 days.</p>
+      <p><b>RSI</b> (Relative Strength Index) compares the size of recent up days with recent down days over 14 days and turns it into a number from 0 to 100.</p>
+      <ul>
+        <li><b>Above 70:</b> the price has risen fast and may be <b>overbought</b>, so it could pull back.</li>
+        <li><b>Below 30:</b> the price has fallen fast and may be <b>oversold</b>, so it could bounce.</li>
+        <li><b>30 to 70:</b> neutral.</li>
+      </ul>
+      <p>These are warnings, not rules. A strong stock can stay overbought for months.</p>
+      ${key("RSI tells you how fast a price has moved, not where it will go.")}
+      ${live(`${s} has an RSI of <b>${an.rsi.toFixed(0)}</b> (${zone}) and momentum of <b class="${an.mom30 >= 0 ? "pos" : "neg"}">${fmtPct(an.mom30)}</b> over 30 days.`)}`;
+    },
+    quiz: {
+      q: "A stock's RSI is 82. What does that usually mean?",
+      opts: ["It has risen fast and may be overbought", "It is cheap and must go up", "The company is losing money"],
+      a: 0,
+      why: "An RSI above 70 means recent gains have been unusually strong. It says nothing about the company's profits.",
+    },
+    tryIt: { label: "Open the coach's signals" },
+  },
+  {
+    id: "risk", title: "Risk and volatility",
+    body: () => {
+      const ranked = STOCKS.map(s => ({ sym: s.sym, v: volatility(series(s.sym)) })).sort((a, b) => b.v - a.v);
+      const hi = ranked[0], lo = ranked[ranked.length - 1];
+      return `
+      <p><b>Volatility</b> measures how much a price swings up and down. This app shows it as a yearly percentage. A higher number means bigger swings.</p>
+      <p>Bigger swings work both ways: bigger possible gains and bigger possible losses. A useful question before buying is: <i>if this dropped 30%, could I stay calm and not panic-sell?</i></p>
+      ${key("higher volatility means a bumpier ride, in both directions.")}
+      ${live(`The most volatile stock right now is <b>${hi.sym}</b> at ${(hi.v * 100).toFixed(0)}% a year. The calmest is <b>${lo.sym}</b> at ${(lo.v * 100).toFixed(0)}%.`)}`;
+    },
+    quiz: {
+      q: "Stock A has 12% volatility and Stock B has 45%. Which one usually swings more?",
+      opts: ["Stock B", "Stock A", "They swing about the same"],
+      a: 0,
+      why: "45% volatility means much bigger typical moves than 12%.",
+    },
+    tryIt: { label: "Look at the most volatile stock", pick: "mostVolatile" },
+  },
+  {
+    id: "diversify", title: "Don't put all your eggs in one basket",
+    body: () => {
+      const { total } = portfolioTotals();
+      const rows = Object.entries(state.holdings).map(([sym, h]) => ({ sym, v: h.shares * usd(sym) })).sort((a, b) => b.v - a.v);
+      const mkts = new Set(rows.map(r => market[r.sym].mkt));
+      const liveText = rows.length
+        ? `You own <b>${rows.length}</b> stock${rows.length === 1 ? "" : "s"} across <b>${mkts.size}</b> market${mkts.size === 1 ? "" : "s"}. Your biggest position, <b>${rows[0].sym}</b>, is <b>${(rows[0].v / total * 100).toFixed(1)}%</b> of your portfolio.`
+        : "You don't own any stocks yet. Once you do, this box will show how spread out your money is.";
+      return `
+      <p><b>Diversification</b> means spreading your money across many companies, industries and even countries. If one company has bad news, the others soften the hit.</p>
+      <p><b>Position sizing</b> means deciding how much money goes into any one stock. The auto-pilot here never puts more than 15% of the portfolio into a single stock.</p>
+      <p>A fund such as an <b>ETF</b> holds many stocks at once. <b>0050</b> in the watchlist is an ETF that holds about 50 of Taiwan's biggest companies, so one purchase gives you a slice of all of them.</p>
+      ${key("no single stock should be able to sink your whole portfolio.")}
+      ${live(liveText)}`;
+    },
+    quiz: {
+      q: "Which portfolio is the most diversified?",
+      opts: ["10 stocks across tech, banking and telecom in two countries", "All your money in one stock you really like", "Two chip-making companies"],
+      a: 0,
+      why: "Different industries and countries tend not to fall at the same time, which spreads the risk.",
+    },
+    tryIt: { label: "Look at the 0050 ETF", sym: "0050" },
+  },
+  {
+    id: "whenact", title: "When to buy and when to sell",
+    body: () => {
+      const co = coach(selected);
+      const first = co.actions[0].replace(/<button[^>]*>.*?<\/button>/g, "");
+      return `
+      <p>Good traders decide their rules <b>before</b> they trade, so fear and excitement don't make the decision for them. Here is a simple plan that the Coach on the Trade tab follows.</p>
+      <div class="checklist">
+        <div>
+          <h4>Consider buying when…</h4>
+          <ul>
+            <li>The trend is up (20-day average above the 50-day).</li>
+            <li>It isn't overbought (RSI below 70).</li>
+            <li>You can say <i>why</i> you're buying in one sentence.</li>
+            <li>The amount is small: about 5–10% of your portfolio.</li>
+            <li>You already know the price where you'd sell if you're wrong.</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Consider selling when…</h4>
+          <ul>
+            <li>It hits your <b>stop-loss</b>, for example 8% below what you paid.</li>
+            <li>The trend turns down and your reason for buying no longer holds.</li>
+            <li>It has grown into too big a part of your portfolio.</li>
+            <li>It has gained a lot, and you want to lock in part of the profit.</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Try not to…</h4>
+          <ul>
+            <li>Buy just because everyone is talking about it (FOMO, fear of missing out).</li>
+            <li>Panic-sell after one bad day.</li>
+            <li>Buy more of a falling stock only to "get back to even."</li>
+            <li>Put everything into one stock.</li>
+          </ul>
+        </div>
+      </div>
+      ${key("plan the exit before you enter. Know why you're buying, how much, and when you'd sell.")}
+      ${live(`The Coach's view on <b>${selected}</b>: ${co.summary}<br><br><b>Its suggestion:</b> ${first}`)}`;
+    },
+    quiz: {
+      q: "You bought a stock at $100 with a rule to sell if it falls 8%. It's now $91. What does your plan say?",
+      opts: ["Sell, because it's below your $92 stop-loss", "Buy more to lower your average cost", "Ignore it; it will come back"],
+      a: 0,
+      why: "8% below $100 is $92, and $91 is past that line. Sticking to the rule keeps a small loss from growing.",
+    },
+    tryIt: { label: "Read the Coach card" },
+  },
+  {
+    id: "taiwan", title: "Investing in Taiwan stocks",
+    body: () => {
+      const p = price("2330");
+      return `
+      <p>The <b>Taiwan Stock Exchange</b> (臺灣證券交易所, TWSE) uses numbers instead of letters for tickers: <b>2330</b> is TSMC and <b>2317</b> is Hon Hai, also known as Foxconn. ETFs usually start with 00, like <b>0050</b>.</p>
+      <p>Prices are in <b>New Taiwan dollars (NT$)</b>. This app keeps your cash in US dollars and converts at a fixed NT$${MARKETS.TW.perUSD} = US$1. In real life the exchange rate moves every day, so a Taiwan stock can rise in NT$ and still lose value in US$. That is called <b>currency risk</b>.</p>
+      <div class="facts">
+        <div class="fact"><div class="fact-k">Trading hours</div><div class="fact-v">9:00 to 13:30, Monday to Friday, Taiwan time</div></div>
+        <div class="fact"><div class="fact-k">Board lot (一張)</div><div class="fact-v">1,000 shares. Odd-lot trading (零股) lets you buy fewer.</div></div>
+        <div class="fact"><div class="fact-k">Daily price limit</div><div class="fact-v">At most 10% up or down from the previous close in one day. This app enforces it and shows a LIMIT tag.</div></div>
+        <div class="fact"><div class="fact-k">Price steps</div><div class="fact-v">Prices move in fixed steps. Above NT$1,000 the step is NT$5, so TSMC can't trade at NT$1,083.</div></div>
+        <div class="fact"><div class="fact-k">Colors</div><div class="fact-v"><b>Red means up</b> and green means down, the opposite of this app and of US apps.</div></div>
+      </div>
+      <p>TSMC is by far the largest company on the exchange, so its price has a big effect on the whole Taiwan market.</p>
+      ${key("Taiwan stocks trade in NT$, in lots of 1,000 shares, with a 10% daily limit, and red means up.")}
+      ${live(`TSMC (2330) is <b>${fmtP("2330", p)}</b> per share, about <b>${fmt$(usd("2330"))}</b>. One full board lot of 1,000 shares would cost <b>${fmtP("2330", p * 1000)}</b>. In this app you can buy single shares, like odd-lot trading.`)}`;
+    },
+    quiz: {
+      q: "On a Taiwanese stock app, a price shown in red means…",
+      opts: ["The price went up", "The price went down", "Trading is paused"],
+      a: 0,
+      why: "In Taiwan, as in mainland China, Hong Kong and Japan, red marks a rising price. In the US and Europe it is usually the other way round.",
+    },
+    tryIt: { label: "Look at TSMC (2330)", sym: "2330" },
+  },
+  {
+    id: "predict", title: "Why nobody can predict the market",
+    body: () => {
+      const { total } = portfolioTotals();
+      const change = total - START_CASH;
+      return `
+      <p>Every signal in these lessons is a <b>hint, not a promise</b>. Prices react to news that nobody knows in advance: a surprise profit report, a new law, a factory fire.</p>
+      <p>This simulator works the same way. Trends tend to last a while, so the signals help a little, but surprise news and random moves often overwhelm them. Turn on auto-pilot and watch: it wins some trades and loses others.</p>
+      <p>Even professionals find it hard. Over long periods, most professional fund managers fail to beat a simple fund that just holds the whole market.</p>
+      <p>If you invest real money someday, a few habits help:</p>
+      <ul>
+        <li>Learn first, and think in years rather than days.</li>
+        <li>Spread your money out, for example with a broad market fund.</li>
+        <li>Only invest money you won't need soon.</li>
+        <li>Watch out for fees, and for anyone promising guaranteed returns.</li>
+        <li>Talk it over with someone you trust before you start.</li>
+      </ul>
+      ${key("anyone who says they can predict the market for sure is wrong, or selling something.")}
+      ${live(`Your simulated account is <b class="${change >= 0 ? "pos" : "neg"}">${change >= 0 ? "up" : "down"} ${fmt$(Math.abs(change))} (${fmtPct(change / START_CASH)})</b> since you started.`)}`;
+    },
+    quiz: {
+      q: "Can any AI or expert reliably predict tomorrow's stock prices?",
+      opts: ["No. Signals can help you think, but nobody predicts prices reliably", "Yes, with enough data", "Only for big, famous companies"],
+      a: 0,
+      why: "Markets react to new information that nobody has yet. That is why risk control and diversification matter more than predictions.",
+    },
+    tryIt: { label: "Try auto-pilot" },
+  },
+];
+
+/* ============ Rendering: learn view ============ */
+function lessonIndex(id) { return Math.max(0, LESSONS.findIndex(l => l.id === id)); }
+
+function renderLessonList() {
+  const doneCount = LESSONS.filter(l => learn.done[l.id]).length;
+  $("progressText").textContent = `${doneCount} of ${LESSONS.length}`;
+  $("progressFill").style.width = (doneCount / LESSONS.length * 100) + "%";
+  $("progressBar").setAttribute("aria-valuenow", String(doneCount));
+  $("progressBar").setAttribute("aria-valuemax", String(LESSONS.length));
+  $("learnCount").textContent = `${doneCount}/${LESSONS.length}`;
+  $("lessonList").innerHTML = LESSONS.map((l, i) => `
+    <button type="button" class="lesson-btn${learn.done[l.id] ? " done" : ""}" data-id="${l.id}" aria-current="${l.id === learn.current}">
+      <span class="lesson-num" aria-hidden="true">${learn.done[l.id] ? "✓" : i + 1}</span>
+      <span>${l.title}${learn.done[l.id] ? '<span class="sr-only"> (completed)</span>' : ""}</span>
+    </button>`).join("");
+}
+
+function renderLesson() {
+  const i = lessonIndex(learn.current);
+  const l = LESSONS[i];
+  const prev = LESSONS[i - 1], next = LESSONS[i + 1];
+  $("lessonPanel").innerHTML = `
+    <div class="eyebrow">Lesson ${i + 1} of ${LESSONS.length}${learn.done[l.id] ? " · completed" : ""}</div>
+    <h2>${l.title}</h2>
+    <div class="lesson-body">${l.body()}</div>
+    <div class="quiz">
+      <h3>Quick check</h3>
+      <p class="q">${l.quiz.q}</p>
+      <div class="quiz-opts">
+        ${l.quiz.opts.map((o, k) => `<button type="button" class="quiz-opt" data-k="${k}">${o}</button>`).join("")}
+      </div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+    </div>
+    <div class="lesson-nav">
+      ${prev ? `<button type="button" class="btn btn-ghost" id="prevLesson">← ${prev.title}</button>` : ""}
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" id="tryIt">${l.tryIt.label} →</button>
+      ${next ? `<button type="button" class="btn btn-primary" id="nextLesson">Next lesson</button>` : ""}
+    </div>`;
+
+  const panel = $("lessonPanel");
+  panel.querySelectorAll(".quiz-opt").forEach(b => b.addEventListener("click", () => answerQuiz(l, +b.dataset.k)));
+  if (prev) $("prevLesson").addEventListener("click", () => openLesson(prev.id, true));
+  if (next) $("nextLesson").addEventListener("click", () => openLesson(next.id, true));
+  $("tryIt").addEventListener("click", () => tryIt(l));
+}
+
+function answerQuiz(l, k) {
+  const fb = $("quizFeedback");
+  const buttons = $("lessonPanel").querySelectorAll(".quiz-opt");
+  if (k === l.quiz.a) {
+    buttons.forEach(b => { b.disabled = true; if (+b.dataset.k === k) b.classList.add("right"); });
+    fb.innerHTML = `<b class="pos">Correct!</b> ${l.quiz.why}`;
+    if (!learn.done[l.id]) {
+      learn.done[l.id] = true;
+      saveLearn();
+      renderLessonList();
+      const eb = $("lessonPanel").querySelector(".eyebrow");
+      if (eb && !eb.textContent.includes("completed")) eb.textContent += " · completed";
+    }
+    if (LESSONS.every(x => learn.done[x.id])) {
+      fb.innerHTML += `<br><br><b>You finished all ${LESSONS.length} lessons.</b> Try putting them into practice on the Trade tab.`;
+    }
+  } else {
+    buttons[k].classList.add("wrong");
+    buttons[k].disabled = true;
+    fb.innerHTML = `<b class="neg">Not quite.</b> Have another look at the lesson and try again.`;
+  }
+}
+
+function openLesson(id, focusPanel) {
+  learn.current = id;
+  saveLearn();
+  renderLessonList();
+  renderLesson();
+  if (focusPanel && window.matchMedia("(max-width: 860px)").matches) {
+    $("lessonPanel").scrollIntoView({ block: "start" });
+  }
+}
+
+function tryIt(l) {
+  const t = l.tryIt;
+  let sym = t.sym;
+  if (t.pick === "mostVolatile") {
+    sym = STOCKS.map(s => ({ sym: s.sym, v: volatility(series(s.sym)) })).sort((a, b) => b.v - a.v)[0].sym;
+  }
+  if (sym) {
+    selected = sym;
+    if (state.mktFilter !== "ALL" && state.mktFilter !== market[sym].mkt) state.mktFilter = "ALL";
+  }
+  if (t.qty) $("qty").value = t.qty;
+  showView("trade");
+  renderAll();
+  const target = { news: "newsFeed", rsi: "recReasons", whenact: "coachSummary", ma: "chartWrap", chart: "chartWrap",
+                   pnl: "holdings", predict: "autoPilot", buysell: "qty" }[l.id];
+  if (l.id === "rsi") document.querySelector("details.signals").open = true;
+  if (target) $(target).scrollIntoView({ block: "center" });
+  else window.scrollTo({ top: 0 });
+}
+
+/* ============ Views (Trade / Learn) ============ */
+function showView(v) {
+  const isLearn = v === "learn";
+  $("tradeView").hidden = isLearn;
+  $("learnView").hidden = !isLearn;
+  $("tabTrade").setAttribute("aria-pressed", String(!isLearn));
+  $("tabLearn").setAttribute("aria-pressed", String(isLearn));
+  if (isLearn) { renderLessonList(); renderLesson(); }
+  const want = isLearn ? "#learn" : "";
+  if (location.hash !== want) {
+    try { history.replaceState(null, "", want || location.pathname + location.search); } catch (e) { /* ignore */ }
+  }
 }
 
 /* ============ Wire up ============ */
@@ -694,17 +1594,67 @@ $("autoPilot").addEventListener("change", e => {
   state.aiFeed.unshift({ t: now(), msg: state.autoPilot ? "Auto-pilot <b>enabled</b> — the AI will now manage this paper portfolio." : "Auto-pilot <b>disabled</b>." });
   renderAll();
 });
+
+// Two-step reset (browser confirm dialogs are not always available)
+let resetArmed = null;
 $("resetBtn").addEventListener("click", () => {
-  if (!confirm("Reset your paper account back to $100,000? This clears holdings and history.")) return;
-  state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], autoPilot: false };
+  const btn = $("resetBtn");
+  if (!resetArmed) {
+    btn.textContent = "Click again to reset to $100,000";
+    btn.className = "btn btn-danger-ghost";
+    resetArmed = setTimeout(() => {
+      resetArmed = null; btn.textContent = "Reset account"; btn.className = "btn btn-ghost";
+    }, 4000);
+    return;
+  }
+  clearTimeout(resetArmed); resetArmed = null;
+  btn.textContent = "Reset account"; btn.className = "btn btn-ghost";
+  state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: state.news, autoPilot: false, mktFilter: state.mktFilter, dayStartTotal: START_CASH };
   $("autoPilot").checked = false;
+  $("tradeMsg").textContent = "Account reset to $100,000."; $("tradeMsg").className = "trade-msg pos";
   renderAll();
 });
+
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+  state.mktFilter = b.dataset.mkt;
+  const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
+  if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
+  renderAll();
+}));
+
+$("tabTrade").addEventListener("click", () => showView("trade"));
+$("tabLearn").addEventListener("click", () => showView("learn"));
+
+// One click handler for lesson links, "?" buttons, stock buttons and the lesson list
+document.addEventListener("click", e => {
+  const lessonBtn = e.target.closest("[data-lesson]");
+  if (lessonBtn) {
+    learn.current = lessonBtn.dataset.lesson;
+    saveLearn();
+    showView("learn");
+    window.scrollTo({ top: 0 });
+    return;
+  }
+  const listBtn = e.target.closest(".lesson-btn");
+  if (listBtn) { openLesson(listBtn.dataset.id, true); return; }
+  const symBtn = e.target.closest("[data-sym]");
+  if (symBtn && market[symBtn.dataset.sym]) {
+    selected = symBtn.dataset.sym;
+    if (state.mktFilter !== "ALL" && state.mktFilter !== market[selected].mkt) state.mktFilter = "ALL";
+    renderAll();
+    if (symBtn.classList.contains("news-sym")) $("dSym").scrollIntoView({ block: "center" });
+  }
+});
+window.addEventListener("hashchange", () => showView(location.hash === "#learn" ? "learn" : "trade"));
+
 $("chartWrap").addEventListener("mousemove", chartHover);
 $("chartWrap").addEventListener("mouseleave", chartLeave);
 
+if (state.dayStartTotal == null) state.dayStartTotal = portfolioTotals().total;
 $("autoPilot").checked = state.autoPilot;
 renderAll();
+renderLessonList();
+showView(location.hash === "#learn" ? "learn" : "trade");
 setInterval(tick, TICK_MS);
 </script>
 </body>
