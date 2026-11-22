@@ -14,7 +14,10 @@ AI can guarantee profitable decisions.
 a simulated market of 12 US and 8 Taiwan stocks (with trends, news headlines,
 whole-market moves, daily recaps and Taiwan's 10% price limit), a virtual
 $100,000 paper-trading account, a Coach that summarizes each stock and
-suggests what a careful trader might do, an optional auto-pilot, and a Learn
-tab with 12 beginner lessons and quizzes. All prices and news are simulated
+suggests what a careful trader might do, an optional auto-pilot, a trade
+Journal that records every buy and sell and reviews each step against the
+lessons' rules, and a Learn tab with 12 beginner lessons, quizzes and a
+45-word stock and economics vocabulary. The whole app is available in
+English and Traditional Chinese (繁體中文). All prices and news are simulated
 and no real money or brokerage account is involved. Open the file in any
 browser — no build step or server needed.

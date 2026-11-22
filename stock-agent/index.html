@@ -26,6 +26,8 @@
     --accent-ink: #ffffff;
     --warn-bg: #fdf6e3;
     --warn-border: #eda100;
+    --warn-ink: #8a5a00;
+    --warn-soft: rgba(237,161,0,0.14);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -47,6 +49,8 @@
       --accent: #3987e5;
       --warn-bg: #2a2313;
       --warn-border: #c98500;
+      --warn-ink: #e0a43a;
+      --warn-soft: rgba(201,133,0,0.18);
     }
   }
   :root[data-theme="dark"] {
@@ -68,6 +72,8 @@
     --accent: #3987e5;
     --warn-bg: #2a2313;
     --warn-border: #c98500;
+    --warn-ink: #e0a43a;
+    --warn-soft: rgba(201,133,0,0.18);
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -324,42 +330,109 @@
   .lesson-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
   .lesson-nav .spacer { flex: 1; }
 
+  /* ============ Journal view ============ */
+  .journal { max-width: 1000px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 16px; }
+  .journal-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .j-title { font-size: 22px; margin: 0; }
+  .j-sub { margin: 4px 0 0; color: var(--ink-2); font-size: 14px; max-width: 65ch; }
+  .j-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .j-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+  .j-stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  .j-stat .value { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .j-stat .hint { font-size: 12px; color: var(--muted); }
+  .j-habits { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .j-habits h3 { font-size: 14px; margin: 0 0 6px; }
+  .j-habits ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--ink-2); }
+  .j-habits li { margin: 4px 0; }
+  .j-habits li b { color: var(--ink); }
+  .j-list { display: flex; flex-direction: column; gap: 12px; }
+  .j-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; }
+  .side-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: #fff; }
+  .side-buy { background: #0a7f0a; } .side-sell { background: #c23333; }
+  .j-top .time { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .who { font-size: 11px; font-weight: 600; color: var(--ink-2); border: 1px solid var(--grid); border-radius: 4px; padding: 0 5px; }
+  .grade { font-size: 12.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .j-top .grade { margin-left: auto; }
+  .grade-good { background: var(--up-soft); color: var(--up); }
+  .grade-mixed { background: var(--warn-soft); color: var(--warn-ink); }
+  .grade-risky { background: var(--down-soft); color: var(--down); }
+  .j-seen { font-size: 12.5px; color: var(--muted); margin: 8px 0 10px; }
+  .j-seen b { color: var(--ink-2); }
+  .j-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .j-checks li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; font-size: 13.5px; color: var(--ink-2); }
+  .ck-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+  .ck-good .ck-icon { background: var(--up); } .ck-bad .ck-icon { background: var(--down); } .ck-warn .ck-icon { background: var(--warn-border); }
+  .j-checks b { color: var(--ink); }
+  .j-outcome { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--grid); font-size: 13.5px; color: var(--ink-2); }
+  .j-outcome b { color: var(--ink); }
+  .j-outcome .verdict { display: block; margin-top: 2px; color: var(--ink); }
+  .j-empty { text-align: center; padding: 32px 16px; color: var(--ink-2); }
+
   footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
   footer a { color: var(--accent); }
   @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
+  /* ============ Language picker + vocabulary ============ */
+  .lang-select {
+    font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--page); color: var(--ink); cursor: pointer;
+  }
+  .learn-switch { max-width: 1180px; margin: 0 auto; padding: 16px 20px 0; display: flex; }
+  #learnView .learn { padding-top: 12px; }
+  .vocab { max-width: 1180px; margin: 0 auto; padding: 12px 20px 40px; display: flex; flex-direction: column; gap: 14px; }
+  .vocab-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .vocab-tools input[type=search] {
+    flex: 1 1 240px; min-width: 0; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--baseline);
+    background: var(--surface); color: var(--ink); font: inherit;
+  }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--baseline); background: var(--surface); color: var(--ink-2); font: inherit;
+    font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 999px; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .vocab-count { font-size: 13px; color: var(--muted); }
+  .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .term-card { display: flex; flex-direction: column; gap: 6px; }
+  .term-card .cat { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+  .term-card .term { font-size: 17px; font-weight: 700; margin: 0; line-height: 1.3; }
+  .term-card .alt { font-size: 13px; color: var(--muted); font-weight: 600; margin-left: 6px; }
+  .term-card p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .term-card .ex { font-size: 13.5px; color: var(--muted); }
+  .term-card .ex b { color: var(--ink-2); font-weight: 600; }
 </style>
 </head>
 <body>
 
 <header class="topbar">
   <div class="logo">Stock<span>Pilot</span> AI</div>
-  <span class="badge">Paper trading — virtual money</span>
-  <nav class="tabs" aria-label="Sections">
-    <button type="button" id="tabTrade" data-view="trade" aria-pressed="true">Trade</button>
-    <button type="button" id="tabLearn" data-view="learn" aria-pressed="false">Learn<span class="count" id="learnCount"></span></button>
+  <span class="badge" data-i18n="badge">Paper trading — virtual money</span>
+  <nav class="tabs" aria-label="Sections" data-i18n-aria="nav.label">
+    <button type="button" data-view="trade" aria-pressed="true"><span data-i18n="tab.trade">Trade</span></button>
+    <button type="button" data-view="journal" aria-pressed="false"><span data-i18n="tab.journal">Journal</span><span class="count" id="journalCount"></span></button>
+    <button type="button" data-view="learn" aria-pressed="false"><span data-i18n="tab.learn">Learn</span><span class="count" id="learnCount"></span></button>
   </nav>
+  <select id="langSel" class="lang-select" aria-label="Language">
+    <option value="en">English</option>
+    <option value="zh">繁體中文</option>
+  </select>
   <div class="cash">
-    <div class="label">Cash available</div>
+    <div class="label" data-i18n="cash">Cash available</div>
     <div class="value" id="cashValue">$0.00</div>
   </div>
 </header>
 
-<div class="disclaimer">
-  <strong>Practice mode:</strong> prices and news are simulated. They behave like a real market (trends, news, whole-market moves),
-  but they are not real, and every trade uses virtual money. The coach teaches common rules of thumb; no one can predict markets.
-  This is an educational tool, not financial advice.
-</div>
+<div class="disclaimer" data-i18n-html="disclaimer"></div>
 
 <main id="tradeView">
   <!-- LEFT: watchlist -->
   <div class="col-left">
     <div class="card">
       <div class="wl-head">
-        <h2>Market watchlist</h2>
-        <div class="seg" role="group" aria-label="Filter by market">
-          <button type="button" data-mkt="ALL" aria-pressed="true">All</button>
-          <button type="button" data-mkt="US" aria-pressed="false">US</button>
-          <button type="button" data-mkt="TW" aria-pressed="false">Taiwan</button>
+        <h2 data-i18n="wl.title">Market watchlist</h2>
+        <div class="seg" role="group" aria-label="Filter by market" data-i18n-aria="wl.filter">
+          <button type="button" data-mkt="ALL" aria-pressed="true" data-i18n="wl.all">All</button>
+          <button type="button" data-mkt="US" aria-pressed="false" data-i18n="wl.us">US</button>
+          <button type="button" data-mkt="TW" aria-pressed="false" data-i18n="wl.tw">Taiwan</button>
         </div>
       </div>
       <div class="clock" id="simClock"></div>
@@ -381,40 +454,40 @@
         <div class="tooltip" id="chartTip"><span class="t-date"></span><br><span class="t-val"></span></div>
       </div>
       <div class="stats">
-        <div class="stat"><div class="label">30-day change<button type="button" class="help" data-lesson="chart" aria-label="Learn about price charts">?</button></div><div class="value" id="s30"></div></div>
-        <div class="stat"><div class="label">90-day high</div><div class="value" id="sHigh"></div></div>
-        <div class="stat"><div class="label">90-day low</div><div class="value" id="sLow"></div></div>
-        <div class="stat"><div class="label">Volatility<button type="button" class="help" data-lesson="risk" aria-label="Learn about volatility">?</button></div><div class="value" id="sVol"></div></div>
-        <div class="stat"><div class="label">You own</div><div class="value" id="sOwn"></div></div>
+        <div class="stat"><div class="label"><span data-i18n="stat.30d">30-day change</span><button type="button" class="help" data-lesson="chart" data-i18n-aria="help.chart">?</button></div><div class="value" id="s30"></div></div>
+        <div class="stat"><div class="label" data-i18n="stat.high">90-day high</div><div class="value" id="sHigh"></div></div>
+        <div class="stat"><div class="label" data-i18n="stat.low">90-day low</div><div class="value" id="sLow"></div></div>
+        <div class="stat"><div class="label"><span data-i18n="stat.vol">Volatility</span><button type="button" class="help" data-lesson="risk" data-i18n-aria="help.risk">?</button></div><div class="value" id="sVol"></div></div>
+        <div class="stat"><div class="label" data-i18n="stat.own">You own</div><div class="value" id="sOwn"></div></div>
       </div>
 
       <div class="card coach-card">
-        <h2>🧭 Coach <span class="sub">· what's happening and what to consider</span><button type="button" class="help" data-lesson="whenact" aria-label="Learn when to buy and sell">?</button></h2>
+        <h2><span data-i18n="coach.title">🧭 Coach</span> <span class="sub" data-i18n="coach.sub">· what's happening and what to consider</span><button type="button" class="help" data-lesson="whenact" data-i18n-aria="help.coach">?</button></h2>
         <div class="rec-line">
           <span class="rec-pill" id="recPill">—</span>
           <span class="conf" id="recConf"></span>
         </div>
         <p class="coach-summary" id="coachSummary"></p>
-        <div class="coach-h">What a careful trader might do</div>
+        <div class="coach-h" data-i18n="coach.h">What a careful trader might do</div>
         <ul class="coach-actions" id="coachActions"></ul>
         <details class="signals">
-          <summary>Show the signals behind this</summary>
+          <summary data-i18n="coach.signals">Show the signals behind this</summary>
           <ul class="reasons" id="recReasons"></ul>
         </details>
-        <p class="coach-note">These are common rules of thumb for practice. Prices here are partly random, so even good rules lose sometimes.</p>
+        <p class="coach-note" data-i18n="coach.note"></p>
       </div>
 
       <div class="trade">
-        <input type="number" id="qty" min="1" step="1" value="10" aria-label="Number of shares" />
-        <button class="btn btn-buy" id="buyBtn">Buy</button>
-        <button class="btn btn-sell" id="sellBtn">Sell</button>
+        <input type="number" id="qty" min="1" step="1" value="10" aria-label="Number of shares" data-i18n-aria="qty.label" />
+        <button class="btn btn-buy" id="buyBtn" data-i18n="btn.buy">Buy</button>
+        <button class="btn btn-sell" id="sellBtn" data-i18n="btn.sell">Sell</button>
         <span style="font-size:13px;color:var(--muted)" id="tradeCost"></span>
       </div>
       <div class="trade-msg" id="tradeMsg"></div>
     </div>
 
     <div class="card">
-      <h2>📰 Market news <span class="sub">· simulated headlines</span><button type="button" class="help" data-lesson="news" aria-label="Learn how news moves prices">?</button></h2>
+      <h2><span data-i18n="news.title">📰 Market news</span> <span class="sub" data-i18n="news.sub">· simulated headlines</span><button type="button" class="help" data-lesson="news" data-i18n-aria="help.news">?</button></h2>
       <ul class="feed news-feed" id="newsFeed"></ul>
     </div>
   </div>
@@ -423,87 +496,1073 @@
   <div class="col-right">
     <div class="card">
       <div class="hero">
-        <div class="label">Portfolio value (US$)</div>
+        <div class="label" data-i18n="pv.label">Portfolio value (US$)</div>
         <div class="value" id="pvValue">$0.00</div>
         <div class="delta" id="pvDelta"></div>
       </div>
       <p class="coach-line" id="portfolioCoach"></p>
-      <h2>Holdings<button type="button" class="help" data-lesson="pnl" aria-label="Learn about profit and loss">?</button></h2>
+      <h2><span data-i18n="holdings">Holdings</span><button type="button" class="help" data-lesson="pnl" data-i18n-aria="help.pnl">?</button></h2>
       <div id="holdings"></div>
     </div>
 
     <div class="card">
-      <h2>🤖 AI auto-pilot <span class="sub">· paper money only</span><button type="button" class="help" data-lesson="diversify" aria-label="Learn about position sizing">?</button></h2>
+      <h2><span data-i18n="ap.title">🤖 AI auto-pilot</span> <span class="sub" data-i18n="ap.sub">· paper money only</span><button type="button" class="help" data-lesson="diversify" data-i18n-aria="help.ap">?</button></h2>
       <div class="switch-row">
         <input type="checkbox" id="autoPilot" />
-        <label for="autoPilot">Let the AI trade automatically for me</label>
+        <label for="autoPilot" data-i18n="ap.label">Let the AI trade automatically for me</label>
       </div>
-      <p style="font-size:12.5px;color:var(--muted);margin:8px 0 0">
-        When on, the AI buys its strongest "Buy" picks (max 15% of portfolio each,
-        always keeping 10% in cash) and sells holdings it rates "Sell." Every action is logged below.
-      </p>
+      <p style="font-size:12.5px;color:var(--muted);margin:8px 0 0" data-i18n="ap.desc"></p>
       <ul class="feed" id="aiFeed"></ul>
     </div>
 
     <div class="card">
-      <h2>Trade history</h2>
+      <h2 data-i18n="hist.title">Trade history</h2>
       <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
-        <button class="btn btn-ghost" id="resetBtn" style="padding:5px 12px;font-size:12px">Reset account</button>
+        <button class="btn btn-ghost" id="resetBtn" style="padding:5px 12px;font-size:12px" data-i18n="reset">Reset account</button>
       </div>
       <ul class="feed" id="history"></ul>
     </div>
   </div>
 </main>
 
-<section class="learn" id="learnView" hidden>
-  <aside class="card">
-    <h2>Stock market basics</h2>
-    <div class="progress-label"><span>Your progress</span><b id="progressText">0 of 12</b></div>
-    <div class="progress" role="progressbar" aria-label="Lessons completed" id="progressBar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div id="progressFill" style="width:0%"></div></div>
-    <div class="lesson-list" id="lessonList"></div>
-  </aside>
-  <article class="card lesson-panel" id="lessonPanel" aria-live="polite"></article>
+<section class="journal" id="journalView" hidden>
+  <div class="journal-head">
+    <div>
+      <h2 class="j-title" data-i18n="j.title">Trade journal</h2>
+      <p class="j-sub" data-i18n="j.sub"></p>
+    </div>
+    <div class="seg" role="group" aria-label="Whose trades to show" data-i18n-aria="j.filter">
+      <button type="button" data-jfilter="you" aria-pressed="true" data-i18n="j.mine">My trades</button>
+      <button type="button" data-jfilter="auto" aria-pressed="false" data-i18n="j.auto">Auto-pilot</button>
+      <button type="button" data-jfilter="all" aria-pressed="false" data-i18n="j.all">All</button>
+    </div>
+  </div>
+  <div class="j-stats" id="jStats"></div>
+  <div class="card j-habits" id="jHabits"></div>
+  <div class="j-list" id="jList"></div>
+</section>
+
+<section id="learnView" hidden>
+  <div class="learn-switch">
+    <div class="seg" role="group" aria-label="Learn sections" data-i18n-aria="l.sections">
+      <button type="button" data-pane="lessons" aria-pressed="true" data-i18n="l.lessons">Lessons</button>
+      <button type="button" data-pane="vocab" aria-pressed="false" data-i18n="l.vocab">Vocabulary</button>
+    </div>
+  </div>
+  <div class="learn" id="lessonsPane">
+    <aside class="card">
+      <h2 data-i18n="l.title">Stock market basics</h2>
+      <div class="progress-label"><span data-i18n="l.progress">Your progress</span><b id="progressText"></b></div>
+      <div class="progress" role="progressbar" aria-label="Lessons completed" data-i18n-aria="l.progressAria" id="progressBar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div id="progressFill" style="width:0%"></div></div>
+      <div class="lesson-list" id="lessonList"></div>
+    </aside>
+    <article class="card lesson-panel" id="lessonPanel" aria-live="polite"></article>
+  </div>
+  <div class="vocab" id="vocabPane" hidden>
+    <div class="vocab-tools">
+      <input type="search" id="vocabSearch" placeholder="Search words…" data-i18n-ph="v.search" aria-label="Search words" data-i18n-aria="v.search" />
+      <span class="vocab-count" id="vocabCount"></span>
+    </div>
+    <div class="chips" id="vocabCats" role="group" aria-label="Word categories" data-i18n-aria="v.cats"></div>
+    <div class="vocab-grid" id="vocabGrid"></div>
+  </div>
 </section>
 
 <footer>
-  StockPilot AI · a practice trading sandbox · prices and news are simulated ·
-  <a href="../index.html">back to CoachStat</a>
+  <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
+  <a href="../index.html" data-i18n="footer.back">back to CoachStat</a>
 </footer>
 
 <script>
 "use strict";
+/* ============ Translations ============ */
+// Each language is one dictionary. Values are strings with {placeholders}
+// or functions that receive the same values. To add a language, copy the
+// `en` block, translate it, and add an <option> to the language picker.
+const I18N = {
+  en: {
+    "nav.label": "Sections",
+    badge: "Paper trading — virtual money",
+    "tab.trade": "Trade", "tab.journal": "Journal", "tab.learn": "Learn",
+    cash: "Cash available",
+    disclaimer: "<strong>Practice mode:</strong> prices and news are simulated. They behave like a real market (trends, news, whole-market moves), but they are not real, and every trade uses virtual money. The coach teaches common rules of thumb; no one can predict markets. This is an educational tool, not financial advice.",
+    "wl.title": "Market watchlist", "wl.filter": "Filter by market", "wl.all": "All", "wl.us": "US", "wl.tw": "Taiwan",
+    clock: v => `<b>Day ${v.d} · ${v.time}</b> · simulated trading day, about 1 minute long`,
+    stamp: v => `Day ${v.d} · ${v.time}`,
+    "stat.30d": "30-day change", "stat.high": "90-day high", "stat.low": "90-day low", "stat.vol": "Volatility", "stat.own": "You own",
+    shares: v => `${v.n} sh`,
+    "help.chart": "Learn about price charts", "help.risk": "Learn about volatility", "help.coach": "Learn when to buy and sell",
+    "help.news": "Learn how news moves prices", "help.pnl": "Learn about profit and loss", "help.ap": "Learn about position sizing",
+    "coach.title": "🧭 Coach", "coach.sub": "· what's happening and what to consider",
+    "coach.h": "What a careful trader might do", "coach.signals": "Show the signals behind this",
+    "coach.note": "These are common rules of thumb for practice. Prices here are partly random, so even good rules lose sometimes.",
+    "qty.label": "Number of shares", "btn.buy": "Buy", "btn.sell": "Sell",
+    "news.title": "📰 Market news", "news.sub": "· simulated headlines",
+    "pv.label": "Portfolio value (US$)", holdings: "Holdings",
+    "ap.title": "🤖 AI auto-pilot", "ap.sub": "· paper money only", "ap.label": "Let the AI trade automatically for me",
+    "ap.desc": "When on, the AI buys its strongest \"Buy\" picks (max 15% of portfolio each, always keeping 10% in cash) and sells holdings it rates \"Sell.\" Every action is logged below and reviewed in the Journal.",
+    "hist.title": "Trade history", reset: "Reset account", "reset.confirm": "Click again to reset to $100,000", "reset.done": "Account reset to $100,000.",
+    "j.title": "Trade journal", "j.filter": "Whose trades to show", "j.mine": "My trades", "j.auto": "Auto-pilot", "j.all": "All",
+    "j.sub": "Every buy and sell is recorded with what you could see at that moment, then checked against the rules from the lessons. Judge each step by its reasons, not only by whether it made money.",
+    "l.sections": "Learn sections", "l.lessons": "Lessons", "l.vocab": "Vocabulary",
+    "l.title": "Stock market basics", "l.progress": "Your progress", "l.progressAria": "Lessons completed",
+    "v.search": "Search words…", "v.cats": "Word categories",
+    footer: "StockPilot AI · a practice trading sandbox · prices and news are simulated", "footer.back": "back to CoachStat",
+
+    // market + detail
+    "mkt.US": "US", "mkt.TW": "Taiwan",
+    "limit.up": "LIMIT UP", "limit.down": "LIMIT DOWN",
+    "chg.today": v => `${v.p} today`,
+    "fx.tw": v => `Taiwan Stock Exchange · ≈ ${v.usd} per share at NT$${v.rate} = US$1 (simulated rate) · today's limit ${v.lo} to ${v.hi}`,
+    "fx.us": v => `Previous close ${v.pc}`,
+    "chart.legend": "— price   - - 20-day average", "chart.today": "today", "chart.days": v => `${v.d}d`,
+    "chart.aria": v => `${v.sym} price over the last 90 days, with its 20-day average`,
+    "tip.today": "Today (live)", "tip.yday": "Yesterday's close", "tip.ago": v => `${v.d} days ago`,
+    "rec.BUY": "BUY", "rec.SELL": "SELL", "rec.HOLD": "HOLD",
+    "signals": v => `Signals: ${v.rec}`, strength: v => `signal strength ${v.c}%`,
+    "r.trendUp": v => `Trend is up: the 20-day average (${v.a}) is above the 50-day (${v.b}).`,
+    "r.trendDown": v => `Trend is down: the 20-day average (${v.a}) is below the 50-day (${v.b}).`,
+    "r.momUp": v => `Strong momentum: up ${v.p} over the last 30 days.`,
+    "r.momDown": v => `Weak momentum: down ${v.p} over the last 30 days.`,
+    "r.momFlat": v => `Momentum is flat (${v.p} over 30 days).`,
+    "r.rsiLow": v => `RSI is ${v.r}: the stock looks oversold, which can come before a bounce.`,
+    "r.rsiHigh": v => `RSI is ${v.r}: the stock looks overbought and could pull back.`,
+    "r.rsiMid": v => `RSI is ${v.r}, in the normal range.`,
+    "r.volHigh": v => `High volatility (${v.p} a year): bigger swings, bigger risk.`,
+
+    // trading
+    "verb.buy": "Bought", "verb.sell": "Sold",
+    "msg.nocash": "Not enough cash for that order.", "msg.noshares": "You don't own that many shares.",
+    "msg.done": v => `${v.verb} ${v.n} shares of ${v.sym} at ${v.px}.`,
+    "msg.journal": "Journal:", "msg.why": "See why",
+    hist: v => `${v.ai}<b>${v.verb} ${v.n} ${v.sym}</b> @ ${v.px}`,
+    "th.sym": "Sym", "th.shares": "Shares", "th.price": "Price", "th.pl": "P&amp;L (US$)",
+    "hold.empty": "No holdings yet — buy your first stock or turn on auto-pilot.",
+    "pv.delta": v => `${v.arrow} ${v.amt} (${v.p}) all-time`,
+    "ap.empty": "Auto-pilot actions will appear here.", "hist.empty": "No trades yet.", "news.empty": "Headlines will appear here as news breaks.",
+    "ap.on": "Auto-pilot <b>enabled</b> — the AI will now manage this paper portfolio.", "ap.off": "Auto-pilot <b>disabled</b>.",
+    "ap.sold": v => `Sold all <b>${v.sym}</b> — ${v.reason}`,
+    "ap.bought": v => `Bought ${v.n} <b>${v.sym}</b> (signal ${v.c}%) — ${v.reason}`,
+
+    // news
+    "news.pos": ["{n} beats profit expectations", "{n} wins a big new contract", "Analysts raise their price target for {n}", "{n} launches a popular new product", "{n} raises its sales forecast"],
+    "news.neg": ["{n} misses profit expectations", "{n} cuts its sales forecast", "Regulators open an investigation into {n}", "{n} loses a major customer", "Analysts downgrade {n}"],
+    "news.secPos": { chips: "Demand for AI chips jumps", shipping: "Global shipping rates climb", finance: "Banks report strong lending", tech: "Tech spending picks up", consumer: "Shoppers spend more than expected", telecom: "Telecom subscriptions grow" },
+    "news.secNeg": { chips: "Chip orders slow down", shipping: "Global shipping rates fall", finance: "Loan defaults rise", tech: "Companies cut tech spending", consumer: "Shoppers pull back on spending", telecom: "Telecom price war heats up" },
+    "news.mktPos": { US: ["The Federal Reserve signals lower interest rates", "A strong jobs report lifts US stocks"], TW: ["Taiwan export orders jump", "Foreign investors buy Taiwan stocks"] },
+    "news.mktNeg": { US: ["US inflation comes in hotter than expected", "Worries about a slowing US economy hit stocks"], TW: ["Taiwan export orders fall", "Foreign investors sell Taiwan stocks"] },
+    "news.industry": "Industry:", "news.market": v => `${v.m} market:`,
+    "news.yday": "Yesterday", "news.ago": v => `${v.d} days ago`,
+    "recap.t": v => `Day ${v.d} close`,
+    recap: v => `📊 <b>Day ${v.d} recap:</b> US stocks ${v.us}, Taiwan ${v.tw} on average. Your portfolio ${v.pd} today. Biggest mover: <b>${v.sym}</b> ${v.c}.`,
+
+    // coach
+    why: "Why?",
+    "c.trend": v => `${v.name} has been in ${v.up ? "an uptrend" : "a downtrend"}: ${v.pos ? "up" : "down"} ${v.mom}% over 30 days, with the 20-day average ${v.up ? "above" : "below"} the 50-day.`,
+    "c.rsiHigh": v => ` RSI is ${v.r}, so it has risen fast and may be overbought.`,
+    "c.rsiLow": v => ` RSI is ${v.r}, so it has fallen fast and may be oversold.`,
+    "c.rsiMid": v => ` RSI is ${v.r}, in the normal range.`,
+    "c.vol": v => ` Its price swings are ${["small", "medium-sized", "large"][v.w]} (${v.p}% a year).`,
+    "c.limit": v => ` It is at Taiwan's daily ${v.up ? "upper" : "lower"} price limit, so it can't move further ${v.up ? "up" : "down"} today.`,
+    "c.news": v => ` Recent news: “${v.h}” (${v.c}).`,
+    "a.stop": v => `You're down ${v.p}% on this stock. Many traders use a <b>stop-loss</b>: they sell if a stock falls about 7–10% below what they paid, so a small loss can't turn into a big one.`,
+    "a.profit": v => `You're up ${v.p}%. Selling part of it would <b>lock in some profit</b> while keeping the rest in case it keeps rising.`,
+    "a.big": v => `This stock is ${v.p}% of your portfolio. That's a lot in one place; trimming it would lower your risk.`,
+    "a.hold": "The trend is still up while you own it. <b>Holding</b> and letting a winner run is reasonable. Keep your stop-loss in mind.",
+    "a.exit": "The trend has turned down while you own it. Ask whether your reason for buying still holds. If not, <b>selling</b> is reasonable.",
+    "a.buy": "The trend and RSI line up for a <b>buy</b>. A careful trader would start small (about 5–10% of the portfolio) and decide in advance at what price they'd sell if they're wrong.",
+    "a.chase": "It has climbed fast. Instead of <b>chasing</b> it, a careful trader might wait for a pullback before buying.",
+    "a.knife": "It has fallen hard and looks oversold. Bounces happen, but buying a falling stock is risky (traders call it \"catching a falling knife\"). <b>Waiting</b> for the trend to turn up is safer.",
+    "a.wait": "The trend is down. Most beginners do better <b>waiting</b> until the trend turns up before buying.",
+    "a.vol": "This stock swings a lot, so use a <b>smaller amount</b> than usual if you trade it.",
+    "a.news": "Don't trade just because of a headline: prices react within seconds, so the move has usually already happened.",
+    "pc.prefix": "Coach:",
+    "pc.none": "you haven't bought anything yet. Look for a stock in an uptrend, start small, and decide ahead of time when you'd sell.",
+    "pc.big": v => `${v.sym} is ${v.p}% of your portfolio. If it fell 20%, your whole account would drop about ${v.d}%. Consider trimming it.`,
+    "pc.loser": v => `${v.sym} is down ${v.p}% from what you paid. Check your stop-loss plan for it.`,
+    "pc.few": v => `you own ${v.n} stock${v.n === 1 ? "" : "s"}. Spreading across 5 or more lowers your risk.`,
+    "pc.oneMkt": v => `all your stocks are in the ${v.m} market. Adding some from the other market spreads your risk.`,
+    "pc.cash": v => `${v.p}% of your money is still cash. Cash is safe, but it doesn't grow.`,
+    "pc.good": v => `your money is spread across ${v.n} stocks in two markets. Keep each position small and stick to your sell rules.`,
+
+    // journal
+    "g.good": "Good step", "g.mixed": "Mixed step", "g.risky": "Risky step",
+    "js.trades": "Trades", "js.tradesHint": v => `${v.b} buys · ${v.s} sells`,
+    "js.good": "Good steps", "js.goodHint": "followed the rules",
+    "js.mixed": "Mixed steps", "js.mixedHint": "some good, some risky",
+    "js.risky": "Risky steps", "js.riskyHint": "broke key rules",
+    "js.score": "Rule score", "js.scoreHint": "of rule checks passed",
+    "jh.well": "What you do well", "jh.work": "What to work on", "jh.title": "Your habits",
+    "jh.noWell": "Nothing yet. Follow the buy checklist and your strengths will show up here.",
+    "jh.noWork": "No mistakes found so far. Keep it up.",
+    "jh.empty": "After a few trades, this box will show what you do well and what to work on.",
+    "jh.times": v => `(${v.n}×)`, lesson: "Lesson", "lesson.named": v => `Lesson: ${v.t}`,
+    "who.you": "You", "who.auto": "🤖 Auto-pilot",
+    "seen.you": "What you could see:", "seen.auto": "What it could see:",
+    "seen.trend": v => `trend ${v.up ? "up" : "down"}`, "seen.rsi": v => `RSI ${v.r}`, "seen.mom": v => `30-day ${v.p}`,
+    "seen.day": v => `today ${v.p}`, "seen.vol": v => `swings ${v.p}/yr`,
+    "seen.posAfter": v => `position after ${v.p} of portfolio`, "seen.posBefore": v => `position before ${v.p} of portfolio`,
+    "seen.pl": v => `your gain/loss ${v.p}`, "seen.holding": v => `already holding ${v.p}`, "seen.news": v => `news “${v.h}”`,
+    "o.title": "What happened next:", "o.early": "Too early to tell. Check back after a full trading day.",
+    "o.who.you": "you", "o.who.auto": "the auto-pilot",
+    "o.buy": v => `Since ${v.who} bought, ${v.sym} is ${v.p} (${v.move}), ${v.win ? "a gain" : "a loss"} of about ${v.amt} on these shares.`,
+    "o.sellWin": v => `Since ${v.who} sold, ${v.sym} fell ${v.p} (${v.move}). Selling saved about ${v.amt}.`,
+    "o.sellLoss": v => `Since ${v.who} sold, ${v.sym} rose ${v.p} (${v.move}). Holding would have made about ${v.amt} more.`,
+    "vd.gg": "Good step, good result: the reasons and the outcome agreed.",
+    "vd.gb": "Good step, unlucky result. Keep following the rules: good steps still lose sometimes.",
+    "vd.bg": "Lucky this time. Steps like this lose more often than they win, so don't let one result fool you.",
+    "vd.bb": "The risks in this step showed up. Use the tips above next time.",
+    "j.emptyTitle": v => `No ${v.auto ? "auto-pilot " : ""}trades yet.`,
+    "j.emptyYou": "Make your first buy on the Trade tab. It will show up here with a review of every rule it followed or broke.",
+    "j.emptyAuto": "Turn on auto-pilot on the Trade tab and its trades will be reviewed here.",
+    "j.go": "Go to Trade",
+    "ck.buy-knife.t": "Tried to catch a falling knife",
+    "ck.buy-knife.w": v => `The trend was down and RSI was ${v.r}. Oversold stocks can keep falling for a long time. Next time, wait for the trend to turn up first.`,
+    "ck.buy-downtrend.t": "Bought while the trend was down",
+    "ck.buy-downtrend.w": "The 20-day average was below the 50-day. Stocks in a downtrend often keep falling. Next time, wait until the 20-day average climbs back above the 50-day.",
+    "ck.buy-uptrend.t": "Bought in an uptrend",
+    "ck.buy-uptrend.w": "The 20-day average was above the 50-day, so you went with the trend instead of against it.",
+    "ck.buy-chase.t": v => `Chased a stock that had already run up (RSI ${v.r})`,
+    "ck.buy-chase.w": "After a fast climb, prices often pull back. Next time, wait for RSI to cool below 70 for a better price.",
+    "ck.buy-nochase.t": v => `Didn't chase (RSI ${v.r})`,
+    "ck.buy-nochase.w": "RSI was in the normal range, so you weren't buying at the top of a sudden spike.",
+    "ck.buy-avgdown.t": "Bought more of a falling stock",
+    "ck.buy-avgdown.w": v => `You were already down ${v.p} on it. Adding to a loser to "get back to even" can turn a small loss into a big one.`,
+    "ck.buy-big.t": v => `Put ${v.p} of your portfolio in one stock`,
+    "ck.buy-big.w": v => `If it fell 20%, your whole account would lose about ${v.d}%. Next time, keep each stock under about 10%.`,
+    "ck.buy-large.t": v => `Fairly large position (${v.p} of your portfolio)`,
+    "ck.buy-large.w": "Above about 10%, your account starts to depend a lot on one company.",
+    "ck.buy-small.t": v => `Kept the position small (${v.p} of your portfolio)`,
+    "ck.buy-small.w": "With small positions, one bad stock can't sink your account.",
+    "ck.buy-nocash.t": v => `Left almost no cash (${v.p})`,
+    "ck.buy-nocash.w": "With no cash left you have no cushion, and you can't act when a better chance comes along.",
+    "ck.buy-news.t": "Bought right after good news",
+    "ck.buy-news.w": v => `“${v.h}” had just come out. Prices jump within seconds of a headline, so buying after it often means buying at the top of the jump.`,
+    "ck.buy-jumpy.t": "Big bet on a very jumpy stock",
+    "ck.buy-jumpy.w": v => `It swings about ${v.p} a year. Use a smaller amount for stocks this volatile.`,
+    "ck.sell-stoploss.t": v => `Cut a losing position (down ${v.p})`,
+    "ck.sell-stoploss.w": "Selling a loser keeps it from turning into a bigger loss. That's exactly what a stop-loss is for.",
+    "ck.sell-late.t": "Waited a long time to sell",
+    "ck.sell-late.w": "A stop-loss about 8% below your buy price would have limited the damage. Next time, decide your exit price before you buy.",
+    "ck.sell-profit.t": v => `Locked in a big gain (up ${v.p})`,
+    "ck.sell-profit.w": "Taking profit after a big rise turns a gain on paper into real money.",
+    "ck.sell-trend.t": "Sold after the trend turned down",
+    "ck.sell-trend.w": "The 20-day average had dropped below the 50-day, a common sign to get out.",
+    "ck.sell-trim.t": "Trimmed an oversized position",
+    "ck.sell-trim.w": v => `That stock was ${v.p} of your portfolio. Reducing it lowers your risk.`,
+    "ck.sell-strength.t": v => `Sold into strength (RSI ${v.r})`,
+    "ck.sell-strength.w": "Selling after a fast climb often gets a good price before a pullback.",
+    "ck.sell-panic.t": "Sold after one bad day while the trend was still up",
+    "ck.sell-panic.w": v => `It was down ${v.p} today, but the longer trend was up. One bad day is usually noise, and panic-selling locks in the dip.`,
+    "ck.sell-early.t": "Sold a winner very early",
+    "ck.sell-early.w": "The trend was still up and nothing had gone wrong. Letting winners run is how gains add up. Cutting winners early while keeping losers is a common mistake.",
+    "ck.sell-news.t": "Sold right after bad news",
+    "ck.sell-news.w": v => `“${v.h}” had just come out. Prices drop within seconds of a headline, so selling afterwards often sells near the low. Ask whether the news really changes the company's story.`,
+    "ck.sell-noreason.t": "No clear reason for this sale",
+    "ck.sell-noreason.w": "Before selling, name your reason: stop-loss hit, trend turned down, position too big, or taking profit.",
+
+    // learn
+    "l.of": v => `${v.a} of ${v.b}`, "l.lessonN": v => `Lesson ${v.i} of ${v.n}`, "l.completed": " · completed",
+    "l.done": " (completed)", "l.live": "In the simulator right now", "l.key": "Key idea:",
+    "l.check": "Quick check", "l.next": "Next lesson", "l.correct": "Correct!", "l.wrong": "Not quite.",
+    "l.wrongMsg": "Have another look at the lesson and try again.",
+    "l.allDone": v => `<b>You finished all ${v.n} lessons.</b> Try putting them into practice on the Trade tab.`,
+    "v.count": v => `${v.n} word${v.n === 1 ? "" : "s"}`, "v.all": "All", "v.ex": "Example:", "v.none": "No words match your search.",
+    "cat.basics": "Basics", "cat.trading": "Trading", "cat.analysis": "Analysis", "cat.risk": "Risk", "cat.economy": "Economy",
+  },
+
+  zh: {
+    "nav.label": "頁面",
+    badge: "模擬交易 — 虛擬資金",
+    "tab.trade": "交易", "tab.journal": "交易日誌", "tab.learn": "學習",
+    cash: "可用現金",
+    disclaimer: "<strong>練習模式：</strong>價格和新聞都是模擬的。它們的變化方式像真實市場（趨勢、新聞、整體市場波動），但並不是真的，所有交易都使用虛擬資金。教練教的是常見的經驗法則，沒有人能預測市場。這是學習工具，不是投資建議。",
+    "wl.title": "市場觀察清單", "wl.filter": "依市場篩選", "wl.all": "全部", "wl.us": "美股", "wl.tw": "台股",
+    clock: v => `<b>第 ${v.d} 天 · ${v.time}</b> · 模擬交易日，每天約 1 分鐘`,
+    stamp: v => `第 ${v.d} 天 · ${v.time}`,
+    "stat.30d": "30 日漲跌", "stat.high": "90 日最高", "stat.low": "90 日最低", "stat.vol": "波動度", "stat.own": "持有",
+    shares: v => `${v.n} 股`,
+    "help.chart": "了解價格走勢圖", "help.risk": "了解波動度", "help.coach": "了解何時買進和賣出",
+    "help.news": "了解新聞如何影響股價", "help.pnl": "了解損益", "help.ap": "了解部位大小",
+    "coach.title": "🧭 教練", "coach.sub": "· 現況與可以考慮的做法",
+    "coach.h": "謹慎的交易者可能會怎麼做", "coach.signals": "顯示背後的訊號",
+    "coach.note": "這些是練習用的常見經驗法則。這裡的價格有一部分是隨機的，所以即使是好的規則，有時也會虧損。",
+    "qty.label": "股數", "btn.buy": "買進", "btn.sell": "賣出",
+    "news.title": "📰 市場新聞", "news.sub": "· 模擬標題",
+    "pv.label": "投資組合價值（美元）", holdings: "持股",
+    "ap.title": "🤖 AI 自動駕駛", "ap.sub": "· 僅限虛擬資金", "ap.label": "讓 AI 自動幫我交易",
+    "ap.desc": "開啟後，AI 會買進訊號最強的「買進」標的（每檔最多占投資組合 15%，並一律保留 10% 現金），並賣出評為「賣出」的持股。每個動作都會記錄在下方，並在交易日誌中檢討。",
+    "hist.title": "交易紀錄", reset: "重設帳戶", "reset.confirm": "再按一次，重設為 $100,000", "reset.done": "帳戶已重設為 $100,000。",
+    "j.title": "交易日誌", "j.filter": "顯示誰的交易", "j.mine": "我的交易", "j.auto": "自動駕駛", "j.all": "全部",
+    "j.sub": "每一筆買賣都會記錄下當時你看得到的資訊，再用課程中的規則檢查。評估每一步時，要看理由，而不只是看有沒有賺錢。",
+    "l.sections": "學習分類", "l.lessons": "課程", "l.vocab": "詞彙表",
+    "l.title": "股市入門", "l.progress": "你的進度", "l.progressAria": "已完成的課程",
+    "v.search": "搜尋詞彙…", "v.cats": "詞彙分類",
+    footer: "StockPilot AI · 模擬交易練習 · 價格和新聞皆為模擬", "footer.back": "回到 CoachStat",
+
+    "mkt.US": "美股", "mkt.TW": "台股",
+    "limit.up": "漲停", "limit.down": "跌停",
+    "chg.today": v => `今日 ${v.p}`,
+    "fx.tw": v => `台灣證券交易所 · 每股約 ${v.usd}（以 NT$${v.rate} = US$1 模擬匯率計算）· 今日漲跌停價 ${v.lo} 至 ${v.hi}`,
+    "fx.us": v => `昨收 ${v.pc}`,
+    "chart.legend": "— 價格   - - 20 日均線", "chart.today": "今天", "chart.days": v => `${v.d}天`,
+    "chart.aria": v => `${v.sym} 最近 90 天的價格與 20 日均線`,
+    "tip.today": "今天（即時）", "tip.yday": "昨日收盤", "tip.ago": v => `${v.d} 天前`,
+    "rec.BUY": "買進", "rec.SELL": "賣出", "rec.HOLD": "觀望",
+    "signals": v => `訊號：${v.rec}`, strength: v => `訊號強度 ${v.c}%`,
+    "r.trendUp": v => `趨勢向上：20 日均線（${v.a}）高於 50 日均線（${v.b}）。`,
+    "r.trendDown": v => `趨勢向下：20 日均線（${v.a}）低於 50 日均線（${v.b}）。`,
+    "r.momUp": v => `動能強勁：過去 30 天上漲 ${v.p}。`,
+    "r.momDown": v => `動能疲弱：過去 30 天下跌 ${v.p}。`,
+    "r.momFlat": v => `動能持平（30 天 ${v.p}）。`,
+    "r.rsiLow": v => `RSI 為 ${v.r}：看起來超賣，之後有可能反彈。`,
+    "r.rsiHigh": v => `RSI 為 ${v.r}：看起來超買，可能會回檔。`,
+    "r.rsiMid": v => `RSI 為 ${v.r}，在正常範圍內。`,
+    "r.volHigh": v => `波動很大（每年 ${v.p}）：起伏更大，風險也更大。`,
+
+    "verb.buy": "買進", "verb.sell": "賣出",
+    "msg.nocash": "現金不足，無法下這筆單。", "msg.noshares": "你沒有那麼多股。",
+    "msg.done": v => `已${v.verb} ${v.n} 股 ${v.sym}，價格 ${v.px}。`,
+    "msg.journal": "日誌：", "msg.why": "看原因",
+    hist: v => `${v.ai}<b>${v.verb} ${v.n} 股 ${v.sym}</b> @ ${v.px}`,
+    "th.sym": "代號", "th.shares": "股數", "th.price": "價格", "th.pl": "損益（美元）",
+    "hold.empty": "還沒有持股 — 買進你的第一檔股票，或開啟自動駕駛。",
+    "pv.delta": v => `${v.arrow} ${v.amt}（${v.p}）累計`,
+    "ap.empty": "自動駕駛的動作會顯示在這裡。", "hist.empty": "還沒有交易。", "news.empty": "有新聞時，標題會顯示在這裡。",
+    "ap.on": "自動駕駛<b>已開啟</b> — AI 現在會管理這個模擬投資組合。", "ap.off": "自動駕駛<b>已關閉</b>。",
+    "ap.sold": v => `賣出全部 <b>${v.sym}</b> — ${v.reason}`,
+    "ap.bought": v => `買進 ${v.n} 股 <b>${v.sym}</b>（訊號 ${v.c}%）— ${v.reason}`,
+
+    "news.pos": ["{n}獲利優於預期", "{n}拿下一筆大合約", "分析師調高{n}目標價", "{n}推出熱門新產品", "{n}上調營收預測"],
+    "news.neg": ["{n}獲利不如預期", "{n}下修營收預測", "主管機關對{n}展開調查", "{n}失去一個大客戶", "分析師調降{n}評等"],
+    "news.secPos": { chips: "AI 晶片需求大增", shipping: "全球運價上漲", finance: "銀行放款表現強勁", tech: "科技支出回升", consumer: "消費支出優於預期", telecom: "電信用戶數成長" },
+    "news.secNeg": { chips: "晶片訂單放緩", shipping: "全球運價下跌", finance: "貸款違約增加", tech: "企業削減科技支出", consumer: "消費者減少支出", telecom: "電信價格戰升溫" },
+    "news.mktPos": { US: ["聯準會暗示將降息", "就業數據強勁，帶動美股上漲"], TW: ["台灣外銷訂單大增", "外資買超台股"] },
+    "news.mktNeg": { US: ["美國通膨高於預期", "對美國經濟放緩的擔憂衝擊股市"], TW: ["台灣外銷訂單下滑", "外資賣超台股"] },
+    "news.industry": "產業：", "news.market": v => `${v.m}：`,
+    "news.yday": "昨天", "news.ago": v => `${v.d} 天前`,
+    "recap.t": v => `第 ${v.d} 天收盤`,
+    recap: v => `📊 <b>第 ${v.d} 天收盤：</b>美股平均 ${v.us}，台股平均 ${v.tw}。你的投資組合今天 ${v.pd}。漲跌最大：<b>${v.sym}</b> ${v.c}。`,
+
+    why: "為什麼？",
+    "c.trend": v => `${v.name}目前處於${v.up ? "上升" : "下降"}趨勢：30 天${v.pos ? "上漲" : "下跌"} ${v.mom}%，20 日均線${v.up ? "高於" : "低於"} 50 日均線。`,
+    "c.rsiHigh": v => `RSI 為 ${v.r}，漲得很快，可能已經超買。`,
+    "c.rsiLow": v => `RSI 為 ${v.r}，跌得很快，可能已經超賣。`,
+    "c.rsiMid": v => `RSI 為 ${v.r}，在正常範圍內。`,
+    "c.vol": v => `價格波動${["小", "中等", "大"][v.w]}（每年約 ${v.p}%）。`,
+    "c.limit": v => `已經${v.up ? "漲停" : "跌停"}，今天不能再${v.up ? "上漲" : "下跌"}。`,
+    "c.news": v => `最新消息：「${v.h}」（${v.c}）。`,
+    "a.stop": v => `這檔股票你虧了 ${v.p}%。很多交易者會設<b>停損</b>：股價跌到比買進價低約 7–10% 時就賣出，避免小虧變大虧。`,
+    "a.profit": v => `你賺了 ${v.p}%。賣出一部分可以<b>鎖住部分獲利</b>，剩下的繼續持有，以防它還會上漲。`,
+    "a.big": v => `這檔股票占你投資組合的 ${v.p}%，集中在一檔太多了；減碼可以降低風險。`,
+    "a.hold": "你持有期間趨勢仍然向上。<b>繼續持有</b>、讓賺錢的股票繼續跑是合理的。記得你的停損點。",
+    "a.exit": "你持有期間趨勢轉為向下。想一想當初買進的理由是否還成立；如果不成立，<b>賣出</b>是合理的。",
+    "a.buy": "趨勢和 RSI 都支持<b>買進</b>。謹慎的交易者會先小額買（約投資組合的 5–10%），並事先決定判斷錯誤時要在什麼價格賣出。",
+    "a.chase": "它漲得很快。謹慎的交易者不會<b>追高</b>，而是等回檔再買。",
+    "a.knife": "它跌得很重，看起來超賣。雖然可能反彈，但買下跌中的股票很危險（交易者稱為「接落下的刀」）。<b>等</b>趨勢轉為向上比較安全。",
+    "a.wait": "趨勢向下。大多數新手最好<b>等</b>趨勢轉為向上再買。",
+    "a.vol": "這檔股票波動很大，如果要交易，金額要比平常<b>少一點</b>。",
+    "a.news": "不要只因為一則標題就交易：股價幾秒內就會反應，等你看到時，漲跌通常已經發生了。",
+    "pc.prefix": "教練：",
+    "pc.none": "你還沒有買任何股票。找一檔趨勢向上的股票，先小額買，並事先決定什麼時候賣。",
+    "pc.big": v => `${v.sym} 占你投資組合的 ${v.p}%。如果它下跌 20%，你整個帳戶會減少約 ${v.d}%。可以考慮減碼。`,
+    "pc.loser": v => `${v.sym} 比你的買進價低了 ${v.p}%。檢查一下你為它設的停損計畫。`,
+    "pc.few": v => `你持有 ${v.n} 檔股票。分散到 5 檔以上可以降低風險。`,
+    "pc.oneMkt": v => `你的股票都在${v.m}。加入另一個市場的股票可以分散風險。`,
+    "pc.cash": v => `你有 ${v.p}% 的錢還是現金。現金很安全，但不會成長。`,
+    "pc.good": v => `你的資金分散在兩個市場的 ${v.n} 檔股票。保持每個部位都小，並遵守你的賣出規則。`,
+
+    "g.good": "好的一步", "g.mixed": "好壞參半", "g.risky": "冒險的一步",
+    "js.trades": "交易次數", "js.tradesHint": v => `買進 ${v.b} 次 · 賣出 ${v.s} 次`,
+    "js.good": "好的一步", "js.goodHint": "遵守規則",
+    "js.mixed": "好壞參半", "js.mixedHint": "有好有壞",
+    "js.risky": "冒險的一步", "js.riskyHint": "違反重要規則",
+    "js.score": "規則分數", "js.scoreHint": "通過的規則檢查比例",
+    "jh.well": "你做得好的地方", "jh.work": "需要加強的地方", "jh.title": "你的交易習慣",
+    "jh.noWell": "還沒有。照著買進檢查清單做，你的優點就會出現在這裡。",
+    "jh.noWork": "目前沒有發現錯誤，繼續保持。",
+    "jh.empty": "交易幾次之後，這裡會顯示你做得好的地方和需要加強的地方。",
+    "jh.times": v => `（${v.n} 次）`, lesson: "課程", "lesson.named": v => `課程：${v.t}`,
+    "who.you": "你", "who.auto": "🤖 自動駕駛",
+    "seen.you": "你當時看得到的：", "seen.auto": "它當時看得到的：",
+    "seen.trend": v => `趨勢${v.up ? "向上" : "向下"}`, "seen.rsi": v => `RSI ${v.r}`, "seen.mom": v => `30 日 ${v.p}`,
+    "seen.day": v => `今日 ${v.p}`, "seen.vol": v => `年波動 ${v.p}`,
+    "seen.posAfter": v => `買進後部位占 ${v.p}`, "seen.posBefore": v => `賣出前部位占 ${v.p}`,
+    "seen.pl": v => `你的損益 ${v.p}`, "seen.holding": v => `已持有，損益 ${v.p}`, "seen.news": v => `新聞「${v.h}」`,
+    "o.title": "後來發生什麼事：", "o.early": "現在還看不出來。過一個完整交易日後再回來看。",
+    "o.who.you": "你", "o.who.auto": "自動駕駛",
+    "o.buy": v => `${v.who}買進之後，${v.sym} ${v.p}（${v.move}），這些股票${v.win ? "賺了" : "虧了"}約 ${v.amt}。`,
+    "o.sellWin": v => `${v.who}賣出之後，${v.sym} 下跌了 ${v.p}（${v.move}）。賣出省下約 ${v.amt}。`,
+    "o.sellLoss": v => `${v.who}賣出之後，${v.sym} 上漲了 ${v.p}（${v.move}）。如果繼續持有，會多賺約 ${v.amt}。`,
+    "vd.gg": "好的一步，好的結果：理由和結果一致。",
+    "vd.gb": "好的一步，但運氣不好。繼續遵守規則：好的決定有時也會虧錢。",
+    "vd.bg": "這次是運氣好。這樣的做法輸的次數通常比贏的多，別被一次結果騙了。",
+    "vd.bb": "這一步的風險真的出現了。下次參考上面的建議。",
+    "j.emptyTitle": v => `還沒有${v.auto ? "自動駕駛的" : ""}交易。`,
+    "j.emptyYou": "到交易頁面買進你的第一檔股票。它會出現在這裡，並檢討它遵守或違反了哪些規則。",
+    "j.emptyAuto": "在交易頁面開啟自動駕駛，它的交易會在這裡檢討。",
+    "j.go": "前往交易",
+    "ck.buy-knife.t": "試圖接落下的刀",
+    "ck.buy-knife.w": v => `趨勢向下且 RSI 為 ${v.r}。超賣的股票可能會持續下跌很久。下次先等趨勢轉為向上。`,
+    "ck.buy-downtrend.t": "在下降趨勢中買進",
+    "ck.buy-downtrend.w": "20 日均線低於 50 日均線。下降趨勢中的股票常常會繼續下跌。下次等 20 日均線回到 50 日均線之上再買。",
+    "ck.buy-uptrend.t": "在上升趨勢中買進",
+    "ck.buy-uptrend.w": "20 日均線高於 50 日均線，你是順著趨勢，而不是逆勢操作。",
+    "ck.buy-chase.t": v => `追高已經大漲的股票（RSI ${v.r}）`,
+    "ck.buy-chase.w": "快速上漲之後常會回檔。下次等 RSI 降到 70 以下，通常能買到更好的價格。",
+    "ck.buy-nochase.t": v => `沒有追高（RSI ${v.r}）`,
+    "ck.buy-nochase.w": "RSI 在正常範圍，你不是在突然飆漲的頂點買進。",
+    "ck.buy-avgdown.t": "加碼買進下跌中的股票",
+    "ck.buy-avgdown.w": v => `你在這檔股票上已經虧了 ${v.p}。為了「攤平回本」而加碼，可能讓小虧變成大虧。`,
+    "ck.buy-big.t": v => `把投資組合的 ${v.p} 放在一檔股票`,
+    "ck.buy-big.w": v => `如果它下跌 20%，你整個帳戶會虧約 ${v.d}%。下次每檔股票盡量控制在 10% 以下。`,
+    "ck.buy-large.t": v => `部位偏大（占投資組合 ${v.p}）`,
+    "ck.buy-large.w": "超過約 10% 時，你的帳戶會很依賴單一公司。",
+    "ck.buy-small.t": v => `部位保持小（占投資組合 ${v.p}）`,
+    "ck.buy-small.w": "部位小，一檔股票表現差也不會拖垮你的帳戶。",
+    "ck.buy-nocash.t": v => `幾乎沒留現金（${v.p}）`,
+    "ck.buy-nocash.w": "沒有現金就沒有緩衝，有更好的機會時也無法行動。",
+    "ck.buy-news.t": "好消息一出就買進",
+    "ck.buy-news.w": v => `「${v.h}」剛公布。股價在標題出來後幾秒內就會跳動，之後才買，常常是買在跳漲的高點。`,
+    "ck.buy-jumpy.t": "在波動很大的股票上下重注",
+    "ck.buy-jumpy.w": v => `它每年波動約 ${v.p}。波動這麼大的股票，金額要少一點。`,
+    "ck.sell-stoploss.t": v => `賣出虧損部位（虧 ${v.p}）`,
+    "ck.sell-stoploss.w": "賣掉虧錢的股票，避免小虧變大虧。這正是停損的用途。",
+    "ck.sell-late.t": "拖太久才賣",
+    "ck.sell-late.w": "如果在買進價下方約 8% 設停損，損失就會比較小。下次買之前先決定出場價。",
+    "ck.sell-profit.t": v => `鎖住大筆獲利（賺 ${v.p}）`,
+    "ck.sell-profit.w": "大漲之後獲利了結，把帳面獲利變成真正的錢。",
+    "ck.sell-trend.t": "趨勢轉弱後賣出",
+    "ck.sell-trend.w": "20 日均線跌破 50 日均線，這是常見的出場訊號。",
+    "ck.sell-trim.t": "減碼過大的部位",
+    "ck.sell-trim.w": v => `那檔股票占你投資組合的 ${v.p}。減碼可以降低風險。`,
+    "ck.sell-strength.t": v => `趁強勢賣出（RSI ${v.r}）`,
+    "ck.sell-strength.w": "快速上漲後賣出，常能在回檔前賣到好價格。",
+    "ck.sell-panic.t": "趨勢仍向上，卻因為一天下跌就賣出",
+    "ck.sell-panic.w": v => `它今天跌了 ${v.p}，但較長期的趨勢是向上的。一天的下跌通常只是雜訊，恐慌賣出會把虧損鎖住。`,
+    "ck.sell-early.t": "太早賣掉賺錢的股票",
+    "ck.sell-early.w": "趨勢仍然向上，也沒有出什麼問題。讓賺錢的股票繼續跑，獲利才會累積。賺錢的太早賣、虧錢的卻一直留著，是常見的錯誤。",
+    "ck.sell-news.t": "壞消息一出就賣出",
+    "ck.sell-news.w": v => `「${v.h}」剛公布。股價在標題出來後幾秒內就會下跌，之後才賣，常常賣在低點。想一想這則新聞是否真的改變了公司的前景。`,
+    "ck.sell-noreason.t": "這次賣出沒有明確理由",
+    "ck.sell-noreason.w": "賣出之前先說出理由：碰到停損、趨勢轉弱、部位太大，或是獲利了結。",
+
+    "l.of": v => `${v.a} / ${v.b}`, "l.lessonN": v => `第 ${v.i} 課，共 ${v.n} 課`, "l.completed": " · 已完成",
+    "l.done": "（已完成）", "l.live": "模擬器裡的現況", "l.key": "重點：",
+    "l.check": "小測驗", "l.next": "下一課", "l.correct": "答對了！", "l.wrong": "不太對。",
+    "l.wrongMsg": "再看一次課程內容，然後再試一次。",
+    "l.allDone": v => `<b>你完成了全部 ${v.n} 課。</b>到交易頁面實際練習看看吧。`,
+    "v.count": v => `${v.n} 個詞彙`, "v.all": "全部", "v.ex": "例子：", "v.none": "沒有符合搜尋的詞彙。",
+    "cat.basics": "基礎", "cat.trading": "交易", "cat.analysis": "分析", "cat.risk": "風險", "cat.economy": "經濟",
+  },
+};
+
+/* ============ Vocabulary ============ */
+// [category, English term, definition, example, 中文詞彙, 定義, 例子]
+const GLOSSARY = [
+  ["basics", "Stock / share", "A small piece of ownership in a company.", "Owning 1 share of Apple makes you one of its many owners.",
+   "股票", "公司所有權的一小部分。", "持有 1 股蘋果，你就是蘋果眾多股東之一。"],
+  ["basics", "Shareholder", "A person or group that owns shares of a company.", "Shareholders can vote on some company decisions.",
+   "股東", "擁有公司股票的人或機構。", "股東可以對公司的某些決定投票。"],
+  ["basics", "Stock exchange", "A marketplace where shares are bought and sold, like Nasdaq or the Taiwan Stock Exchange.", "TSMC trades on the Taiwan Stock Exchange.",
+   "證券交易所", "買賣股票的市場，例如那斯達克或台灣證券交易所。", "台積電在台灣證券交易所交易。"],
+  ["basics", "Ticker", "The short code for a stock.", "AAPL is Apple's ticker; 2330 is TSMC's.",
+   "股票代號", "代表一檔股票的簡短代碼。", "AAPL 是蘋果的代號，2330 是台積電的代號。"],
+  ["basics", "Broker", "A company that places buy and sell orders for you.", "You need an account at a broker to trade real stocks.",
+   "券商", "幫你下買賣單的公司。", "要買賣真的股票，需要在券商開戶。"],
+  ["basics", "Market capitalization", "A company's total value: share price × number of shares.", "A $100 stock with 1 billion shares has a $100 billion market cap.",
+   "市值", "公司的總價值：股價 × 股數。", "股價 100 元、有 10 億股，市值就是 1,000 億元。"],
+  ["basics", "Dividend", "Cash a company pays its shareholders out of its profits.", "Chunghwa Telecom is known for paying steady dividends.",
+   "股利（股息）", "公司從獲利中發給股東的現金。", "中華電以穩定配發股利聞名。"],
+  ["basics", "ETF (exchange-traded fund)", "A fund that holds many stocks and trades like a single stock.", "0050 holds about 50 of Taiwan's biggest companies.",
+   "ETF（指數股票型基金）", "持有許多股票、像單一股票一樣交易的基金。", "0050 持有台灣約 50 家最大的公司。"],
+  ["basics", "Index", "A number that tracks a group of stocks to show how the market is doing.", "The S&P 500 tracks 500 large US companies.",
+   "指數", "追蹤一群股票、用來顯示市場表現的數字。", "S&P 500 指數追蹤美國 500 家大公司。"],
+  ["basics", "Portfolio", "All the investments you own, plus cash.", "Her portfolio has 6 stocks and some cash.",
+   "投資組合", "你擁有的所有投資加上現金。", "她的投資組合有 6 檔股票和一些現金。"],
+
+  ["trading", "Market order", "An order to buy or sell right away at the current price.", "Every trade in StockPilot is a market order.",
+   "市價單", "以當下價格立即買進或賣出的委託。", "StockPilot 裡的每筆交易都是市價單。"],
+  ["trading", "Limit order", "An order that only goes through at your chosen price or better.", "A limit order to buy at $95 won't fill while the price is $100.",
+   "限價單", "只在你指定的價格或更好的價格成交的委託。", "股價 100 元時，95 元的限價買單不會成交。"],
+  ["trading", "Stop-loss", "A plan or order to sell if the price falls to a set level, to limit a loss.", "Buying at $100 with an 8% stop-loss means selling at $92.",
+   "停損", "價格跌到設定水準就賣出的計畫或委託，用來限制虧損。", "100 元買進、設 8% 停損，就是跌到 92 元時賣出。"],
+  ["trading", "Taking profit", "Selling some or all of a winning stock to lock in the gain.", "After a 20% rise, he sold half to take profit.",
+   "停利（獲利了結）", "賣出部分或全部賺錢的股票，把獲利鎖住。", "上漲 20% 後，他賣掉一半獲利了結。"],
+  ["trading", "Position", "How much of one stock you own.", "A $5,000 position in a $100,000 portfolio is 5%.",
+   "部位", "你持有某一檔股票的數量或金額。", "在 10 萬元的投資組合中，5,000 元的部位占 5%。"],
+  ["trading", "Board lot", "The standard trading unit in Taiwan: 1,000 shares.", "One board lot of a NT$200 stock costs NT$200,000.",
+   "一張", "台灣股票的標準交易單位：1,000 股。", "股價 200 元的股票，一張要 20 萬元。"],
+  ["trading", "Odd lot", "Fewer shares than a board lot.", "Odd-lot trading lets you buy just 5 shares of TSMC.",
+   "零股", "少於一張（1,000 股）的股數。", "零股交易讓你可以只買 5 股台積電。"],
+  ["trading", "Price limit", "The most a price may move in one day. In Taiwan it is 10%.", "A stock that closed at NT$100 can trade between NT$90 and NT$110 the next day.",
+   "漲跌幅限制", "一天內價格最多能變動的幅度，台股是 10%。", "昨收 100 元的股票，今天只能在 90 到 110 元之間交易。"],
+  ["trading", "Liquidity", "How easily something can be bought or sold without moving its price much.", "Big companies like Apple have high liquidity.",
+   "流動性", "買賣某樣東西有多容易，而且不太影響價格。", "像蘋果這樣的大公司流動性很高。"],
+  ["trading", "Paper trading", "Practising trading with pretend money.", "StockPilot is a paper-trading app.",
+   "模擬交易", "用假錢練習交易。", "StockPilot 是一個模擬交易 app。"],
+
+  ["analysis", "Trend", "The general direction of a price over weeks or months.", "Higher highs and higher lows mean an uptrend.",
+   "趨勢", "價格在幾週或幾個月內的大致方向。", "高點和低點都越來越高，就是上升趨勢。"],
+  ["analysis", "Moving average", "The average price over the last few days, used to see the trend more clearly.", "The 20-day moving average is the average close of the last 20 days.",
+   "移動平均線（均線）", "最近幾天的平均價格，用來看清趨勢。", "20 日均線是最近 20 天收盤價的平均。"],
+  ["analysis", "Momentum", "How strongly a price has moved recently.", "Up 12% in a month is strong momentum.",
+   "動能", "價格最近變動的力道。", "一個月上漲 12% 代表動能很強。"],
+  ["analysis", "RSI (Relative Strength Index)", "A 0–100 score of how fast a price has risen or fallen over 14 days.", "An RSI above 70 is called overbought.",
+   "RSI（相對強弱指標）", "用 0 到 100 表示 14 天內價格漲跌速度的指標。", "RSI 高於 70 稱為超買。"],
+  ["analysis", "Overbought / oversold", "A price that rose (or fell) so fast it may pull back (or bounce).", "After five straight up days, the stock looked overbought.",
+   "超買／超賣", "價格漲（跌）得太快，可能會回檔（反彈）。", "連漲五天後，這檔股票看起來超買了。"],
+  ["analysis", "Volatility", "How much a price swings up and down.", "Tesla is more volatile than Visa.",
+   "波動度", "價格上下擺動的幅度。", "特斯拉的波動度比 Visa 高。"],
+  ["analysis", "Earnings", "A company's profit, usually reported every three months.", "The stock jumped after strong earnings.",
+   "盈餘（財報獲利）", "公司的獲利，通常每三個月公布一次。", "財報獲利亮眼後，股價大漲。"],
+  ["analysis", "P/E ratio", "Share price divided by yearly earnings per share; shows how expensive a stock is compared with its profits.", "A P/E of 30 means investors pay $30 for each $1 of yearly profit.",
+   "本益比", "股價除以每股年盈餘，顯示股票相對於獲利貴不貴。", "本益比 30 代表投資人花 30 元買每年 1 元的獲利。"],
+  ["analysis", "Bull market", "A long period of rising prices.", "Many stocks doubled during the bull market.",
+   "牛市（多頭市場）", "價格長期上漲的時期。", "多頭市場時，許多股票翻倍。"],
+  ["analysis", "Bear market", "A fall of 20% or more from a recent high.", "Prices fell 25%, so it was a bear market.",
+   "熊市（空頭市場）", "從近期高點下跌 20% 以上。", "股價跌了 25%，進入空頭市場。"],
+  ["analysis", "Pullback / correction", "A short drop inside a longer uptrend. A correction is a drop of about 10%.", "Waiting for a pullback can get you a better price.",
+   "回檔／修正", "長期上升趨勢中的短暫下跌；修正約為 10% 的跌幅。", "等回檔再買，通常能買到比較好的價格。"],
+
+  ["risk", "Diversification", "Spreading money across many stocks, industries and countries.", "Owning 10 stocks in different industries is more diversified than owning 1.",
+   "分散投資", "把錢分散到許多股票、產業和國家。", "持有 10 檔不同產業的股票，比只持有 1 檔更分散。"],
+  ["risk", "Risk", "The chance of losing money, or of results being different from what you expect.", "Higher possible returns usually come with higher risk.",
+   "風險", "虧錢或結果和預期不同的可能性。", "可能的報酬越高，通常風險也越高。"],
+  ["risk", "Drawdown", "How far your account or a stock has fallen from its highest point.", "Going from $120,000 down to $90,000 is a 25% drawdown.",
+   "回撤", "帳戶或股票從最高點下跌的幅度。", "從 12 萬跌到 9 萬，是 25% 的回撤。"],
+  ["risk", "Exchange rate / currency risk", "The price of one currency in another, and the risk that it changes.", "If the NT$ weakens, Taiwan stocks are worth fewer US dollars.",
+   "匯率／匯率風險", "一種貨幣換成另一種貨幣的價格，以及它變動的風險。", "新台幣貶值時，台股換成美元就會變少。"],
+  ["risk", "FOMO", "Fear of missing out: buying because everyone else is.", "Buying a stock just because it's trending online is FOMO.",
+   "FOMO（錯失恐懼）", "因為大家都在買而跟著買。", "只因為網路上很紅就買股票，就是 FOMO。"],
+  ["risk", "Panic selling", "Selling in fear after a sudden drop.", "Selling everything after one bad day is panic selling.",
+   "恐慌性賣出", "突然下跌後因為害怕而賣出。", "只因為一天大跌就全部賣掉，就是恐慌性賣出。"],
+  ["risk", "Averaging down", "Buying more of a stock that has fallen, to lower your average cost.", "Averaging down on a falling stock can make losses bigger.",
+   "攤平", "股票下跌後加碼買進，以降低平均成本。", "對持續下跌的股票攤平，可能讓虧損變更大。"],
+
+  ["economy", "Interest rate", "The cost of borrowing money, set mainly by the central bank.", "Higher interest rates often push stock prices down.",
+   "利率", "借錢的成本，主要由中央銀行決定。", "利率上升常讓股價下跌。"],
+  ["economy", "Inflation", "Prices of goods and services rising over time.", "With 3% inflation, $100 of groceries costs $103 a year later.",
+   "通貨膨脹", "商品和服務的價格隨時間上漲。", "通膨 3% 時，100 元的食物一年後要 103 元。"],
+  ["economy", "Central bank", "The bank that manages a country's money and interest rates, like the US Federal Reserve or Taiwan's Central Bank.", "The Federal Reserve raised rates to fight inflation.",
+   "中央銀行", "管理國家貨幣和利率的銀行，例如美國聯準會、台灣的中央銀行。", "聯準會升息來對抗通膨。"],
+  ["economy", "Recession", "A period when the economy shrinks and jobs are lost.", "Stocks often fall when people expect a recession.",
+   "經濟衰退", "經濟萎縮、工作減少的時期。", "大家預期經濟衰退時，股市常常下跌。"],
+  ["economy", "GDP (gross domestic product)", "The total value of everything a country produces in a year.", "Strong GDP growth means the economy is expanding.",
+   "GDP（國內生產毛額）", "一個國家一年生產的所有東西的總價值。", "GDP 成長強勁，代表經濟在擴張。"],
+  ["economy", "Exports", "Goods a country sells to other countries. Very important for Taiwan.", "Strong chip exports help Taiwan's economy.",
+   "出口", "一個國家賣給其他國家的商品，對台灣非常重要。", "晶片出口強勁，有助台灣經濟。"],
+  ["economy", "Unemployment rate", "The share of people who want a job but can't find one.", "A low unemployment rate is a sign of a strong economy.",
+   "失業率", "想工作卻找不到工作的人所占的比例。", "失業率低是經濟強勁的跡象。"],
+];
+
+/* ============ Lessons (each has live data + English and Chinese text) ============ */
+const live = html => `<div class="live-box"><span class="live-label">${t("l.live")}</span>${html}</div>`;
+const key = html => `<div class="key-idea"><b>${t("l.key")}</b> ${html}</div>`;
+const B = (cls, txt) => `<b class="${cls}">${txt}</b>`;
+
+const LESSONS = [
+  {
+    id: "basics", a: 0, tryIt: {},
+    data: () => ({ n: STOCKS.length, us: STOCKS.filter(s => s.mkt === "US").length, tw: STOCKS.filter(s => s.mkt === "TW").length }),
+    en: {
+      title: "What is a stock?", try: "Browse the watchlist",
+      body: d => `
+        <p>A company is owned by its <b>shareholders</b>. A <b>stock</b>, also called a <b>share</b>, is one small slice of that ownership. Apple has roughly 15 billion shares, so owning one share means owning a very tiny piece of Apple.</p>
+        <p>Companies first sell shares to raise money. After that, people buy and sell shares with each other on a <b>stock exchange</b>, such as Nasdaq and the New York Stock Exchange in the US, or the Taiwan Stock Exchange.</p>
+        <p>The price changes all day because buyers and sellers keep agreeing on new prices. When more people want to buy than sell, the price goes up. When more want to sell, it goes down.</p>
+        ${key("a stock price is what buyers and sellers agree a slice of the company is worth right now.")}
+        ${live(`The watchlist has <b>${d.n} stocks</b>: ${d.us} from the US and ${d.tw} from Taiwan. Each one has a short code called a <b>ticker</b>: AAPL is Apple, and 2330 is TSMC.`)}`,
+      q: "What does owning one share of a company mean?",
+      opts: ["You own a small piece of the company", "You lent the company money and it pays you back with interest", "You work for the company"],
+      why: "A share is part ownership. Lending money to a company is called a bond, which is a different kind of investment.",
+    },
+    zh: {
+      title: "什麼是股票？", try: "瀏覽觀察清單",
+      body: d => `
+        <p>公司是由<b>股東</b>擁有的。<b>股票</b>就是公司所有權的一小部分。蘋果大約有 150 億股，所以持有一股，就代表擁有蘋果非常非常小的一部分。</p>
+        <p>公司一開始賣股票來籌措資金。之後，大家在<b>證券交易所</b>互相買賣股票，例如美國的那斯達克、紐約證券交易所，或是台灣證券交易所。</p>
+        <p>股價整天都在變，因為買方和賣方不斷談出新的價格。想買的人比想賣的人多，價格就上漲；想賣的人比較多，價格就下跌。</p>
+        ${key("股價就是買方和賣方現在同意這一小部分公司值多少錢。")}
+        ${live(`觀察清單裡有 <b>${d.n} 檔股票</b>：${d.us} 檔美股和 ${d.tw} 檔台股。每一檔都有一個簡短的<b>股票代號</b>：AAPL 是蘋果，2330 是台積電。`)}`,
+      q: "持有一家公司的一股，代表什麼？",
+      opts: ["你擁有這家公司的一小部分", "你借錢給公司，公司會連本帶利還你", "你在這家公司上班"],
+      why: "股票代表部分所有權。借錢給公司叫做債券，是另一種投資。",
+    },
+  },
+  {
+    id: "buysell", a: 1, tryIt: { qty: 1 },
+    data: () => {
+      const s = selected, p = price(s);
+      return { s, p: fmtP(s, p), p10: fmtP(s, 10 * p), usd10: market[s].mkt === "TW" ? fmt$(10 * usd(s)) : null };
+    },
+    en: {
+      title: "Buying and selling shares", try: "Buy 1 share",
+      body: d => `
+        <p>To buy, you pick a stock and how many shares you want. The cost is the number of shares times the price.</p>
+        <p>You make money if you later sell for <b>more</b> than you paid, and lose money if you sell for <b>less</b>. Until you sell, any gain or loss exists only on paper and can still change.</p>
+        ${key("cost = shares × price. Profit = (sell price − buy price) × shares.")}
+        ${live(`${d.s} costs <b>${d.p}</b> per share, so 10 shares would cost <b>${d.p10}</b>.${d.usd10 ? ` That is about <b>${d.usd10}</b> in US dollars.` : ""}`)}`,
+      q: "You buy 5 shares at $100 each and later sell them at $120 each. What is your profit?",
+      opts: ["$20", "$100", "$600"],
+      why: "Each share gained $20, and you had 5 of them: (120 − 100) × 5 = $100. The $600 is the total you get back when you sell.",
+    },
+    zh: {
+      title: "買進和賣出股票", try: "買進 1 股",
+      body: d => `
+        <p>買股票時，你要選一檔股票和想買的股數。成本就是股數乘以股價。</p>
+        <p>之後如果賣出的價格比買進價<b>高</b>，你就賺錢；如果比較<b>低</b>，你就虧錢。在賣出之前，賺或賠都只是帳面上的，還會繼續變動。</p>
+        ${key("成本 = 股數 × 股價。獲利 = （賣出價 − 買進價）× 股數。")}
+        ${live(`${d.s} 每股 <b>${d.p}</b>，所以 10 股要 <b>${d.p10}</b>。${d.usd10 ? `約等於 <b>${d.usd10}</b> 美元。` : ""}`)}`,
+      q: "你用每股 $100 買了 5 股，之後以每股 $120 賣出。你賺了多少？",
+      opts: ["$20", "$100", "$600"],
+      why: "每股賺 $20，你有 5 股：（120 − 100）× 5 = $100。$600 是賣出時拿回的總金額。",
+    },
+  },
+  {
+    id: "pnl", a: 1, tryIt: {},
+    data: () => {
+      const { mv, total } = portfolioTotals(), change = total - START_CASH;
+      return { cash: fmt$(state.cash), mv: fmt$(mv), n: Object.keys(state.holdings).length, total: fmt$(total), up: change >= 0, amt: fmt$(Math.abs(change)) };
+    },
+    en: {
+      title: "Profit, loss and portfolio value", try: "Look at your holdings",
+      body: d => `
+        <p>Your <b>portfolio</b> is everything in your account: your cash plus all the stocks you own.</p>
+        <p><b>P&amp;L</b> stands for profit and loss. The Holdings table compares each stock's current value with your <b>average cost</b>, which is what you paid per share on average across all your buys.</p>
+        <ul>
+          <li><b>Unrealized</b> P&amp;L is a gain or loss on stocks you still own. It changes every time the price moves.</li>
+          <li><b>Realized</b> P&amp;L is locked in once you sell.</li>
+        </ul>
+        ${key("portfolio value = cash + the current value of every stock you own.")}
+        ${live(`You have <b>${d.cash}</b> in cash and <b>${d.mv}</b> in ${d.n} stock${d.n === 1 ? "" : "s"}, for a total of <b>${d.total}</b>. That is ${B(d.up ? "pos" : "neg", `${d.up ? "up" : "down"} ${d.amt}`)} from the $100,000 you started with.`)}`,
+      q: "You buy the same number of shares twice: once at $50 and once at $70. What is your average cost per share?",
+      opts: ["$50", "$60", "$70"],
+      why: "Equal amounts bought at $50 and $70 average out to $60 per share.",
+    },
+    zh: {
+      title: "損益和投資組合價值", try: "看看你的持股",
+      body: d => `
+        <p>你的<b>投資組合</b>就是帳戶裡的所有東西：現金加上你持有的所有股票。</p>
+        <p><b>損益</b>就是賺和賠。持股表會把每檔股票的現值和你的<b>平均成本</b>比較，平均成本就是你所有買進的每股平均價格。</p>
+        <ul>
+          <li><b>未實現</b>損益是你還持有的股票的賺賠，每次股價變動都會改變。</li>
+          <li><b>已實現</b>損益是賣出之後就確定的賺賠。</li>
+        </ul>
+        ${key("投資組合價值 = 現金 + 你持有的每檔股票的現值。")}
+        ${live(`你有 <b>${d.cash}</b> 現金，以及 ${d.n} 檔股票共 <b>${d.mv}</b>，總共 <b>${d.total}</b>。和一開始的 $100,000 相比，${B(d.up ? "pos" : "neg", `${d.up ? "多了" : "少了"} ${d.amt}`)}。`)}`,
+      q: "你分兩次買進相同股數：一次 $50，一次 $70。你的每股平均成本是多少？",
+      opts: ["$50", "$60", "$70"],
+      why: "在 $50 和 $70 各買相同數量，平均下來每股 $60。",
+    },
+  },
+  {
+    id: "chart", a: 0, tryIt: {},
+    data: () => {
+      const s = selected, a = series(s), p = price(s), last90 = a.slice(-91);
+      const lo = Math.min(...last90), hi = Math.max(...last90), c30 = p / a[a.length - 31] - 1;
+      return { s, c30: fmtPct(c30), pos: c30 >= 0, lo: fmtP(s, lo), hi: fmtP(s, hi), where: Math.round((p - lo) / ((hi - lo) || 1) * 100) };
+    },
+    en: {
+      title: "Reading a price chart", try: "Hover over the chart",
+      body: d => `
+        <p>The chart on the Trade tab shows the price over the last 90 trading days. The left side is older and the dot on the right edge is today's live price.</p>
+        <p>Look at the direction over weeks, not single days. A line that climbs from left to right is an <b>uptrend</b>. One that slides down is a <b>downtrend</b>. Prices wiggle every day, so one bad day on its own tells you very little.</p>
+        <p>The <b>90-day high and low</b> show the range the price has moved in. A price near the high has been rising, and a price near the low has been falling.</p>
+        ${key("zoom out. The trend over weeks matters more than today's move.")}
+        ${live(`${d.s} is ${B(d.pos ? "pos" : "neg", d.c30)} over 30 days. Its 90-day range is ${d.lo} to ${d.hi}, and today it sits <b>${d.where}%</b> of the way up from the low.`)}`,
+      q: "A stock fell 2% today but is up 15% over the last three months. What is the bigger picture?",
+      opts: ["It has been in an uptrend, and today is a small dip", "It is crashing and should be sold right away", "Charts can't tell you anything"],
+      why: "A 2% dip inside a 15% climb is normal day-to-day noise. The longer trend is still up.",
+    },
+    zh: {
+      title: "看懂價格走勢圖", try: "把滑鼠移到走勢圖上",
+      body: d => `
+        <p>交易頁面的走勢圖顯示最近 90 個交易日的價格。左邊是比較舊的，右邊的圓點是今天的即時價格。</p>
+        <p>要看幾週的方向，而不是單一一天。從左往右往上爬的線是<b>上升趨勢</b>，往下滑的是<b>下降趨勢</b>。股價每天都會上下波動，所以只看一天的下跌，能看出的東西很少。</p>
+        <p><b>90 日最高和最低</b>顯示價格的波動範圍。價格接近最高點代表一直在上漲，接近最低點代表一直在下跌。</p>
+        ${key("把眼光放遠。幾週的趨勢比今天的漲跌更重要。")}
+        ${live(`${d.s} 30 天漲跌 ${B(d.pos ? "pos" : "neg", d.c30)}。90 日區間是 ${d.lo} 到 ${d.hi}，今天的位置在從最低點往上 <b>${d.where}%</b> 的地方。`)}`,
+      q: "一檔股票今天跌了 2%，但過去三個月漲了 15%。整體來看是怎樣？",
+      opts: ["它處於上升趨勢，今天只是小幅回落", "它正在崩盤，應該馬上賣掉", "走勢圖看不出任何東西"],
+      why: "上漲 15% 當中的 2% 下跌，只是正常的每日波動。較長期的趨勢仍然向上。",
+    },
+  },
+  {
+    id: "news", a: 0, tryIt: {},
+    data: () => {
+      const latest = state.news.find(n => !n.recap);
+      return { latest: latest ? newsHeadline(latest) : null, chg: latest ? fmtPct(latest.chg) : "", ups: STOCKS.filter(s => dayChange(s.sym) > 0).length, n: STOCKS.length };
+    },
+    en: {
+      title: "How news moves prices", try: "Read the market news",
+      body: d => `
+        <p>Prices move the most when there is news. There are three main kinds:</p>
+        <ul>
+          <li><b>Company news</b> such as profit reports, new products or lawsuits. It moves one stock, sometimes a lot in a single day.</li>
+          <li><b>Industry news</b> affects similar companies together. When demand for AI chips jumps, NVIDIA, TSMC and MediaTek often rise together.</li>
+          <li><b>Market-wide news</b> such as interest rates, inflation or the economy. It moves almost every stock at once.</li>
+        </ul>
+        <p>Prices react within seconds, so by the time you read a headline the move has usually already happened. Buying <i>because</i> of a headline you just saw is a common beginner mistake.</p>
+        ${key("news moves prices fast. By the time you hear it, it's usually already in the price.")}
+        ${live(`${d.latest ? `Latest headline: <b>${d.latest}</b> (${d.chg}). ` : ""}Right now <b>${d.ups} of ${d.n}</b> stocks are up today. Watch the Market news card on the Trade tab to see how headlines move prices.`)}`,
+      q: "The central bank unexpectedly raises interest rates. What usually happens?",
+      opts: ["Most stocks move at the same time, often down", "Only bank stocks move", "Nothing; stocks ignore interest rates"],
+      why: "Interest rates affect the whole economy, so news like this moves almost every stock. Higher rates usually push prices down.",
+    },
+    zh: {
+      title: "新聞如何影響股價", try: "看市場新聞",
+      body: d => `
+        <p>有新聞時，股價變動最大。新聞主要有三種：</p>
+        <ul>
+          <li><b>公司新聞</b>，例如財報、新產品或訴訟。它會影響單一股票，有時一天就大漲或大跌。</li>
+          <li><b>產業新聞</b>會同時影響類似的公司。AI 晶片需求大增時，輝達、台積電和聯發科常常一起上漲。</li>
+          <li><b>整體市場新聞</b>，例如利率、通膨或經濟狀況。它幾乎會同時影響每一檔股票。</li>
+        </ul>
+        <p>股價幾秒內就會反應，所以等你看到標題時，漲跌通常已經發生了。<i>因為</i>剛看到一則標題就買進，是新手常犯的錯。</p>
+        ${key("新聞讓股價變動得很快。等你聽到時，通常已經反映在股價上了。")}
+        ${live(`${d.latest ? `最新標題：<b>${d.latest}</b>（${d.chg}）。` : ""}現在 <b>${d.n} 檔中有 ${d.ups} 檔</b>今天上漲。看看交易頁面的市場新聞，觀察標題怎麼影響股價。`)}`,
+      q: "中央銀行意外升息。通常會發生什麼事？",
+      opts: ["大部分股票同時變動，而且常常下跌", "只有銀行股會變動", "沒事，股票不受利率影響"],
+      why: "利率影響整體經濟，所以這類新聞幾乎會影響每一檔股票。升息通常會讓股價下跌。",
+    },
+  },
+  {
+    id: "ma", a: 0, tryIt: {},
+    data: () => { const s = selected, an = analyze(s), c = cur(s); return { s, a: c + an.s20.toFixed(2), b: c + an.s50.toFixed(2), up: an.s20 > an.s50 }; },
+    en: {
+      title: "Trends and moving averages", try: "See the trend on the chart",
+      body: d => `
+        <p>A <b>moving average</b> is the average closing price over the last few days. It smooths out daily wiggles so the trend is easier to see. The dashed line on the chart is the 20-day average.</p>
+        <ul>
+          <li>The <b>20-day average</b> shows the recent trend.</li>
+          <li>The <b>50-day average</b> shows the longer trend.</li>
+        </ul>
+        <p>When the 20-day average is above the 50-day, recent prices are higher than older ones, which suggests an uptrend. When it is below, it suggests a downtrend. Trends in real markets often last for weeks, which is why traders watch them.</p>
+        ${key("20-day above 50-day suggests an uptrend so far. It doesn't promise what comes next.")}
+        ${live(`For ${d.s}, the 20-day average is <b>${d.a}</b> and the 50-day is <b>${d.b}</b>, so the trend looks ${B(d.up ? "pos" : "neg", d.up ? "up" : "down")}.`)}`,
+      q: "A stock's 20-day average is $105 and its 50-day average is $98. What does that suggest?",
+      opts: ["Recent prices are higher than before: an uptrend", "Recent prices are lower than before: a downtrend", "The stock is guaranteed to keep rising"],
+      why: "The recent average is higher than the longer one, so the trend has been up. It describes the past; it isn't a guarantee.",
+    },
+    zh: {
+      title: "趨勢和移動平均線", try: "在走勢圖上看趨勢",
+      body: d => `
+        <p><b>移動平均線</b>（均線）是最近幾天收盤價的平均。它把每天的小波動抹平，讓趨勢更容易看清楚。走勢圖上的虛線就是 20 日均線。</p>
+        <ul>
+          <li><b>20 日均線</b>顯示近期的趨勢。</li>
+          <li><b>50 日均線</b>顯示較長期的趨勢。</li>
+        </ul>
+        <p>20 日均線高於 50 日均線時，代表最近的價格比之前高，暗示上升趨勢；低於時則暗示下降趨勢。真實市場的趨勢常常會持續幾週，所以交易者很重視它。</p>
+        ${key("20 日均線高於 50 日均線，代表到目前為止是上升趨勢，但不保證之後會怎樣。")}
+        ${live(`${d.s} 的 20 日均線是 <b>${d.a}</b>，50 日均線是 <b>${d.b}</b>，所以趨勢看起來${B(d.up ? "pos" : "neg", d.up ? "向上" : "向下")}。`)}`,
+      q: "一檔股票的 20 日均線是 $105，50 日均線是 $98。這代表什麼？",
+      opts: ["最近的價格比之前高：上升趨勢", "最近的價格比之前低：下降趨勢", "這檔股票保證會繼續上漲"],
+      why: "近期平均高於較長期的平均，所以趨勢一直向上。這描述的是過去，並不是保證。",
+    },
+  },
+  {
+    id: "rsi", a: 0, tryIt: {},
+    data: () => { const s = selected, an = analyze(s); return { s, r: an.rsi.toFixed(0), zone: an.rsi > 70 ? 2 : an.rsi < 30 ? 0 : 1, mom: fmtPct(an.mom30), pos: an.mom30 >= 0 }; },
+    en: {
+      title: "Momentum and RSI", try: "Open the coach's signals",
+      body: d => `
+        <p><b>Momentum</b> is how strongly a price has moved recently. The coach looks at the change over the last 30 days.</p>
+        <p><b>RSI</b> (Relative Strength Index) compares the size of recent up days with recent down days over 14 days and turns it into a number from 0 to 100.</p>
+        <ul>
+          <li><b>Above 70:</b> the price has risen fast and may be <b>overbought</b>, so it could pull back.</li>
+          <li><b>Below 30:</b> the price has fallen fast and may be <b>oversold</b>, so it could bounce.</li>
+          <li><b>30 to 70:</b> neutral.</li>
+        </ul>
+        <p>These are warnings, not rules. A strong stock can stay overbought for months.</p>
+        ${key("RSI tells you how fast a price has moved, not where it will go.")}
+        ${live(`${d.s} has an RSI of <b>${d.r}</b> (${["oversold", "neutral", "overbought"][d.zone]}) and momentum of ${B(d.pos ? "pos" : "neg", d.mom)} over 30 days.`)}`,
+      q: "A stock's RSI is 82. What does that usually mean?",
+      opts: ["It has risen fast and may be overbought", "It is cheap and must go up", "The company is losing money"],
+      why: "An RSI above 70 means recent gains have been unusually strong. It says nothing about the company's profits.",
+    },
+    zh: {
+      title: "動能和 RSI", try: "打開教練的訊號",
+      body: d => `
+        <p><b>動能</b>是價格最近變動的力道。教練會看過去 30 天的漲跌。</p>
+        <p><b>RSI</b>（相對強弱指標）比較 14 天內上漲日和下跌日的幅度，轉換成 0 到 100 的數字。</p>
+        <ul>
+          <li><b>高於 70：</b>價格漲得很快，可能<b>超買</b>，有機會回檔。</li>
+          <li><b>低於 30：</b>價格跌得很快，可能<b>超賣</b>，有機會反彈。</li>
+          <li><b>30 到 70：</b>中性。</li>
+        </ul>
+        <p>這些是警訊，不是規則。強勢的股票可能連續好幾個月都處於超買。</p>
+        ${key("RSI 告訴你價格變動得多快，而不是它會往哪裡去。")}
+        ${live(`${d.s} 的 RSI 是 <b>${d.r}</b>（${["超賣", "中性", "超買"][d.zone]}），30 天動能為 ${B(d.pos ? "pos" : "neg", d.mom)}。`)}`,
+      q: "一檔股票的 RSI 是 82。這通常代表什麼？",
+      opts: ["它漲得很快，可能超買了", "它很便宜，一定會漲", "這家公司在虧錢"],
+      why: "RSI 高於 70 代表最近的漲幅特別強，和公司有沒有賺錢無關。",
+    },
+  },
+  {
+    id: "risk", a: 0, tryIt: { pick: "mostVolatile" },
+    data: () => {
+      const r = STOCKS.map(s => ({ sym: s.sym, v: volatility(series(s.sym)) })).sort((a, b) => b.v - a.v);
+      return { hi: r[0].sym, hiV: pct0(r[0].v), lo: r[r.length - 1].sym, loV: pct0(r[r.length - 1].v) };
+    },
+    en: {
+      title: "Risk and volatility", try: "Look at the most volatile stock",
+      body: d => `
+        <p><b>Volatility</b> measures how much a price swings up and down. This app shows it as a yearly percentage. A higher number means bigger swings.</p>
+        <p>Bigger swings work both ways: bigger possible gains and bigger possible losses. A useful question before buying is: <i>if this dropped 30%, could I stay calm and not panic-sell?</i></p>
+        ${key("higher volatility means a bumpier ride, in both directions.")}
+        ${live(`The most volatile stock right now is <b>${d.hi}</b> at ${d.hiV} a year. The calmest is <b>${d.lo}</b> at ${d.loV}.`)}`,
+      q: "Stock A has 12% volatility and Stock B has 45%. Which one usually swings more?",
+      opts: ["Stock B", "Stock A", "They swing about the same"],
+      why: "45% volatility means much bigger typical moves than 12%.",
+    },
+    zh: {
+      title: "風險和波動度", try: "看波動最大的股票",
+      body: d => `
+        <p><b>波動度</b>衡量價格上下擺動的幅度。這個 app 用每年的百分比表示，數字越大代表起伏越大。</p>
+        <p>起伏大是雙向的：可能賺得多，也可能賠得多。買進前可以問自己：<i>如果它跌 30%，我能保持冷靜、不恐慌賣出嗎？</i></p>
+        ${key("波動越大，過程越顛簸，上下都是。")}
+        ${live(`目前波動最大的是 <b>${d.hi}</b>，每年約 ${d.hiV}；最平穩的是 <b>${d.lo}</b>，約 ${d.loV}。`)}`,
+      q: "股票 A 的波動度是 12%，股票 B 是 45%。哪一檔通常起伏比較大？",
+      opts: ["股票 B", "股票 A", "差不多"],
+      why: "45% 的波動度代表一般的漲跌幅比 12% 大很多。",
+    },
+  },
+  {
+    id: "diversify", a: 0, tryIt: { sym: "0050" },
+    data: () => {
+      const { total } = portfolioTotals();
+      const rows = Object.entries(state.holdings).map(([sym, h]) => ({ sym, v: h.shares * usd(sym) })).sort((a, b) => b.v - a.v);
+      return { n: rows.length, mk: new Set(rows.map(r => market[r.sym].mkt)).size, big: rows[0] ? rows[0].sym : "", bigP: rows[0] ? (rows[0].v / total * 100).toFixed(1) + "%" : "" };
+    },
+    en: {
+      title: "Don't put all your eggs in one basket", try: "Look at the 0050 ETF",
+      body: d => `
+        <p><b>Diversification</b> means spreading your money across many companies, industries and even countries. If one company has bad news, the others soften the hit.</p>
+        <p><b>Position sizing</b> means deciding how much money goes into any one stock. The auto-pilot here never puts more than 15% of the portfolio into a single stock.</p>
+        <p>A fund such as an <b>ETF</b> holds many stocks at once. <b>0050</b> in the watchlist is an ETF that holds about 50 of Taiwan's biggest companies, so one purchase gives you a slice of all of them.</p>
+        ${key("no single stock should be able to sink your whole portfolio.")}
+        ${live(d.n ? `You own <b>${d.n}</b> stock${d.n === 1 ? "" : "s"} across <b>${d.mk}</b> market${d.mk === 1 ? "" : "s"}. Your biggest position, <b>${d.big}</b>, is <b>${d.bigP}</b> of your portfolio.` : "You don't own any stocks yet. Once you do, this box will show how spread out your money is.")}`,
+      q: "Which portfolio is the most diversified?",
+      opts: ["10 stocks across tech, banking and telecom in two countries", "All your money in one stock you really like", "Two chip-making companies"],
+      why: "Different industries and countries tend not to fall at the same time, which spreads the risk.",
+    },
+    zh: {
+      title: "不要把雞蛋放在同一個籃子裡", try: "看 0050 ETF",
+      body: d => `
+        <p><b>分散投資</b>是把錢分散到許多公司、產業，甚至不同國家。一家公司有壞消息時，其他的可以減輕衝擊。</p>
+        <p><b>部位大小</b>是決定每檔股票要放多少錢。這裡的自動駕駛不會把超過 15% 的投資組合放在同一檔股票。</p>
+        <p><b>ETF</b> 這類基金一次持有許多股票。觀察清單裡的 <b>0050</b> 是持有台灣約 50 家最大公司的 ETF，買一次就等於擁有它們每一家的一小部分。</p>
+        ${key("不應該有任何一檔股票能拖垮你整個投資組合。")}
+        ${live(d.n ? `你持有 <b>${d.n}</b> 檔股票，分布在 <b>${d.mk}</b> 個市場。最大的部位 <b>${d.big}</b> 占投資組合的 <b>${d.bigP}</b>。` : "你還沒有持股。買進之後，這裡會顯示你的資金分散得如何。")}`,
+      q: "哪一個投資組合最分散？",
+      opts: ["兩個國家、科技、金融和電信產業共 10 檔股票", "所有錢都放在一檔你很喜歡的股票", "兩家晶片公司"],
+      why: "不同產業和國家通常不會同時下跌，這樣可以分散風險。",
+    },
+  },
+  {
+    id: "whenact", a: 0, tryIt: {},
+    data: () => { const co = coach(selected); return { s: selected, sum: co.summary, first: co.actions[0].replace(/<button[^>]*>.*?<\/button>/g, "") }; },
+    en: {
+      title: "When to buy and when to sell", try: "Read the Coach card",
+      body: d => `
+        <p>Good traders decide their rules <b>before</b> they trade, so fear and excitement don't make the decision for them. Here is a simple plan. The Coach on the Trade tab follows it, and the Journal tab checks every trade you make against it.</p>
+        <div class="checklist">
+          <div><h4>Consider buying when…</h4><ul>
+            <li>The trend is up (20-day average above the 50-day).</li>
+            <li>It isn't overbought (RSI below 70).</li>
+            <li>You can say <i>why</i> you're buying in one sentence.</li>
+            <li>The amount is small: about 5–10% of your portfolio.</li>
+            <li>You already know the price where you'd sell if you're wrong.</li></ul></div>
+          <div><h4>Consider selling when…</h4><ul>
+            <li>It hits your <b>stop-loss</b>, for example 8% below what you paid.</li>
+            <li>The trend turns down and your reason for buying no longer holds.</li>
+            <li>It has grown into too big a part of your portfolio.</li>
+            <li>It has gained a lot, and you want to lock in part of the profit.</li></ul></div>
+          <div><h4>Try not to…</h4><ul>
+            <li>Buy just because everyone is talking about it (FOMO, fear of missing out).</li>
+            <li>Panic-sell after one bad day.</li>
+            <li>Buy more of a falling stock only to "get back to even."</li>
+            <li>Put everything into one stock.</li></ul></div>
+        </div>
+        ${key("plan the exit before you enter. Know why you're buying, how much, and when you'd sell.")}
+        ${live(`The Coach's view on <b>${d.s}</b>: ${d.sum}<br><br><b>Its suggestion:</b> ${d.first}`)}`,
+      q: "You bought a stock at $100 with a rule to sell if it falls 8%. It's now $91. What does your plan say?",
+      opts: ["Sell, because it's below your $92 stop-loss", "Buy more to lower your average cost", "Ignore it; it will come back"],
+      why: "8% below $100 is $92, and $91 is past that line. Sticking to the rule keeps a small loss from growing.",
+    },
+    zh: {
+      title: "什麼時候買，什麼時候賣", try: "看教練卡片",
+      body: d => `
+        <p>好的交易者會在交易<b>之前</b>就定好規則，這樣恐懼和興奮就不會替他們做決定。下面是一個簡單的計畫。交易頁面的教練會照著它給建議，交易日誌也會用它檢查你的每一筆交易。</p>
+        <div class="checklist">
+          <div><h4>可以考慮買進的時候…</h4><ul>
+            <li>趨勢向上（20 日均線高於 50 日均線）。</li>
+            <li>沒有超買（RSI 低於 70）。</li>
+            <li>你能用一句話說出<i>為什麼</i>要買。</li>
+            <li>金額不大：約投資組合的 5–10%。</li>
+            <li>你已經知道判斷錯誤時要在什麼價格賣出。</li></ul></div>
+          <div><h4>可以考慮賣出的時候…</h4><ul>
+            <li>碰到你的<b>停損</b>，例如比買進價低 8%。</li>
+            <li>趨勢轉為向下，而且當初買進的理由已經不成立。</li>
+            <li>它在投資組合中占比變得太大。</li>
+            <li>它已經漲了很多，你想鎖住部分獲利。</li></ul></div>
+          <div><h4>盡量不要…</h4><ul>
+            <li>只因為大家都在討論就買（FOMO，錯失恐懼）。</li>
+            <li>因為一天下跌就恐慌賣出。</li>
+            <li>只為了「攤平回本」而加碼下跌中的股票。</li>
+            <li>把所有錢都放在一檔股票。</li></ul></div>
+        </div>
+        ${key("進場前先規劃出場。知道為什麼買、買多少，以及什麼時候賣。")}
+        ${live(`教練對 <b>${d.s}</b> 的看法：${d.sum}<br><br><b>它的建議：</b>${d.first}`)}`,
+      q: "你以 $100 買進一檔股票，規則是下跌 8% 就賣。現在是 $91。你的計畫怎麼說？",
+      opts: ["賣出，因為已經低於 $92 的停損價", "加碼買進來降低平均成本", "不用管，它會漲回來"],
+      why: "$100 的 8% 以下是 $92，$91 已經超過這條線。遵守規則能避免小虧擴大。",
+    },
+  },
+  {
+    id: "taiwan", a: 0, tryIt: { sym: "2330" },
+    data: () => { const p = price("2330"); return { p: fmtP("2330", p), usd: fmt$(usd("2330")), lot: fmtP("2330", p * 1000), rate: MARKETS.TW.perUSD }; },
+    en: {
+      title: "Investing in Taiwan stocks", try: "Look at TSMC (2330)",
+      body: d => `
+        <p>The <b>Taiwan Stock Exchange</b> (臺灣證券交易所, TWSE) uses numbers instead of letters for tickers: <b>2330</b> is TSMC and <b>2317</b> is Hon Hai, also known as Foxconn. ETFs usually start with 00, like <b>0050</b>.</p>
+        <p>Prices are in <b>New Taiwan dollars (NT$)</b>. This app keeps your cash in US dollars and converts at a fixed NT$${d.rate} = US$1. In real life the exchange rate moves every day, so a Taiwan stock can rise in NT$ and still lose value in US$. That is called <b>currency risk</b>.</p>
+        <div class="facts">
+          <div class="fact"><div class="fact-k">Trading hours</div><div class="fact-v">9:00 to 13:30, Monday to Friday, Taiwan time</div></div>
+          <div class="fact"><div class="fact-k">Board lot (一張)</div><div class="fact-v">1,000 shares. Odd-lot trading (零股) lets you buy fewer.</div></div>
+          <div class="fact"><div class="fact-k">Daily price limit</div><div class="fact-v">At most 10% up or down from the previous close in one day. This app enforces it and shows a tag.</div></div>
+          <div class="fact"><div class="fact-k">Price steps</div><div class="fact-v">Prices move in fixed steps. Above NT$1,000 the step is NT$5, so TSMC can't trade at NT$1,083.</div></div>
+          <div class="fact"><div class="fact-k">Colors</div><div class="fact-v"><b>Red means up</b> and green means down, the opposite of this app and of US apps.</div></div>
+        </div>
+        <p>TSMC is by far the largest company on the exchange, so its price has a big effect on the whole Taiwan market.</p>
+        ${key("Taiwan stocks trade in NT$, in lots of 1,000 shares, with a 10% daily limit, and red means up.")}
+        ${live(`TSMC (2330) is <b>${d.p}</b> per share, about <b>${d.usd}</b>. One full board lot of 1,000 shares would cost <b>${d.lot}</b>. In this app you can buy single shares, like odd-lot trading.`)}`,
+      q: "On a Taiwanese stock app, a price shown in red means…",
+      opts: ["The price went up", "The price went down", "Trading is paused"],
+      why: "In Taiwan, as in mainland China, Hong Kong and Japan, red marks a rising price. In the US and Europe it is usually the other way round.",
+    },
+    zh: {
+      title: "投資台股", try: "看台積電（2330）",
+      body: d => `
+        <p><b>台灣證券交易所</b>（TWSE）用數字而不是英文字母當股票代號：<b>2330</b> 是台積電，<b>2317</b> 是鴻海。ETF 的代號通常以 00 開頭，例如 <b>0050</b>。</p>
+        <p>價格以<b>新台幣（NT$）</b>計算。這個 app 用美元保管你的現金，並以固定的 NT$${d.rate} = US$1 換算。現實中匯率每天都在變，所以台股可能以新台幣計算上漲，但換成美元卻變少。這叫做<b>匯率風險</b>。</p>
+        <div class="facts">
+          <div class="fact"><div class="fact-k">交易時間</div><div class="fact-v">週一至週五 9:00 到 13:30（台灣時間）</div></div>
+          <div class="fact"><div class="fact-k">一張</div><div class="fact-v">1,000 股。零股交易可以買少於一張。</div></div>
+          <div class="fact"><div class="fact-k">漲跌幅限制</div><div class="fact-v">一天最多比昨收上漲或下跌 10%。這個 app 也有這個限制，並會顯示標籤。</div></div>
+          <div class="fact"><div class="fact-k">升降單位</div><div class="fact-v">價格以固定的級距變動。超過 NT$1,000 時級距是 NT$5，所以台積電不會出現 NT$1,083 的價格。</div></div>
+          <div class="fact"><div class="fact-k">顏色</div><div class="fact-v">台股<b>紅色代表上漲</b>、綠色代表下跌，和這個 app 以及美國的 app 相反。</div></div>
+        </div>
+        <p>台積電是交易所裡規模最大的公司，所以它的股價對整個台股影響很大。</p>
+        ${key("台股以新台幣交易、一張 1,000 股、每天漲跌幅限制 10%，而且紅色代表上漲。")}
+        ${live(`台積電（2330）每股 <b>${d.p}</b>，約 <b>${d.usd}</b>。一整張 1,000 股要 <b>${d.lot}</b>。在這個 app 裡你可以只買一股，就像零股交易。`)}`,
+      q: "在台灣的看盤 app 上，價格顯示紅色代表…",
+      opts: ["價格上漲", "價格下跌", "暫停交易"],
+      why: "在台灣，和中國大陸、香港、日本一樣，紅色代表上漲。在美國和歐洲通常相反。",
+    },
+  },
+  {
+    id: "predict", a: 0, tryIt: {},
+    data: () => { const { total } = portfolioTotals(), c = total - START_CASH; return { up: c >= 0, amt: fmt$(Math.abs(c)), p: fmtPct(c / START_CASH) }; },
+    en: {
+      title: "Why nobody can predict the market", try: "Try auto-pilot",
+      body: d => `
+        <p>Every signal in these lessons is a <b>hint, not a promise</b>. Prices react to news that nobody knows in advance: a surprise profit report, a new law, a factory fire.</p>
+        <p>This simulator works the same way. Trends tend to last a while, so the signals help a little, but surprise news and random moves often overwhelm them. Turn on auto-pilot and watch: it wins some trades and loses others.</p>
+        <p>Even professionals find it hard. Over long periods, most professional fund managers fail to beat a simple fund that just holds the whole market.</p>
+        <p>If you invest real money someday, a few habits help:</p>
+        <ul>
+          <li>Learn first, and think in years rather than days.</li>
+          <li>Spread your money out, for example with a broad market fund.</li>
+          <li>Only invest money you won't need soon.</li>
+          <li>Watch out for fees, and for anyone promising guaranteed returns.</li>
+          <li>Talk it over with someone you trust before you start.</li>
+        </ul>
+        ${key("anyone who says they can predict the market for sure is wrong, or selling something.")}
+        ${live(`Your simulated account is ${B(d.up ? "pos" : "neg", `${d.up ? "up" : "down"} ${d.amt} (${d.p})`)} since you started.`)}`,
+      q: "Can any AI or expert reliably predict tomorrow's stock prices?",
+      opts: ["No. Signals can help you think, but nobody predicts prices reliably", "Yes, with enough data", "Only for big, famous companies"],
+      why: "Markets react to new information that nobody has yet. That is why risk control and diversification matter more than predictions.",
+    },
+    zh: {
+      title: "為什麼沒有人能預測市場", try: "試試自動駕駛",
+      body: d => `
+        <p>這些課程裡的每個訊號都是<b>提示，不是保證</b>。股價會因為沒人能事先知道的新聞而變動：意外的財報、新法律、工廠失火。</p>
+        <p>這個模擬器也是一樣。趨勢通常會持續一陣子，所以訊號有一點幫助，但意外的新聞和隨機的波動常常會蓋過它們。開啟自動駕駛觀察看看：它有些交易賺、有些賠。</p>
+        <p>就連專業人士也覺得很難。長期來看，大多數專業基金經理人都贏不過一檔單純持有整個市場的基金。</p>
+        <p>如果有一天你要投資真的錢，這些習慣會有幫助：</p>
+        <ul>
+          <li>先學習，用「年」而不是「天」來思考。</li>
+          <li>分散你的資金，例如投資涵蓋整個市場的基金。</li>
+          <li>只投資短期內不會用到的錢。</li>
+          <li>注意手續費，也要小心任何保證獲利的人。</li>
+          <li>開始之前，先和你信任的人討論。</li>
+        </ul>
+        ${key("說自己一定能預測市場的人，不是錯了，就是想賣你東西。")}
+        ${live(`你的模擬帳戶從開始到現在${B(d.up ? "pos" : "neg", `${d.up ? "賺了" : "虧了"} ${d.amt}（${d.p}）`)}。`)}`,
+      q: "有任何 AI 或專家能可靠地預測明天的股價嗎？",
+      opts: ["不能。訊號可以幫助思考，但沒有人能可靠地預測股價", "可以，只要資料夠多", "只有大公司可以"],
+      why: "市場會對還沒有人知道的新資訊做出反應。所以控制風險和分散投資，比預測更重要。",
+    },
+  },
+];
+const LT = l => l[lang] || l.en;  // lesson text in the current language
+
+/* ============ Language ============ */
+function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+const LANG_KEY = "stockpilot-lang";
+let lang = load(LANG_KEY) || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+if (!I18N[lang]) lang = "en";
+function t(k, v = {}) {
+  const s = I18N[lang][k] !== undefined ? I18N[lang][k] : I18N.en[k];
+  if (s === undefined) return k;
+  if (typeof s === "function") return s(v);
+  if (typeof s === "string") return s.replace(/\{(\w+)\}/g, (_, x) => v[x] !== undefined ? v[x] : "");
+  return s;
+}
+function applyStatic() {
+  document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en";
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => el.setAttribute("placeholder", t(el.dataset.i18nPh)));
+  $("langSel").value = lang;
+}
+
 /* ============ Markets ============ */
 // Cash is kept in US dollars. Taiwan stocks are priced in New Taiwan dollars
 // and converted at a fixed, simulated exchange rate.
 const MARKETS = {
-  US: { label: "US",     cur: "$",   perUSD: 1,  vol: 0.009 },
-  TW: { label: "Taiwan", cur: "NT$", perUSD: 32, vol: 0.010 },
+  US: { cur: "$",   perUSD: 1,  vol: 0.009 },
+  TW: { cur: "NT$", perUSD: 32, vol: 0.010 },
 };
 // Daily volatility of each industry's shared moves
 const SECTORS = { chips: 0.014, tech: 0.008, finance: 0.007, consumer: 0.008, shipping: 0.016, telecom: 0.003, fund: 0 };
 
 /* ============ Universe (starting prices are rough, simulated levels) ============ */
 const STOCKS = [
-  { sym: "AAPL",  name: "Apple",              short: "Apple",       base: 232,  drift: 0.0003, vol: 0.015, beta: 1.0, sector: "tech",     mkt: "US" },
-  { sym: "MSFT",  name: "Microsoft",          short: "Microsoft",   base: 448,  drift: 0.0004, vol: 0.014, beta: 0.9, sector: "tech",     mkt: "US" },
-  { sym: "NVDA",  name: "NVIDIA",             short: "NVIDIA",      base: 138,  drift: 0.0007, vol: 0.028, beta: 1.6, sector: "chips",    mkt: "US" },
-  { sym: "GOOGL", name: "Alphabet",           short: "Alphabet",    base: 182,  drift: 0.0003, vol: 0.017, beta: 1.1, sector: "tech",     mkt: "US" },
-  { sym: "AMZN",  name: "Amazon",             short: "Amazon",      base: 205,  drift: 0.0004, vol: 0.019, beta: 1.2, sector: "tech",     mkt: "US" },
-  { sym: "META",  name: "Meta Platforms",     short: "Meta",        base: 585,  drift: 0.0005, vol: 0.021, beta: 1.3, sector: "tech",     mkt: "US" },
-  { sym: "TSLA",  name: "Tesla",              short: "Tesla",       base: 248,  drift: 0.0002, vol: 0.034, beta: 1.8, sector: "consumer", mkt: "US" },
-  { sym: "BRK.B", name: "Berkshire Hath.",    short: "Berkshire",   base: 462,  drift: 0.0003, vol: 0.010, beta: 0.6, sector: "finance",  mkt: "US" },
-  { sym: "JPM",   name: "JPMorgan Chase",     short: "JPMorgan",    base: 244,  drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance",  mkt: "US" },
-  { sym: "V",     name: "Visa",               short: "Visa",        base: 312,  drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",  mkt: "US" },
-  { sym: "NFLX",  name: "Netflix",            short: "Netflix",     base: 892,  drift: 0.0004, vol: 0.023, beta: 1.2, sector: "consumer", mkt: "US" },
-  { sym: "DIS",   name: "Walt Disney",        short: "Disney",      base: 112,  drift: 0.0001, vol: 0.016, beta: 1.0, sector: "consumer", mkt: "US" },
-  { sym: "2330",  name: "台積電 TSMC",          short: "TSMC",        base: 1085, drift: 0.0005, vol: 0.020, beta: 1.1, sector: "chips",    mkt: "TW" },
-  { sym: "2317",  name: "鴻海 Hon Hai",         short: "Hon Hai",     base: 212,  drift: 0.0003, vol: 0.022, beta: 1.0, sector: "tech",     mkt: "TW" },
-  { sym: "2454",  name: "聯發科 MediaTek",      short: "MediaTek",    base: 1340, drift: 0.0004, vol: 0.024, beta: 1.2, sector: "chips",    mkt: "TW" },
-  { sym: "2308",  name: "台達電 Delta",         short: "Delta",       base: 405,  drift: 0.0004, vol: 0.019, beta: 1.0, sector: "tech",     mkt: "TW" },
-  { sym: "2412",  name: "中華電 Chunghwa Tel",  short: "Chunghwa Telecom", base: 126, drift: 0.0001, vol: 0.006, beta: 0.3, sector: "telecom", mkt: "TW" },
-  { sym: "2881",  name: "富邦金 Fubon",         short: "Fubon",       base: 88,   drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance",  mkt: "TW" },
-  { sym: "2603",  name: "長榮 Evergreen",       short: "Evergreen",   base: 198,  drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping", mkt: "TW" },
-  { sym: "0050",  name: "元大台灣50 ETF",       short: "Taiwan 50 ETF", base: 192, drift: 0.0003, vol: 0.011, beta: 1.0, sector: "fund",   mkt: "TW" },
+  { sym: "AAPL",  name: "Apple",           zh: "蘋果 Apple",      short: "Apple",      zhShort: "蘋果",   base: 232,  drift: 0.0003, vol: 0.015, beta: 1.0, sector: "tech",     mkt: "US" },
+  { sym: "MSFT",  name: "Microsoft",       zh: "微軟 Microsoft",  short: "Microsoft",  zhShort: "微軟",   base: 448,  drift: 0.0004, vol: 0.014, beta: 0.9, sector: "tech",     mkt: "US" },
+  { sym: "NVDA",  name: "NVIDIA",          zh: "輝達 NVIDIA",     short: "NVIDIA",     zhShort: "輝達",   base: 138,  drift: 0.0007, vol: 0.028, beta: 1.6, sector: "chips",    mkt: "US" },
+  { sym: "GOOGL", name: "Alphabet",        zh: "Alphabet（谷歌）", short: "Alphabet",   zhShort: "Alphabet", base: 182, drift: 0.0003, vol: 0.017, beta: 1.1, sector: "tech",   mkt: "US" },
+  { sym: "AMZN",  name: "Amazon",          zh: "亞馬遜 Amazon",   short: "Amazon",     zhShort: "亞馬遜", base: 205,  drift: 0.0004, vol: 0.019, beta: 1.2, sector: "tech",     mkt: "US" },
+  { sym: "META",  name: "Meta Platforms",  zh: "Meta",            short: "Meta",       zhShort: "Meta",   base: 585,  drift: 0.0005, vol: 0.021, beta: 1.3, sector: "tech",     mkt: "US" },
+  { sym: "TSLA",  name: "Tesla",           zh: "特斯拉 Tesla",    short: "Tesla",      zhShort: "特斯拉", base: 248,  drift: 0.0002, vol: 0.034, beta: 1.8, sector: "consumer", mkt: "US" },
+  { sym: "BRK.B", name: "Berkshire Hath.", zh: "波克夏 Berkshire", short: "Berkshire", zhShort: "波克夏", base: 462,  drift: 0.0003, vol: 0.010, beta: 0.6, sector: "finance",  mkt: "US" },
+  { sym: "JPM",   name: "JPMorgan Chase",  zh: "摩根大通 JPMorgan", short: "JPMorgan", zhShort: "摩根大通", base: 244, drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance", mkt: "US" },
+  { sym: "V",     name: "Visa",            zh: "Visa",            short: "Visa",       zhShort: "Visa",   base: 312,  drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",  mkt: "US" },
+  { sym: "NFLX",  name: "Netflix",         zh: "網飛 Netflix",    short: "Netflix",    zhShort: "網飛",   base: 892,  drift: 0.0004, vol: 0.023, beta: 1.2, sector: "consumer", mkt: "US" },
+  { sym: "DIS",   name: "Walt Disney",     zh: "迪士尼 Disney",   short: "Disney",     zhShort: "迪士尼", base: 112,  drift: 0.0001, vol: 0.016, beta: 1.0, sector: "consumer", mkt: "US" },
+  { sym: "2330",  name: "TSMC 台積電",       zh: "台積電",           short: "TSMC",       zhShort: "台積電", base: 1085, drift: 0.0005, vol: 0.020, beta: 1.1, sector: "chips",    mkt: "TW" },
+  { sym: "2317",  name: "Hon Hai 鴻海",      zh: "鴻海",             short: "Hon Hai",    zhShort: "鴻海",   base: 212,  drift: 0.0003, vol: 0.022, beta: 1.0, sector: "tech",     mkt: "TW" },
+  { sym: "2454",  name: "MediaTek 聯發科",   zh: "聯發科",           short: "MediaTek",   zhShort: "聯發科", base: 1340, drift: 0.0004, vol: 0.024, beta: 1.2, sector: "chips",    mkt: "TW" },
+  { sym: "2308",  name: "Delta 台達電",      zh: "台達電",           short: "Delta",      zhShort: "台達電", base: 405,  drift: 0.0004, vol: 0.019, beta: 1.0, sector: "tech",     mkt: "TW" },
+  { sym: "2412",  name: "Chunghwa Tel 中華電", zh: "中華電",          short: "Chunghwa Telecom", zhShort: "中華電", base: 126, drift: 0.0001, vol: 0.006, beta: 0.3, sector: "telecom", mkt: "TW" },
+  { sym: "2881",  name: "Fubon 富邦金",      zh: "富邦金",           short: "Fubon",      zhShort: "富邦金", base: 88,   drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance",  mkt: "TW" },
+  { sym: "2603",  name: "Evergreen 長榮",    zh: "長榮",             short: "Evergreen",  zhShort: "長榮",   base: 198,  drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping", mkt: "TW" },
+  { sym: "0050",  name: "Taiwan 50 ETF 元大台灣50", zh: "元大台灣50", short: "Taiwan 50 ETF", zhShort: "元大台灣50", base: 192, drift: 0.0003, vol: 0.011, beta: 1.0, sector: "fund", mkt: "TW" },
 ];
 const HISTORY_DAYS = 180;
 const TICK_MS = 2500;
@@ -515,9 +1574,9 @@ const TW_LIMIT = 0.10;      // Taiwan daily price limit: ±10% from previous clo
 function mulberry32(a) {
   return function() {
     a |= 0; a = (a + 0x6D2B79F5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    let x = Math.imul(a ^ (a >>> 15), 1 | a);
+    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
   };
 }
 function gaussWith(rng) { // Box-Muller
@@ -525,9 +1584,9 @@ function gaussWith(rng) { // Box-Muller
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 const gauss = () => gaussWith(Math.random);
-const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const randInt = n => Math.floor(Math.random() * n);
 
-/* ============ Price helpers ============ */
+/* ============ Price model ============ */
 const market = {};
 for (const s of STOCKS) {
   market[s.sym] = {
@@ -539,10 +1598,9 @@ for (const s of STOCKS) {
 }
 function twTick(p) { return p < 10 ? 0.01 : p < 50 ? 0.05 : p < 100 ? 0.1 : p < 500 ? 0.5 : p < 1000 ? 1 : 5; }
 function roundPx(sym, p) {
-  if (market[sym].mkt === "TW") { const t = twTick(p); return +(Math.round(p / t) * t).toFixed(2); }
+  if (market[sym].mkt === "TW") { const s = twTick(p); return +(Math.round(p / s) * s).toFixed(2); }
   return Math.round(p * 100) / 100;
 }
-
 // Shared moves for one period: a global factor links the US and Taiwan markets.
 function drawFactors(rnd) {
   const g = rnd();
@@ -552,27 +1610,10 @@ function drawFactors(rnd) {
 }
 // Return of one stock over one period. `scale` = sqrt of the fraction of a day.
 function periodReturn(m, f, scale, rnd) {
-  const frac = scale * scale;
-  return (m.drift + m.mu) * frac
+  return (m.drift + m.mu) * scale * scale
     + scale * (m.beta * MARKETS[m.mkt].vol * f[m.mkt] + SECTORS[m.sector] * f.sector[m.sector] + m.idio * rnd());
 }
 function updateTrend(m, rnd) { m.mu = 0.96 * m.mu + 0.0006 * rnd(); } // trends persist for weeks, then fade
-
-/* ============ News ============ */
-const NEWS = {
-  pos: ["{n} beats profit expectations", "{n} wins a big new contract", "Analysts raise their price target for {n}",
-        "{n} launches a popular new product", "{n} raises its sales forecast"],
-  neg: ["{n} misses profit expectations", "{n} cuts its sales forecast", "Regulators open an investigation into {n}",
-        "{n} loses a major customer", "Analysts downgrade {n}"],
-  sectorPos: { chips: "Demand for AI chips jumps", shipping: "Global shipping rates climb", finance: "Banks report strong lending",
-               tech: "Tech spending picks up", consumer: "Shoppers spend more than expected", telecom: "Telecom subscriptions grow" },
-  sectorNeg: { chips: "Chip orders slow down", shipping: "Global shipping rates fall", finance: "Loan defaults rise",
-               tech: "Companies cut tech spending", consumer: "Shoppers pull back on spending", telecom: "Telecom price war heats up" },
-  mktPos: { US: ["The Federal Reserve signals lower interest rates", "A strong jobs report lifts US stocks"],
-            TW: ["Taiwan export orders jump", "Foreign investors buy Taiwan stocks"] },
-  mktNeg: { US: ["US inflation comes in hotter than expected", "Worries about a slowing US economy hit stocks"],
-            TW: ["Taiwan export orders fall", "Foreign investors sell Taiwan stocks"] },
-};
 
 /* ============ Build 180 days of history (seeded, so everyone starts the same) ============ */
 function buildHistory() {
@@ -580,7 +1621,7 @@ function buildHistory() {
   const rnd = () => gaussWith(rng);
   const raw = {};
   for (const s of STOCKS) { market[s.sym].mu = 0; raw[s.sym] = [s.base * (0.8 + rng() * 0.2)]; }
-  const recentNews = [];
+  const recent = [];
   for (let d = 1; d < HISTORY_DAYS; d++) {
     const f = drawFactors(rnd);
     for (const s of STOCKS) {
@@ -590,7 +1631,7 @@ function buildHistory() {
       if (rng() < 0.012) { // occasional company news gap
         const shock = (rng() < 0.55 ? 1 : -1) * (0.03 + rng() * 0.05);
         r += shock;
-        if (d >= HISTORY_DAYS - 6) recentNews.push({ sym: s.sym, shock, daysAgo: HISTORY_DAYS - 1 - d });
+        if (d >= HISTORY_DAYS - 6) recent.push({ sym: s.sym, chg: shock, ago: HISTORY_DAYS - 1 - d, i: Math.floor(rng() * 5) });
       }
       if (s.mkt === "TW") r = Math.max(-TW_LIMIT, Math.min(TW_LIMIT, r));
       const arr = raw[s.sym];
@@ -598,28 +1639,24 @@ function buildHistory() {
     }
   }
   for (const s of STOCKS) {
-    const arr = raw[s.sym], k = s.base / arr[arr.length - 1];
-    const m = market[s.sym];
+    const arr = raw[s.sym], k = s.base / arr[arr.length - 1], m = market[s.sym];
     m.daily = arr.map(x => roundPx(s.sym, x * k));
     m.raw = m.daily[m.daily.length - 1];
     m.px = m.raw;
-    m.mu = m.mu * 0.5;
+    m.mu *= 0.5;
   }
-  return recentNews;
+  return recent;
 }
 
-/* ============ Saved state (wrapped: storage can be unavailable) ============ */
-function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
-function store(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* storage unavailable */ } }
-
+/* ============ Saved state ============ */
 const SAVE_KEY = "stockpilot-v1";
 const MARKET_KEY = "stockpilot-market-v2";
 const LEARN_KEY = "stockpilot-learn-v1";
 
-let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], autoPilot: false, mktFilter: "ALL", dayStartTotal: null };
+let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", dayStartTotal: null };
 const saved = load(SAVE_KEY);
 if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
-if (!Array.isArray(state.news)) state.news = [];
+for (const k of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[k])) state[k] = [];
 for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
 
 let sim = { day: 1, tick: 0 };
@@ -634,11 +1671,8 @@ if (marketOk) {
 } else {
   const recent = buildHistory();
   if (!state.news.length) {
-    state.news = recent.sort((a, b) => a.daysAgo - b.daysAgo).slice(0, 6).map(n => ({
-      t: n.daysAgo === 0 ? "Yesterday" : `${n.daysAgo + 1} days ago`, dayNum: 1 - n.daysAgo - 1,
-      sym: n.sym, chg: n.shock,
-      headline: pick(n.shock > 0 ? NEWS.pos : NEWS.neg).replace("{n}", market[n.sym].short),
-    }));
+    state.news = recent.sort((a, b) => a.ago - b.ago).slice(0, 6)
+      .map(n => ({ kind: "co", sym: n.sym, pos: n.chg > 0, i: n.i, chg: n.chg, ago: n.ago + 1, dayNum: -n.ago }));
   }
 }
 function saveMarket() {
@@ -651,7 +1685,7 @@ function saveMarket() {
 }
 function save() { store(SAVE_KEY, state); }
 
-let learn = { done: {}, current: "basics" };
+let learn = { done: {}, current: "basics", pane: "lessons", vcat: "all" };
 const savedLearn = load(LEARN_KEY);
 if (savedLearn && typeof savedLearn.done === "object") learn = { ...learn, ...savedLearn };
 function saveLearn() { store(LEARN_KEY, learn); }
@@ -662,8 +1696,12 @@ let selected = STOCKS[0].sym;
 const $ = id => document.getElementById(id);
 const fmt$ = n => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 const fmtPct = n => (n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%";
+const pct0 = x => (x * 100).toFixed(0) + "%";
+const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
 const cur = sym => mktOf(sym).cur;
+const nameOf = sym => lang === "zh" ? market[sym].zh : market[sym].name;
+const shortOf = sym => lang === "zh" ? market[sym].zhShort : market[sym].short;
 function fmtP(sym, v) {
   return cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -672,12 +1710,12 @@ function prevClose(sym) { const d = market[sym].daily; return d[d.length - 1]; }
 function series(sym) { return [...market[sym].daily, market[sym].px]; }   // daily closes + today's price
 function usd(sym) { return price(sym) / mktOf(sym).perUSD; }
 function dayChange(sym) { return price(sym) / prevClose(sym) - 1; }
-function simTime(tick = sim.tick) {
+function simTime(tick) {
   const mins = 9 * 60 + 30 + tick * 15;
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, "0")}`;
 }
-function stamp() { return `Day ${sim.day} · ${simTime()}`; }
-function now() { return stamp(); }
+const stampText = (d, tk) => t("stamp", { d, time: simTime(tk) });
+const itemTime = it => it.d != null ? stampText(it.d, it.tk) : (it.t || "");
 function portfolioTotals() {
   let mv = 0;
   for (const [sym, h] of Object.entries(state.holdings)) mv += h.shares * usd(sym);
@@ -689,6 +1727,19 @@ function atLimit(sym) {
   if (p >= roundPx(sym, pc * (1 + TW_LIMIT)) - 1e-9) return 1;
   if (p <= roundPx(sym, pc * (1 - TW_LIMIT)) + 1e-9) return -1;
   return 0;
+}
+
+/* ============ News text ============ */
+function newsHeadline(n) {
+  if (n.headline) return n.headline;  // saved by an older version
+  if (n.kind === "co") return t(n.pos ? "news.pos" : "news.neg")[n.i % 5].replace("{n}", shortOf(n.sym));
+  if (n.kind === "sec") return t(n.pos ? "news.secPos" : "news.secNeg")[n.sec];
+  if (n.kind === "mkt") return t(n.pos ? "news.mktPos" : "news.mktNeg")[n.mk][n.i % 2];
+  return "";
+}
+function newsTime(n) {
+  if (n.ago != null) return n.ago === 1 ? t("news.yday") : t("news.ago", { d: n.ago });
+  return itemTime(n);
 }
 
 /* ============ Signals ============ */
@@ -716,52 +1767,42 @@ function volatility(arr, n = 30) {
   return Math.sqrt(varc) * Math.sqrt(252);
 }
 function analyze(sym) {
-  const a = series(sym);
-  const c = cur(sym);
-  const p = a[a.length - 1];
-  const s20 = sma(a, 20), s50 = sma(a, 50);
-  const r = rsi(a);
-  const mom30 = p / a[a.length - 31] - 1;
-  const vol = volatility(a);
+  const a = series(sym), c = cur(sym), p = a[a.length - 1];
+  const s20 = sma(a, 20), s50 = sma(a, 50), r = rsi(a), mom30 = p / a[a.length - 31] - 1, vol = volatility(a);
   const reasons = [];
   let score = 0;
-
-  if (s20 > s50) { score += 1.2; reasons.push(`Trend is up: the 20-day average (${c}${s20.toFixed(2)}) is above the 50-day (${c}${s50.toFixed(2)}).`); }
-  else           { score -= 1.2; reasons.push(`Trend is down: the 20-day average (${c}${s20.toFixed(2)}) is below the 50-day (${c}${s50.toFixed(2)}).`); }
-
-  if (mom30 > 0.05)       { score += 1; reasons.push(`Strong momentum: up ${fmtPct(mom30)} over the last 30 days.`); }
-  else if (mom30 < -0.05) { score -= 1; reasons.push(`Weak momentum: down ${fmtPct(mom30)} over the last 30 days.`); }
-  else                    { reasons.push(`Momentum is flat (${fmtPct(mom30)} over 30 days).`); }
-
-  if (r < 30)      { score += 1; reasons.push(`RSI is ${r.toFixed(0)}: the stock looks oversold, which can come before a bounce.`); }
-  else if (r > 70) { score -= 1; reasons.push(`RSI is ${r.toFixed(0)}: the stock looks overbought and could pull back.`); }
-  else             { reasons.push(`RSI is ${r.toFixed(0)}, in the normal range.`); }
-
-  if (vol > 0.45) { score -= 0.5; reasons.push(`High volatility (${(vol * 100).toFixed(0)}% a year): bigger swings, bigger risk.`); }
-
+  const ab = { a: c + s20.toFixed(2), b: c + s50.toFixed(2) };
+  if (s20 > s50) { score += 1.2; reasons.push({ k: "r.trendUp", v: ab }); }
+  else           { score -= 1.2; reasons.push({ k: "r.trendDown", v: ab }); }
+  if (mom30 > 0.05)       { score += 1; reasons.push({ k: "r.momUp", v: { p: fmtPct(mom30) } }); }
+  else if (mom30 < -0.05) { score -= 1; reasons.push({ k: "r.momDown", v: { p: fmtPct(mom30) } }); }
+  else                    { reasons.push({ k: "r.momFlat", v: { p: fmtPct(mom30) } }); }
+  if (r < 30)      { score += 1; reasons.push({ k: "r.rsiLow", v: { r: r.toFixed(0) } }); }
+  else if (r > 70) { score -= 1; reasons.push({ k: "r.rsiHigh", v: { r: r.toFixed(0) } }); }
+  else             { reasons.push({ k: "r.rsiMid", v: { r: r.toFixed(0) } }); }
+  if (vol > 0.45) { score -= 0.5; reasons.push({ k: "r.volHigh", v: { p: pct0(vol) } }); }
   let rec = "HOLD";
   if (score >= 1.5) rec = "BUY";
   else if (score <= -1.5) rec = "SELL";
   const confidence = Math.min(95, Math.round(55 + Math.abs(score) * 12));
   return { rec, score, confidence, reasons, rsi: r, mom30, vol, s20, s50 };
 }
+const reasonText = r => r ? t(r.k, r.v) : "";
 
 /* ============ Coach: plain-language summary + what to consider ============ */
-const why = id => `<button type="button" class="lesson-link" data-lesson="${id}">Why?</button>`;
+const why = id => `<button type="button" class="lesson-link" data-lesson="${id}">${t("why")}</button>`;
 
 function coach(sym) {
-  const an = analyze(sym), m = market[sym];
+  const an = analyze(sym);
   const up = an.s20 > an.s50;
-  const volWord = an.vol < 0.2 ? "small" : an.vol < 0.4 ? "medium-sized" : "large";
-  let summary = `${m.short} has been in ${up ? "an uptrend" : "a downtrend"}: ${an.mom30 >= 0 ? "up" : "down"} ${Math.abs(an.mom30 * 100).toFixed(1)}% over 30 days, with the 20-day average ${up ? "above" : "below"} the 50-day.`;
-  if (an.rsi > 70) summary += ` RSI is ${an.rsi.toFixed(0)}, so it has risen fast and may be overbought.`;
-  else if (an.rsi < 30) summary += ` RSI is ${an.rsi.toFixed(0)}, so it has fallen fast and may be oversold.`;
-  else summary += ` RSI is ${an.rsi.toFixed(0)}, in the normal range.`;
-  summary += ` Its price swings are ${volWord} (${(an.vol * 100).toFixed(0)}% a year).`;
+  let summary = t("c.trend", { name: shortOf(sym), up, pos: an.mom30 >= 0, mom: Math.abs(an.mom30 * 100).toFixed(1) });
+  const r = an.rsi.toFixed(0);
+  summary += an.rsi > 70 ? t("c.rsiHigh", { r }) : an.rsi < 30 ? t("c.rsiLow", { r }) : t("c.rsiMid", { r });
+  summary += t("c.vol", { w: an.vol < 0.2 ? 0 : an.vol < 0.4 ? 1 : 2, p: (an.vol * 100).toFixed(0) });
   const lim = atLimit(sym);
-  if (lim) summary += ` It is at Taiwan's daily ${lim > 0 ? "upper" : "lower"} price limit, so it can't move further ${lim > 0 ? "up" : "down"} today.`;
+  if (lim) summary += t("c.limit", { up: lim > 0 });
   const news = state.news.find(n => n.sym === sym && n.dayNum >= sim.day - 2);
-  if (news) summary += ` Recent news: “${news.headline}” (${fmtPct(news.chg)}).`;
+  if (news) summary += t("c.news", { h: newsHeadline(news), c: fmtPct(news.chg) });
 
   const h = state.holdings[sym];
   const { total } = portfolioTotals();
@@ -769,22 +1810,18 @@ function coach(sym) {
   if (h) {
     const pl = usd(sym) / h.avgCost - 1;
     const posPct = h.shares * usd(sym) / total;
-    if (pl <= -0.08) acts.push(`You're down ${Math.abs(pl * 100).toFixed(1)}% on this stock. Many traders use a <b>stop-loss</b>: they sell if a stock falls about 7–10% below what they paid, so a small loss can't turn into a big one. ${why("whenact")}`);
-    if (pl >= 0.15) acts.push(`You're up ${(pl * 100).toFixed(1)}%. Selling part of it would <b>lock in some profit</b> while keeping the rest in case it keeps rising. ${why("whenact")}`);
-    if (posPct > 0.2) acts.push(`This stock is ${(posPct * 100).toFixed(0)}% of your portfolio. That's a lot in one place; trimming it would lower your risk. ${why("diversify")}`);
-    if (!acts.length) {
-      acts.push(up
-        ? `The trend is still up while you own it. <b>Holding</b> and letting a winner run is reasonable. Keep your stop-loss in mind. ${why("whenact")}`
-        : `The trend has turned down while you own it. Ask whether your reason for buying still holds. If not, <b>selling</b> is reasonable. ${why("ma")}`);
-    }
+    if (pl <= -0.08) acts.push(t("a.stop", { p: Math.abs(pl * 100).toFixed(1) }) + " " + why("whenact"));
+    if (pl >= 0.15) acts.push(t("a.profit", { p: (pl * 100).toFixed(1) }) + " " + why("whenact"));
+    if (posPct > 0.2) acts.push(t("a.big", { p: (posPct * 100).toFixed(0) }) + " " + why("diversify"));
+    if (!acts.length) acts.push(up ? t("a.hold") + " " + why("whenact") : t("a.exit") + " " + why("ma"));
   } else {
-    if (up && an.rsi <= 70) acts.push(`The trend and RSI line up for a <b>buy</b>. A careful trader would start small (about 5–10% of the portfolio) and decide in advance at what price they'd sell if they're wrong. ${why("whenact")}`);
-    else if (up) acts.push(`It has climbed fast. Instead of <b>chasing</b> it, a careful trader might wait for a pullback before buying. ${why("rsi")}`);
-    else if (an.rsi < 30) acts.push(`It has fallen hard and looks oversold. Bounces happen, but buying a falling stock is risky (traders call it "catching a falling knife"). <b>Waiting</b> for the trend to turn up is safer. ${why("rsi")}`);
-    else acts.push(`The trend is down. Most beginners do better <b>waiting</b> until the trend turns up before buying. ${why("ma")}`);
+    if (up && an.rsi <= 70) acts.push(t("a.buy") + " " + why("whenact"));
+    else if (up) acts.push(t("a.chase") + " " + why("rsi"));
+    else if (an.rsi < 30) acts.push(t("a.knife") + " " + why("rsi"));
+    else acts.push(t("a.wait") + " " + why("ma"));
   }
-  if (an.vol > 0.40 && acts.length < 3) acts.push(`This stock swings a lot, so use a <b>smaller amount</b> than usual if you trade it. ${why("risk")}`);
-  if (news && acts.length < 3) acts.push(`Don't trade just because of a headline: prices react within seconds, so the move has usually already happened. ${why("news")}`);
+  if (an.vol > 0.40 && acts.length < 3) acts.push(t("a.vol") + " " + why("risk"));
+  if (news && acts.length < 3) acts.push(t("a.news") + " " + why("news"));
   return { an, summary, actions: acts.slice(0, 3) };
 }
 
@@ -793,16 +1830,17 @@ function portfolioCoach() {
   const rows = Object.entries(state.holdings)
     .map(([sym, h]) => ({ sym, v: h.shares * usd(sym), pl: usd(sym) / h.avgCost - 1 }))
     .sort((a, b) => b.v - a.v);
-  if (!rows.length) return `<b>Coach:</b> you haven't bought anything yet. Look for a stock in an uptrend, start small, and decide ahead of time when you'd sell.`;
+  const P = `<b>${t("pc.prefix")}</b> `;
+  if (!rows.length) return P + t("pc.none");
   const big = rows[0], bigPct = big.v / total;
-  if (bigPct > 0.25) return `<b>Coach:</b> ${big.sym} is ${(bigPct * 100).toFixed(0)}% of your portfolio. If it fell 20%, your whole account would drop about ${(bigPct * 20).toFixed(1)}%. Consider trimming it.`;
+  if (bigPct > 0.25) return P + t("pc.big", { sym: big.sym, p: (bigPct * 100).toFixed(0), d: (bigPct * 20).toFixed(1) });
   const loser = rows.filter(r => r.pl <= -0.08).sort((a, b) => a.pl - b.pl)[0];
-  if (loser) return `<b>Coach:</b> ${loser.sym} is down ${Math.abs(loser.pl * 100).toFixed(1)}% from what you paid. Check your stop-loss plan for it.`;
-  if (rows.length < 4) return `<b>Coach:</b> you own ${rows.length} stock${rows.length === 1 ? "" : "s"}. Spreading across 5 or more lowers your risk.`;
+  if (loser) return P + t("pc.loser", { sym: loser.sym, p: Math.abs(loser.pl * 100).toFixed(1) });
+  if (rows.length < 4) return P + t("pc.few", { n: rows.length });
   const mkts = new Set(rows.map(r => market[r.sym].mkt));
-  if (mkts.size === 1) return `<b>Coach:</b> all your stocks are in the ${MARKETS[[...mkts][0]].label} market. Adding some from the other market spreads your risk.`;
-  if (state.cash / total > 0.7) return `<b>Coach:</b> ${(state.cash / total * 100).toFixed(0)}% of your money is still cash. Cash is safe, but it doesn't grow.`;
-  return `<b>Coach:</b> your money is spread across ${rows.length} stocks in two markets. Keep each position small and stick to your sell rules.`;
+  if (mkts.size === 1) return P + t("pc.oneMkt", { m: t("mkt." + [...mkts][0]) });
+  if (state.cash / total > 0.7) return P + t("pc.cash", { p: (state.cash / total * 100).toFixed(0) });
+  return P + t("pc.good", { n: rows.length });
 }
 
 /* ============ Charts (SVG, hand-built) ============ */
@@ -825,7 +1863,8 @@ function drawChart(sym) {
   if (old) old.remove();
 
   const c = cur(sym);
-  const a = series(sym).slice(-91);
+  const all = series(sym);
+  const a = all.slice(-91);
   const W = 720, H = 260, padL = 62, padR = 12, padT = 12, padB = 26;
   const min = Math.min(...a), max = Math.max(...a);
   const span = (max - min) || 1;
@@ -841,16 +1880,15 @@ function drawChart(sym) {
   for (const d of [-90, -60, -30, 0]) {
     const i = a.length - 1 + d;
     if (i < 0) continue;
-    labels += `<text x="${x(i)}" y="${H - 8}" text-anchor="${d === 0 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${d === 0 ? "today" : d + "d"}</text>`;
+    labels += `<text x="${x(i)}" y="${H - 8}" text-anchor="${d === 0 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${d === 0 ? t("chart.today") : t("chart.days", { d })}</text>`;
   }
   // 20-day moving average line, so learners can see the trend signal
-  const ma = a.map((_, i) => {
-    const all = series(sym), j = all.length - a.length + i;
+  const maPts = a.map((_, i) => {
+    const j = all.length - a.length + i;
     if (j < 19) return null;
     let s = 0; for (let k = j - 19; k <= j; k++) s += all[k];
-    return s / 20;
-  });
-  const maPts = ma.map((v, i) => v == null ? null : `${x(i).toFixed(1)},${y(Math.min(max, Math.max(min, v))).toFixed(1)}`).filter(Boolean).join(" ");
+    return `${x(i).toFixed(1)},${y(Math.min(max, Math.max(min, s / 20))).toFixed(1)}`;
+  }).filter(Boolean).join(" ");
 
   const line = a.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
   const area = `${padL},${H - padB} ` + line + ` ${W - padR},${H - padB}`;
@@ -859,7 +1897,7 @@ function drawChart(sym) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.setAttribute("role", "img");
-  svg.setAttribute("aria-label", `${sym} price over the last 90 days, with its 20-day average`);
+  svg.setAttribute("aria-label", t("chart.aria", { sym }));
   svg.innerHTML = `
     ${grid}
     <polygon points="${area}" fill="var(--series-soft)"/>
@@ -868,12 +1906,12 @@ function drawChart(sym) {
     <circle cx="${x(last)}" cy="${y(a[last])}" r="3.5" fill="var(--series)"/>
     <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1"/>
     ${labels}
-    <text x="${padL + 6}" y="${padT + 12}" font-size="11" fill="var(--muted)">— price   - - 20-day average</text>
+    <text x="${padL + 6}" y="${padT + 12}" font-size="11" fill="var(--muted)">${t("chart.legend")}</text>
     <line id="xhair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
     <circle id="xdot" r="4" fill="var(--series)" stroke="var(--surface)" stroke-width="2" style="display:none"/>
   `;
   wrap.appendChild(svg);
-  chartGeom = { sym, a, x, y, padL, padR, padT, padB, W, H, svg };
+  chartGeom = { sym, a, x, y, padL, padR, W, H, svg };
 }
 
 function chartHover(ev) {
@@ -892,7 +1930,7 @@ function chartHover(ev) {
   hair.setAttribute("x1", xx); hair.setAttribute("x2", xx); hair.style.display = "";
   dot.setAttribute("cx", xx); dot.setAttribute("cy", yy); dot.style.display = "";
   const daysAgo = a.length - 1 - i;
-  tip.querySelector(".t-date").textContent = daysAgo === 0 ? "Today (live)" : daysAgo === 1 ? "Yesterday's close" : daysAgo + " days ago";
+  tip.querySelector(".t-date").textContent = daysAgo === 0 ? t("tip.today") : daysAgo === 1 ? t("tip.yday") : t("tip.ago", { d: daysAgo });
   tip.querySelector(".t-val").textContent = fmtP(sym, v);
   tip.style.display = "block";
   const wrapRect = $("chartWrap").getBoundingClientRect();
@@ -910,16 +1948,15 @@ function chartLeave() {
 
 /* ============ Rendering: trade view ============ */
 function renderWatchlist() {
-  document.querySelectorAll(".seg button").forEach(b =>
+  document.querySelectorAll(".seg button[data-mkt]").forEach(b =>
     b.setAttribute("aria-pressed", String(b.dataset.mkt === state.mktFilter)));
-  $("simClock").innerHTML = `<b>Day ${sim.day} · ${simTime()}</b> · simulated trading day, about 1 minute long`;
+  $("simClock").innerHTML = t("clock", { d: sim.day, time: simTime(sim.tick) });
   const list = STOCKS.filter(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
-  const el = $("watchlist");
-  el.innerHTML = list.map(s => {
+  $("watchlist").innerHTML = list.map(s => {
     const chg = dayChange(s.sym), lim = atLimit(s.sym);
     return `<button class="stock-row${s.sym === selected ? " active" : ""}" data-sym="${s.sym}">
-      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt === "TW" ? '<span class="mkt-tag">TW</span>' : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">LIMIT</span>` : ""}
-      <span class="name">${s.name}</span></span>
+      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt === "TW" ? '<span class="mkt-tag">TW</span>' : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : ""}
+      <span class="name">${nameOf(s.sym)}</span></span>
       ${sparkline(s.sym)}
       <span class="right"><span class="px">${fmtP(s.sym, price(s.sym))}</span><br>
       <span class="chg ${chg >= 0 ? "pos" : "neg"}">${fmtPct(chg)}</span></span>
@@ -931,14 +1968,15 @@ function renderDetail() {
   const s = market[selected];
   const p = price(selected), chg = dayChange(selected);
   $("dSym").textContent = s.sym;
-  $("dName").textContent = s.name;
+  $("dName").textContent = nameOf(selected);
   $("dPx").textContent = fmtP(selected, p);
   const chgEl = $("dChg");
-  chgEl.textContent = fmtPct(chg) + " today";
+  chgEl.textContent = t("chg.today", { p: fmtPct(chg) });
   chgEl.className = "big-chg " + (chg >= 0 ? "pos" : "neg");
+  const pc = prevClose(selected);
   $("dFx").textContent = s.mkt === "TW"
-    ? `Taiwan Stock Exchange · ≈ ${fmt$(usd(selected))} per share at NT$${MARKETS.TW.perUSD} = US$1 (simulated rate) · daily limit ${fmtP(selected, roundPx(selected, prevClose(selected) * (1 - TW_LIMIT)))} to ${fmtP(selected, roundPx(selected, prevClose(selected) * (1 + TW_LIMIT)))}`
-    : `Previous close ${fmtP(selected, prevClose(selected))}`;
+    ? t("fx.tw", { usd: fmt$(usd(selected)), rate: MARKETS.TW.perUSD, lo: fmtP(selected, roundPx(selected, pc * (1 - TW_LIMIT))), hi: fmtP(selected, roundPx(selected, pc * (1 + TW_LIMIT))) })
+    : t("fx.us", { pc: fmtP(selected, pc) });
 
   const a = series(selected);
   const c30 = p / a[a.length - 31] - 1;
@@ -949,19 +1987,18 @@ function renderDetail() {
   $("sLow").textContent = fmtP(selected, Math.min(...last90));
   $("sVol").textContent = (volatility(a) * 100).toFixed(0) + "%";
   const h = state.holdings[selected];
-  $("sOwn").textContent = h ? `${h.shares} sh` : "0 sh";
+  $("sOwn").textContent = t("shares", { n: h ? h.shares : 0 });
 
   drawChart(selected);
 
   const co = coach(selected);
   const pill = $("recPill");
-  pill.textContent = "Signals: " + co.an.rec;
+  pill.textContent = t("signals", { rec: t("rec." + co.an.rec) });
   pill.className = "rec-pill rec-" + co.an.rec;
-  $("recConf").textContent = `signal strength ${co.an.confidence}%`;
+  $("recConf").textContent = t("strength", { c: co.an.confidence });
   $("coachSummary").textContent = co.summary;
-  $("coachActions").innerHTML = co.actions.map(a => `<li>${a}</li>`).join("");
-  $("recReasons").innerHTML = co.an.reasons.map(r => `<li>${r}</li>`).join("");
-
+  $("coachActions").innerHTML = co.actions.map(x => `<li>${x}</li>`).join("");
+  $("recReasons").innerHTML = co.an.reasons.map(r => `<li>${reasonText(r)}</li>`).join("");
   updateTradeCost();
 }
 
@@ -969,59 +2006,76 @@ function updateTradeCost() {
   const q = Math.max(0, parseInt($("qty").value || "0", 10));
   if (q <= 0) { $("tradeCost").textContent = ""; return; }
   const native = fmtP(selected, q * price(selected));
-  $("tradeCost").textContent = market[selected].mkt === "TW"
-    ? `≈ ${native} (≈ ${fmt$(q * usd(selected))})`
-    : `≈ ${native}`;
+  $("tradeCost").textContent = market[selected].mkt === "TW" ? `≈ ${native} (≈ ${fmt$(q * usd(selected))})` : `≈ ${native}`;
 }
 
 function renderPortfolio() {
   $("cashValue").textContent = fmt$(state.cash);
   const rows = Object.entries(state.holdings).map(([sym, h]) => {
     const pl = h.shares * usd(sym) - h.shares * h.avgCost;
-    return `<tr>
-      <td class="sym-cell">${sym}</td>
-      <td>${h.shares}</td>
-      <td>${fmtP(sym, price(sym))}</td>
-      <td class="${pl >= 0 ? "pos" : "neg"}">${fmt$(pl)}</td>
-    </tr>`;
+    return `<tr><td class="sym-cell">${sym}</td><td>${h.shares}</td><td>${fmtP(sym, price(sym))}</td>
+      <td class="${pl >= 0 ? "pos" : "neg"}">${fmt$(pl)}</td></tr>`;
   });
   $("holdings").innerHTML = rows.length
-    ? `<table><thead><tr><th>Sym</th><th>Shares</th><th>Price</th><th>P&amp;L (US$)</th></tr></thead><tbody>${rows.join("")}</tbody></table>`
-    : `<div class="empty">No holdings yet — buy your first stock or turn on auto-pilot.</div>`;
+    ? `<table><thead><tr><th>${t("th.sym")}</th><th>${t("th.shares")}</th><th>${t("th.price")}</th><th>${t("th.pl")}</th></tr></thead><tbody>${rows.join("")}</tbody></table>`
+    : `<div class="empty">${t("hold.empty")}</div>`;
   const { total } = portfolioTotals();
   $("pvValue").textContent = fmt$(total);
   const totalPl = total - START_CASH;
   const d = $("pvDelta");
-  d.textContent = `${totalPl >= 0 ? "▲" : "▼"} ${fmt$(Math.abs(totalPl))} (${fmtPct(totalPl / START_CASH)}) all-time`;
+  d.textContent = t("pv.delta", { arrow: totalPl >= 0 ? "▲" : "▼", amt: fmt$(Math.abs(totalPl)), p: fmtPct(totalPl / START_CASH) });
   d.className = "delta " + (totalPl >= 0 ? "pos" : "neg");
   $("portfolioCoach").innerHTML = portfolioCoach();
 }
 
+function feedText(f) {
+  if (f.msg) return f.msg;  // saved by an older version
+  return t(f.k, { ...f.v, reason: reasonText(f.r) });
+}
+function histText(f) {
+  if (f.msg) return f.msg;
+  return t("hist", { ai: f.ai ? "🤖 " : "", verb: t("verb." + f.side), n: f.shares, sym: f.sym, px: fmtP(f.sym, f.px) });
+}
 function renderFeeds() {
   $("aiFeed").innerHTML = state.aiFeed.length
-    ? state.aiFeed.slice(0, 30).map(f => `<li><span class="time">${f.t}</span>${f.msg}</li>`).join("")
-    : `<li class="empty">Auto-pilot actions will appear here.</li>`;
+    ? state.aiFeed.slice(0, 30).map(f => `<li><span class="time">${itemTime(f)}</span>${feedText(f)}</li>`).join("")
+    : `<li class="empty">${t("ap.empty")}</li>`;
   $("history").innerHTML = state.history.length
-    ? state.history.slice(0, 30).map(f => `<li><span class="time">${f.t}</span>${f.msg}</li>`).join("")
-    : `<li class="empty">No trades yet.</li>`;
+    ? state.history.slice(0, 30).map(f => `<li><span class="time">${itemTime(f)}</span>${histText(f)}</li>`).join("")
+    : `<li class="empty">${t("hist.empty")}</li>`;
   $("newsFeed").innerHTML = state.news.length
-    ? state.news.slice(0, 40).map(n => n.recap
-        ? `<li class="recap"><span class="time">${n.t}</span>${n.recap}</li>`
-        : `<li><span class="time">${n.t}</span>${n.sym ? `<button type="button" class="news-sym" data-sym="${n.sym}">${n.sym}</button>` : `<b>${n.mktLabel || ""}</b> `}${n.headline} <b class="${n.chg >= 0 ? "pos" : "neg"}">${fmtPct(n.chg)}</b></li>`).join("")
-    : `<li class="empty">Headlines will appear here as news breaks.</li>`;
+    ? state.news.slice(0, 40).map(n => {
+        if (n.recap) {
+          const r = n.recap;
+          if (typeof r === "string") return `<li class="recap"><span class="time">${n.t || ""}</span>${r}</li>`;
+          return `<li class="recap"><span class="time">${t("recap.t", { d: r.d })}</span>${t("recap", {
+            d: r.d, us: colored(r.us, fmtPct(r.us)), tw: colored(r.tw, fmtPct(r.tw)),
+            pd: colored(r.pd, `${r.pd >= 0 ? "+" : "−"}${fmt$(Math.abs(r.pd))}`), sym: r.sym, c: fmtPct(r.c) })}</li>`;
+        }
+        const label = n.sym ? `<button type="button" class="news-sym" data-sym="${n.sym}">${n.sym}</button>`
+          : n.kind === "sec" ? `<b>${t("news.industry")}</b> ` : n.kind === "mkt" ? `<b>${t("news.market", { m: t("mkt." + n.mk) })}</b> ` : (n.mktLabel ? `<b>${n.mktLabel}</b> ` : "");
+        return `<li><span class="time">${newsTime(n)}</span>${label}${newsHeadline(n)} ${colored(n.chg, fmtPct(n.chg))}</li>`;
+      }).join("")
+    : `<li class="empty">${t("news.empty")}</li>`;
 }
 
-function renderAll() { renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds(); save(); }
+function renderAll() {
+  renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds();
+  const mine = state.journal.filter(e => e.by === "you").length;
+  $("journalCount").textContent = mine ? String(mine) : "";
+  save();
+}
 
 /* ============ Trading ============ */
 function trade(sym, shares, side, byAI = false) {
   const p = price(sym), pu = usd(sym);
   const msgEl = $("tradeMsg");
   if (!(shares >= 1)) return false;
+  const pre = snapshot(sym);
   if (side === "buy") {
     const cost = shares * pu;
     if (cost > state.cash) {
-      if (!byAI) { msgEl.textContent = "Not enough cash for that order."; msgEl.className = "trade-msg neg"; }
+      if (!byAI) { msgEl.textContent = t("msg.nocash"); msgEl.className = "trade-msg neg"; }
       return false;
     }
     state.cash -= cost;
@@ -1032,19 +2086,20 @@ function trade(sym, shares, side, byAI = false) {
   } else {
     const h = state.holdings[sym];
     if (!h || h.shares < shares) {
-      if (!byAI) { msgEl.textContent = "You don't own that many shares."; msgEl.className = "trade-msg neg"; }
+      if (!byAI) { msgEl.textContent = t("msg.noshares"); msgEl.className = "trade-msg neg"; }
       return false;
     }
     h.shares -= shares;
     state.cash += shares * pu;
     if (h.shares === 0) delete state.holdings[sym];
   }
-  const verb = side === "buy" ? "Bought" : "Sold";
-  state.history.unshift({ t: now(), msg: `${byAI ? "🤖 " : ""}<b>${verb} ${shares} ${sym}</b> @ ${fmtP(sym, p)}` });
+  state.history.unshift({ d: sim.day, tk: sim.tick, side, shares, sym, px: p, ai: byAI });
   state.history = state.history.slice(0, 100);
+  const j = recordTrade({ sym, side, shares, byAI, pre, px: p, pu });
   if (!byAI) {
-    msgEl.textContent = `${verb} ${shares} shares of ${sym} at ${fmtP(sym, p)}.`;
-    msgEl.className = "trade-msg pos";
+    msgEl.innerHTML = `${t("msg.done", { verb: t("verb." + side), n: shares, sym, px: fmtP(sym, p) })} ${t("msg.journal")} ` +
+      `<span class="grade grade-${j.grade}">${t("g." + j.grade)}</span> <button type="button" class="lesson-link" data-goto="journal">${t("msg.why")}</button>`;
+    msgEl.className = "trade-msg";
   }
   return true;
 }
@@ -1055,16 +2110,12 @@ function runAutoPilot() {
   if (!state.autoPilot) return;
   autoCounter++;
   if (autoCounter % 4 !== 0) return; // act every ~10s, not every tick
-
   const analyses = STOCKS.map(s => ({ sym: s.sym, ...analyze(s.sym) }));
   const { total } = portfolioTotals();
-
   for (const [sym, h] of Object.entries(state.holdings)) {
     const an = analyses.find(a => a.sym === sym);
-    if (an && an.rec === "SELL" && h.shares > 0) {
-      if (trade(sym, h.shares, "sell", true)) {
-        state.aiFeed.unshift({ t: now(), msg: `Sold all <b>${sym}</b> — ${an.reasons[0]}` });
-      }
+    if (an && an.rec === "SELL" && h.shares > 0 && trade(sym, h.shares, "sell", true)) {
+      state.aiFeed.unshift({ d: sim.day, tk: sim.tick, k: "ap.sold", v: { sym }, r: an.reasons[0] });
     }
   }
   const buys = analyses.filter(a => a.rec === "BUY").sort((a, b) => b.score - a.score);
@@ -1075,8 +2126,8 @@ function runAutoPilot() {
     if (room < pu) continue;
     const spendable = state.cash - total * 0.10; // always keep 10% of the portfolio in cash
     const shares = Math.floor(Math.min(room, spendable, state.cash * 0.5) / pu);
-    if (shares >= 1 && trade(an.sym, shares, "buy", true)) {
-      state.aiFeed.unshift({ t: now(), msg: `Bought ${shares} <b>${an.sym}</b> (signal ${an.confidence}%) — ${an.reasons[0]}` });
+    if (shares >= 1 && shares * pu >= total * 0.01 && trade(an.sym, shares, "buy", true)) { // skip tiny buys
+      state.aiFeed.unshift({ d: sim.day, tk: sim.tick, k: "ap.bought", v: { n: shares, sym: an.sym, c: an.confidence }, r: an.reasons[0] });
       break; // one buy per cycle
     }
   }
@@ -1085,26 +2136,16 @@ function runAutoPilot() {
 
 /* ============ Live market ============ */
 function addNews(item) {
-  state.news.unshift({ t: stamp(), dayNum: sim.day, ...item });
+  state.news.unshift({ d: sim.day, tk: sim.tick, dayNum: sim.day, tickNum: sim.tick, ...item });
   state.news = state.news.slice(0, 60);
 }
 
 function closeDay() {
   const { total } = portfolioTotals();
-  const avg = mk => {
-    const xs = STOCKS.filter(s => s.mkt === mk).map(s => dayChange(s.sym));
-    return xs.reduce((a, b) => a + b, 0) / xs.length;
-  };
-  const movers = STOCKS.map(s => ({ sym: s.sym, c: dayChange(s.sym) })).sort((a, b) => Math.abs(b.c) - Math.abs(a.c));
+  const avg = mk => { const xs = STOCKS.filter(s => s.mkt === mk).map(s => dayChange(s.sym)); return xs.reduce((a, b) => a + b, 0) / xs.length; };
+  const top = STOCKS.map(s => ({ sym: s.sym, c: dayChange(s.sym) })).sort((a, b) => Math.abs(b.c) - Math.abs(a.c))[0];
   const start = state.dayStartTotal || total;
-  const pd = total - start;
-  const us = avg("US"), tw = avg("TW");
-  state.news.unshift({
-    t: `Day ${sim.day} close`, dayNum: sim.day,
-    recap: `📊 <b>Day ${sim.day} recap:</b> US stocks <b class="${us >= 0 ? "pos" : "neg"}">${fmtPct(us)}</b>, Taiwan <b class="${tw >= 0 ? "pos" : "neg"}">${fmtPct(tw)}</b> on average. ` +
-           `Your portfolio <b class="${pd >= 0 ? "pos" : "neg"}">${pd >= 0 ? "+" : "−"}${fmt$(Math.abs(pd))}</b> today. ` +
-           `Biggest mover: <b>${movers[0].sym}</b> ${fmtPct(movers[0].c)}.`,
-  });
+  state.news.unshift({ dayNum: sim.day, recap: { d: sim.day, us: avg("US"), tw: avg("TW"), pd: total - start, sym: top.sym, c: top.c } });
   state.news = state.news.slice(0, 60);
   for (const s of STOCKS) {
     const m = market[s.sym];
@@ -1123,25 +2164,25 @@ function tick() {
   const shock = {};
   const r = Math.random();
   if (r < 0.03) {            // company news
-    const s = pick(STOCKS);
-    const sign = Math.random() < 0.55 ? 1 : -1;
-    const size = sign * (0.02 + Math.random() * 0.045);
+    const s = STOCKS[randInt(STOCKS.length)];
+    const pos = Math.random() < 0.55;
+    const size = (pos ? 1 : -1) * (0.02 + Math.random() * 0.045);
     shock[s.sym] = size;
-    addNews({ sym: s.sym, chg: size, headline: pick(sign > 0 ? NEWS.pos : NEWS.neg).replace("{n}", s.short) });
+    addNews({ kind: "co", sym: s.sym, pos, i: randInt(5), chg: size });
   } else if (r < 0.038) {    // industry news
-    const sec = pick(Object.keys(SECTORS).filter(k => k !== "fund"));
-    const sign = Math.random() < 0.5 ? 1 : -1;
-    const size = sign * (0.012 + Math.random() * 0.02);
+    const secs = Object.keys(SECTORS).filter(k => k !== "fund");
+    const sec = secs[randInt(secs.length)];
+    const pos = Math.random() < 0.5;
+    const size = (pos ? 1 : -1) * (0.012 + Math.random() * 0.02);
     for (const s of STOCKS) if (s.sector === sec) shock[s.sym] = size;
-    addNews({ chg: size, mktLabel: "Industry:", headline: (sign > 0 ? NEWS.sectorPos : NEWS.sectorNeg)[sec] });
+    addNews({ kind: "sec", sec, pos, chg: size });
   } else if (r < 0.044) {    // whole-market news
     const mk = Math.random() < 0.5 ? "US" : "TW";
-    const sign = Math.random() < 0.5 ? 1 : -1;
-    const size = sign * (0.006 + Math.random() * 0.012);
+    const pos = Math.random() < 0.5;
+    const size = (pos ? 1 : -1) * (0.006 + Math.random() * 0.012);
     for (const s of STOCKS) if (s.mkt === mk) shock[s.sym] = size * s.beta;
-    addNews({ chg: size, mktLabel: `${MARKETS[mk].label} market:`, headline: pick((sign > 0 ? NEWS.mktPos : NEWS.mktNeg)[mk]) });
+    addNews({ kind: "mkt", mk, pos, i: randInt(2), chg: size });
   }
-
   for (const s of STOCKS) {
     const m = market[s.sym];
     let raw = m.raw * (1 + periodReturn(m, f, scale, gauss) + (shock[s.sym] || 0));
@@ -1152,325 +2193,172 @@ function tick() {
     m.raw = Math.max(1, raw);
     m.px = roundPx(s.sym, m.raw);
   }
-
   sim.tick++;
   if (sim.tick >= TICKS_PER_DAY) closeDay();
   runAutoPilot();
   saveMarket();
   renderAll();
+  if (!$("journalView").hidden) renderJournal();
 }
 
-/* ============ Lessons ============ */
-const live = html => `<div class="live-box"><span class="live-label">In the simulator right now</span>${html}</div>`;
-const key = html => `<div class="key-idea"><b>Key idea:</b> ${html}</div>`;
+/* ============ Trade journal: record every step and review it ============ */
+function snapshot(sym) {
+  const an = analyze(sym), h = state.holdings[sym], { total } = portfolioTotals();
+  const news = state.news.find(n => n.sym === sym && n.dayNum === sim.day && n.tickNum != null && sim.tick - n.tickNum <= 4);
+  return {
+    an, total, dayChg: dayChange(sym),
+    posPct: h ? h.shares * usd(sym) / total : 0,
+    pl: h ? usd(sym) / h.avgCost - 1 : null,
+    news: news ? { n: { ...news }, chg: news.chg } : null,
+  };
+}
+const ck = (id, level, lesson, v = {}) => ({ id, level, lesson, v });
 
-const LESSONS = [
-  {
-    id: "basics", title: "What is a stock?",
-    body: () => `
-      <p>A company is owned by its <b>shareholders</b>. A <b>stock</b>, also called a <b>share</b>, is one small slice of that ownership. Apple has roughly 15 billion shares, so owning one share means owning a very tiny piece of Apple.</p>
-      <p>Companies first sell shares to raise money. After that, people buy and sell shares with each other on a <b>stock exchange</b>, such as Nasdaq and the New York Stock Exchange in the US, or the Taiwan Stock Exchange.</p>
-      <p>The price changes all day because buyers and sellers keep agreeing on new prices. When more people want to buy than sell, the price goes up. When more want to sell, it goes down.</p>
-      ${key("a stock price is what buyers and sellers agree a slice of the company is worth right now.")}
-      ${live(`The watchlist has <b>${STOCKS.length} stocks</b>: ${STOCKS.filter(s => s.mkt === "US").length} from the US and ${STOCKS.filter(s => s.mkt === "TW").length} from Taiwan. Each one has a short code called a <b>ticker</b>: AAPL is Apple, and 2330 is TSMC.`)}`,
-    quiz: {
-      q: "What does owning one share of a company mean?",
-      opts: ["You own a small piece of the company", "You lent the company money and it pays you back with interest", "You work for the company"],
-      a: 0,
-      why: "A share is part ownership. Lending money to a company is called a bond, which is a different kind of investment.",
-    },
-    tryIt: { label: "Browse the watchlist" },
-  },
-  {
-    id: "buysell", title: "Buying and selling shares",
-    body: () => {
-      const s = selected, p = price(s);
-      const tw = market[s].mkt === "TW" ? ` That is about <b>${fmt$(10 * usd(s))}</b> in US dollars.` : "";
-      return `
-      <p>To buy, you pick a stock and how many shares you want. The cost is the number of shares times the price.</p>
-      <p>You make money if you later sell for <b>more</b> than you paid, and lose money if you sell for <b>less</b>. Until you sell, any gain or loss exists only on paper and can still change.</p>
-      ${key("cost = shares × price. Profit = (sell price − buy price) × shares.")}
-      ${live(`${s} costs <b>${fmtP(s, p)}</b> per share, so 10 shares would cost <b>${fmtP(s, 10 * p)}</b>.${tw}`)}`;
-    },
-    quiz: {
-      q: "You buy 5 shares at $100 each and later sell them at $120 each. What is your profit?",
-      opts: ["$20", "$100", "$600"],
-      a: 1,
-      why: "Each share gained $20, and you had 5 of them: (120 − 100) × 5 = $100. The $600 is the total you get back when you sell.",
-    },
-    tryIt: { label: "Buy 1 share", qty: 1 },
-  },
-  {
-    id: "pnl", title: "Profit, loss and portfolio value",
-    body: () => {
-      const { mv, total } = portfolioTotals();
-      const n = Object.keys(state.holdings).length;
-      const change = total - START_CASH;
-      return `
-      <p>Your <b>portfolio</b> is everything in your account: your cash plus all the stocks you own.</p>
-      <p><b>P&amp;L</b> stands for profit and loss. The Holdings table compares each stock's current value with your <b>average cost</b>, which is what you paid per share on average across all your buys.</p>
-      <ul>
-        <li><b>Unrealized</b> P&amp;L is a gain or loss on stocks you still own. It changes every time the price moves.</li>
-        <li><b>Realized</b> P&amp;L is locked in once you sell.</li>
-      </ul>
-      ${key("portfolio value = cash + the current value of every stock you own.")}
-      ${live(`You have <b>${fmt$(state.cash)}</b> in cash and <b>${fmt$(mv)}</b> in ${n} stock${n === 1 ? "" : "s"}, for a total of <b>${fmt$(total)}</b>. That is <b class="${change >= 0 ? "pos" : "neg"}">${change >= 0 ? "up" : "down"} ${fmt$(Math.abs(change))}</b> from the $100,000 you started with.`)}`;
-    },
-    quiz: {
-      q: "You buy the same number of shares twice: once at $50 and once at $70. What is your average cost per share?",
-      opts: ["$50", "$60", "$70"],
-      a: 1,
-      why: "Equal amounts bought at $50 and $70 average out to $60 per share.",
-    },
-    tryIt: { label: "Look at your holdings" },
-  },
-  {
-    id: "chart", title: "Reading a price chart",
-    body: () => {
-      const s = selected, a = series(s), p = price(s);
-      const last90 = a.slice(-91), lo = Math.min(...last90), hi = Math.max(...last90);
-      const where = Math.round((p - lo) / ((hi - lo) || 1) * 100);
-      const c30 = p / a[a.length - 31] - 1;
-      return `
-      <p>The chart on the Trade tab shows the price over the last 90 trading days. The left side is older and the dot on the right edge is today's live price.</p>
-      <p>Look at the direction over weeks, not single days. A line that climbs from left to right is an <b>uptrend</b>. One that slides down is a <b>downtrend</b>. Prices wiggle every day, so one bad day on its own tells you very little.</p>
-      <p>The <b>90-day high and low</b> show the range the price has moved in. A price near the high has been rising, and a price near the low has been falling.</p>
-      ${key("zoom out. The trend over weeks matters more than today's move.")}
-      ${live(`${s} is <b class="${c30 >= 0 ? "pos" : "neg"}">${fmtPct(c30)}</b> over 30 days. Its 90-day range is ${fmtP(s, lo)} to ${fmtP(s, hi)}, and today it sits <b>${where}%</b> of the way up from the low.`)}`;
-    },
-    quiz: {
-      q: "A stock fell 2% today but is up 15% over the last three months. What is the bigger picture?",
-      opts: ["It has been in an uptrend, and today is a small dip", "It is crashing and should be sold right away", "Charts can't tell you anything"],
-      a: 0,
-      why: "A 2% dip inside a 15% climb is normal day-to-day noise. The longer trend is still up.",
-    },
-    tryIt: { label: "Hover over the chart" },
-  },
-  {
-    id: "news", title: "How news moves prices",
-    body: () => {
-      const latest = state.news.find(n => !n.recap);
-      const ups = STOCKS.filter(s => dayChange(s.sym) > 0).length;
-      return `
-      <p>Prices move the most when there is news. There are three main kinds:</p>
-      <ul>
-        <li><b>Company news</b> such as profit reports, new products or lawsuits. It moves one stock, sometimes a lot in a single day.</li>
-        <li><b>Industry news</b> affects similar companies together. When demand for AI chips jumps, NVIDIA, TSMC and MediaTek often rise together.</li>
-        <li><b>Market-wide news</b> such as interest rates, inflation or the economy. It moves almost every stock at once.</li>
-      </ul>
-      <p>Prices react within seconds, so by the time you read a headline the move has usually already happened. Buying <i>because</i> of a headline you just saw is a common beginner mistake.</p>
-      ${key("news moves prices fast. By the time you hear it, it's usually already in the price.")}
-      ${live(`${latest ? `Latest headline: <b>${latest.headline}</b> (${fmtPct(latest.chg)}). ` : ""}Right now <b>${ups} of ${STOCKS.length}</b> stocks are up today. Watch the Market news card on the Trade tab to see how headlines move prices.`)}`;
-    },
-    quiz: {
-      q: "The central bank unexpectedly raises interest rates. What usually happens?",
-      opts: ["Most stocks move at the same time, often down", "Only bank stocks move", "Nothing; stocks ignore interest rates"],
-      a: 0,
-      why: "Interest rates affect the whole economy, so news like this moves almost every stock. Higher rates usually push prices down.",
-    },
-    tryIt: { label: "Read the market news" },
-  },
-  {
-    id: "ma", title: "Trends and moving averages",
-    body: () => {
-      const s = selected, an = analyze(s), c = cur(s);
-      const up = an.s20 > an.s50;
-      return `
-      <p>A <b>moving average</b> is the average closing price over the last few days. It smooths out daily wiggles so the trend is easier to see. The dashed line on the chart is the 20-day average.</p>
-      <ul>
-        <li>The <b>20-day average</b> shows the recent trend.</li>
-        <li>The <b>50-day average</b> shows the longer trend.</li>
-      </ul>
-      <p>When the 20-day average is above the 50-day, recent prices are higher than older ones, which suggests an uptrend. When it is below, it suggests a downtrend. Trends in real markets often last for weeks, which is why traders watch them.</p>
-      ${key("20-day above 50-day suggests an uptrend so far. It doesn't promise what comes next.")}
-      ${live(`For ${s}, the 20-day average is <b>${c}${an.s20.toFixed(2)}</b> and the 50-day is <b>${c}${an.s50.toFixed(2)}</b>, so the trend looks <b class="${up ? "pos" : "neg"}">${up ? "up" : "down"}</b>.`)}`;
-    },
-    quiz: {
-      q: "A stock's 20-day average is $105 and its 50-day average is $98. What does that suggest?",
-      opts: ["Recent prices are higher than before: an uptrend", "Recent prices are lower than before: a downtrend", "The stock is guaranteed to keep rising"],
-      a: 0,
-      why: "The recent average is higher than the longer one, so the trend has been up. It describes the past; it isn't a guarantee.",
-    },
-    tryIt: { label: "See the trend on the chart" },
-  },
-  {
-    id: "rsi", title: "Momentum and RSI",
-    body: () => {
-      const s = selected, an = analyze(s);
-      const zone = an.rsi > 70 ? "overbought" : an.rsi < 30 ? "oversold" : "neutral";
-      return `
-      <p><b>Momentum</b> is how strongly a price has moved recently. The coach looks at the change over the last 30 days.</p>
-      <p><b>RSI</b> (Relative Strength Index) compares the size of recent up days with recent down days over 14 days and turns it into a number from 0 to 100.</p>
-      <ul>
-        <li><b>Above 70:</b> the price has risen fast and may be <b>overbought</b>, so it could pull back.</li>
-        <li><b>Below 30:</b> the price has fallen fast and may be <b>oversold</b>, so it could bounce.</li>
-        <li><b>30 to 70:</b> neutral.</li>
-      </ul>
-      <p>These are warnings, not rules. A strong stock can stay overbought for months.</p>
-      ${key("RSI tells you how fast a price has moved, not where it will go.")}
-      ${live(`${s} has an RSI of <b>${an.rsi.toFixed(0)}</b> (${zone}) and momentum of <b class="${an.mom30 >= 0 ? "pos" : "neg"}">${fmtPct(an.mom30)}</b> over 30 days.`)}`;
-    },
-    quiz: {
-      q: "A stock's RSI is 82. What does that usually mean?",
-      opts: ["It has risen fast and may be overbought", "It is cheap and must go up", "The company is losing money"],
-      a: 0,
-      why: "An RSI above 70 means recent gains have been unusually strong. It says nothing about the company's profits.",
-    },
-    tryIt: { label: "Open the coach's signals" },
-  },
-  {
-    id: "risk", title: "Risk and volatility",
-    body: () => {
-      const ranked = STOCKS.map(s => ({ sym: s.sym, v: volatility(series(s.sym)) })).sort((a, b) => b.v - a.v);
-      const hi = ranked[0], lo = ranked[ranked.length - 1];
-      return `
-      <p><b>Volatility</b> measures how much a price swings up and down. This app shows it as a yearly percentage. A higher number means bigger swings.</p>
-      <p>Bigger swings work both ways: bigger possible gains and bigger possible losses. A useful question before buying is: <i>if this dropped 30%, could I stay calm and not panic-sell?</i></p>
-      ${key("higher volatility means a bumpier ride, in both directions.")}
-      ${live(`The most volatile stock right now is <b>${hi.sym}</b> at ${(hi.v * 100).toFixed(0)}% a year. The calmest is <b>${lo.sym}</b> at ${(lo.v * 100).toFixed(0)}%.`)}`;
-    },
-    quiz: {
-      q: "Stock A has 12% volatility and Stock B has 45%. Which one usually swings more?",
-      opts: ["Stock B", "Stock A", "They swing about the same"],
-      a: 0,
-      why: "45% volatility means much bigger typical moves than 12%.",
-    },
-    tryIt: { label: "Look at the most volatile stock", pick: "mostVolatile" },
-  },
-  {
-    id: "diversify", title: "Don't put all your eggs in one basket",
-    body: () => {
-      const { total } = portfolioTotals();
-      const rows = Object.entries(state.holdings).map(([sym, h]) => ({ sym, v: h.shares * usd(sym) })).sort((a, b) => b.v - a.v);
-      const mkts = new Set(rows.map(r => market[r.sym].mkt));
-      const liveText = rows.length
-        ? `You own <b>${rows.length}</b> stock${rows.length === 1 ? "" : "s"} across <b>${mkts.size}</b> market${mkts.size === 1 ? "" : "s"}. Your biggest position, <b>${rows[0].sym}</b>, is <b>${(rows[0].v / total * 100).toFixed(1)}%</b> of your portfolio.`
-        : "You don't own any stocks yet. Once you do, this box will show how spread out your money is.";
-      return `
-      <p><b>Diversification</b> means spreading your money across many companies, industries and even countries. If one company has bad news, the others soften the hit.</p>
-      <p><b>Position sizing</b> means deciding how much money goes into any one stock. The auto-pilot here never puts more than 15% of the portfolio into a single stock.</p>
-      <p>A fund such as an <b>ETF</b> holds many stocks at once. <b>0050</b> in the watchlist is an ETF that holds about 50 of Taiwan's biggest companies, so one purchase gives you a slice of all of them.</p>
-      ${key("no single stock should be able to sink your whole portfolio.")}
-      ${live(liveText)}`;
-    },
-    quiz: {
-      q: "Which portfolio is the most diversified?",
-      opts: ["10 stocks across tech, banking and telecom in two countries", "All your money in one stock you really like", "Two chip-making companies"],
-      a: 0,
-      why: "Different industries and countries tend not to fall at the same time, which spreads the risk.",
-    },
-    tryIt: { label: "Look at the 0050 ETF", sym: "0050" },
-  },
-  {
-    id: "whenact", title: "When to buy and when to sell",
-    body: () => {
-      const co = coach(selected);
-      const first = co.actions[0].replace(/<button[^>]*>.*?<\/button>/g, "");
-      return `
-      <p>Good traders decide their rules <b>before</b> they trade, so fear and excitement don't make the decision for them. Here is a simple plan that the Coach on the Trade tab follows.</p>
-      <div class="checklist">
-        <div>
-          <h4>Consider buying when…</h4>
-          <ul>
-            <li>The trend is up (20-day average above the 50-day).</li>
-            <li>It isn't overbought (RSI below 70).</li>
-            <li>You can say <i>why</i> you're buying in one sentence.</li>
-            <li>The amount is small: about 5–10% of your portfolio.</li>
-            <li>You already know the price where you'd sell if you're wrong.</li>
-          </ul>
-        </div>
-        <div>
-          <h4>Consider selling when…</h4>
-          <ul>
-            <li>It hits your <b>stop-loss</b>, for example 8% below what you paid.</li>
-            <li>The trend turns down and your reason for buying no longer holds.</li>
-            <li>It has grown into too big a part of your portfolio.</li>
-            <li>It has gained a lot, and you want to lock in part of the profit.</li>
-          </ul>
-        </div>
-        <div>
-          <h4>Try not to…</h4>
-          <ul>
-            <li>Buy just because everyone is talking about it (FOMO, fear of missing out).</li>
-            <li>Panic-sell after one bad day.</li>
-            <li>Buy more of a falling stock only to "get back to even."</li>
-            <li>Put everything into one stock.</li>
-          </ul>
-        </div>
+function judgeBuy(pre, post) {
+  const an = pre.an, up = an.s20 > an.s50, r = an.rsi.toFixed(0), c = [];
+  if (!up && an.rsi < 30) c.push(ck("buy-knife", "bad", "rsi", { r }));
+  else if (!up) c.push(ck("buy-downtrend", "bad", "ma"));
+  else c.push(ck("buy-uptrend", "good", "ma"));
+  if (an.rsi > 70) c.push(ck("buy-chase", "bad", "rsi", { r }));
+  else if (up) c.push(ck("buy-nochase", "good", "rsi", { r }));
+  if (pre.pl != null && pre.pl <= -0.05 && !up) c.push(ck("buy-avgdown", "bad", "whenact", { p: pct0(-pre.pl) }));
+  if (post.posPct > 0.20) c.push(ck("buy-big", "bad", "diversify", { p: pct0(post.posPct), d: (post.posPct * 20).toFixed(1) }));
+  else if (post.posPct > 0.10) c.push(ck("buy-large", "warn", "diversify", { p: pct0(post.posPct) }));
+  else c.push(ck("buy-small", "good", "diversify", { p: pct0(post.posPct) }));
+  if (post.cashPct < 0.05) c.push(ck("buy-nocash", "bad", "diversify", { p: pct0(post.cashPct) }));
+  if (pre.news && pre.news.chg > 0) c.push(ck("buy-news", "bad", "news", { news: pre.news.n }));
+  if (an.vol > 0.40 && post.posPct > 0.08) c.push(ck("buy-jumpy", "warn", "risk", { p: pct0(an.vol) }));
+  return c;
+}
+
+function judgeSell(pre) {
+  const an = pre.an, up = an.s20 > an.s50, pl = pre.pl, c = [];
+  if (pl != null && pl <= -0.08) {
+    c.push(ck("sell-stoploss", "good", "whenact", { p: pct0(-pl) }));
+    if (pl <= -0.15) c.push(ck("sell-late", "bad", "whenact"));
+  }
+  if (pl != null && pl >= 0.15) c.push(ck("sell-profit", "good", "whenact", { p: pct0(pl) }));
+  if (!up && (pl == null || pl > -0.08)) c.push(ck("sell-trend", "good", "ma"));
+  if (pre.posPct > 0.20) c.push(ck("sell-trim", "good", "diversify", { p: pct0(pre.posPct) }));
+  if (an.rsi > 70 && pl != null && pl > 0) c.push(ck("sell-strength", "good", "rsi", { r: an.rsi.toFixed(0) }));
+  if (up && pre.dayChg <= -0.02 && (pl == null || pl > -0.08)) c.push(ck("sell-panic", "bad", "chart", { p: (-pre.dayChg * 100).toFixed(1) + "%" }));
+  else if (up && pl != null && pl >= 0 && pl < 0.05 && an.rsi <= 70 && !c.length) c.push(ck("sell-early", "bad", "whenact"));
+  if (pre.news && pre.news.chg < 0) c.push(ck("sell-news", "warn", "news", { news: pre.news.n }));
+  if (!c.length) c.push(ck("sell-noreason", "warn", "whenact"));
+  return c;
+}
+// Check text is looked up at display time, so it follows the chosen language
+function ckVals(c) { return c.v && c.v.news ? { ...c.v, h: newsHeadline(c.v.news) } : (c.v || {}); }
+const ckTitle = c => c.title || t(`ck.${c.id}.t`, ckVals(c));
+const ckWhy = c => c.why || t(`ck.${c.id}.w`, ckVals(c));
+
+function gradeOf(checks) {
+  const good = checks.filter(c => c.level === "good").length;
+  const bad = checks.filter(c => c.level === "bad").length;
+  const warn = checks.filter(c => c.level === "warn").length;
+  if (!bad && !warn) return "good";
+  if (!bad || good > bad) return "mixed";
+  return "risky";
+}
+const normGrade = g => g === "Good step" ? "good" : g === "Mixed step" ? "mixed" : g === "Risky step" ? "risky" : g;
+
+function recordTrade({ sym, side, shares, byAI, pre, px, pu }) {
+  const { total } = portfolioTotals();
+  const h = state.holdings[sym];
+  const post = { posPct: h ? h.shares * pu / total : 0, cashPct: state.cash / total };
+  const checks = side === "buy" ? judgeBuy(pre, post) : judgeSell(pre);
+  const an = pre.an;
+  const entry = {
+    id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+    sym, side, shares, px, pu, day: sim.day, tick: sim.tick, by: byAI ? "auto" : "you",
+    grade: gradeOf(checks), checks,
+    seen: { up: an.s20 > an.s50, rsi: an.rsi, mom30: an.mom30, vol: an.vol, dayChg: pre.dayChg,
+            posPct: side === "buy" ? post.posPct : pre.posPct, pl: pre.pl, news: pre.news ? pre.news.n : null },
+  };
+  state.journal.unshift(entry);
+  state.journal = state.journal.slice(0, 200);
+  return entry;
+}
+
+function outcome(e) {
+  const days = (sim.day - e.day) + (sim.tick - e.tick) / TICKS_PER_DAY;
+  if (days < 1) return { text: t("o.early"), kind: null };
+  const now = price(e.sym), chg = now / e.px - 1;
+  const v = { who: t("o.who." + e.by), sym: e.sym, move: `${fmtP(e.sym, e.px)} → ${fmtP(e.sym, now)}`, amt: fmt$(Math.abs(usd(e.sym) - e.pu) * e.shares) };
+  if (e.side === "buy") return { kind: chg >= 0 ? "win" : "loss", text: t("o.buy", { ...v, p: colored(chg, fmtPct(chg)), win: chg >= 0 }) };
+  return chg <= 0
+    ? { kind: "win", text: t("o.sellWin", { ...v, p: `<b class="pos">${(Math.abs(chg) * 100).toFixed(2)}%</b>` }) }
+    : { kind: "loss", text: t("o.sellLoss", { ...v, p: `<b class="neg">${(chg * 100).toFixed(2)}%</b>` }) };
+}
+function verdict(e, kind) {
+  if (!kind) return "";
+  const good = normGrade(e.grade) !== "risky";
+  return t(good ? (kind === "win" ? "vd.gg" : "vd.gb") : (kind === "win" ? "vd.bg" : "vd.bb"));
+}
+
+function renderJournal() {
+  document.querySelectorAll("[data-jfilter]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.jfilter === state.jFilter)));
+  const list = state.journal.filter(e => state.jFilter === "all" || e.by === state.jFilter);
+  const all = list.flatMap(e => e.checks);
+  const good = all.filter(c => c.level === "good").length, bad = all.filter(c => c.level === "bad").length;
+  const count = g => list.filter(e => normGrade(e.grade) === g).length;
+  const score = good + bad ? Math.round(good / (good + bad) * 100) : null;
+  const tile = (label, value, hint, style = "") => `<div class="j-stat"><div class="label">${label}</div><div class="value"${style}>${value}</div><div class="hint">${hint}</div></div>`;
+  $("jStats").innerHTML =
+    tile(t("js.trades"), list.length, t("js.tradesHint", { b: list.filter(e => e.side === "buy").length, s: list.filter(e => e.side === "sell").length })) +
+    tile(t("js.good"), count("good"), t("js.goodHint"), ' style="color:var(--up)"') +
+    tile(t("js.mixed"), count("mixed"), t("js.mixedHint"), ' style="color:var(--warn-ink)"') +
+    tile(t("js.risky"), count("risky"), t("js.riskyHint"), ' style="color:var(--down)"') +
+    tile(t("js.score"), score == null ? "—" : score + "%", t("js.scoreHint"));
+
+  const tally = level => {
+    const m = {};
+    for (const c of all.filter(c => c.level === level)) (m[c.id] = m[c.id] || { c, n: 0 }).n++;
+    return Object.values(m).sort((a, b) => b.n - a.n).slice(0, 3);
+  };
+  const strengths = tally("good"), mistakes = [...tally("bad"), ...tally("warn")].slice(0, 3);
+  const item = ({ c, n }) => `<li><b>${ckTitle(c).replace(/\s*[（(].*[)）]$/, "")}</b> ${t("jh.times", { n })} ${ckWhy(c)} <button type="button" class="lesson-link" data-lesson="${c.lesson}">${t("lesson")}</button></li>`;
+  $("jHabits").innerHTML = list.length ? `
+    <div><h3 class="pos">${t("jh.well")}</h3>${strengths.length ? `<ul>${strengths.map(item).join("")}</ul>` : `<p class="empty">${t("jh.noWell")}</p>`}</div>
+    <div><h3 class="neg">${t("jh.work")}</h3>${mistakes.length ? `<ul>${mistakes.map(item).join("")}</ul>` : `<p class="empty">${t("jh.noWork")}</p>`}</div>`
+    : `<div><h3>${t("jh.title")}</h3><p class="empty">${t("jh.empty")}</p></div>`;
+
+  const lessonName = id => { const l = LESSONS.find(x => x.id === id); return l ? LT(l).title : t("lesson"); };
+  const icon = { good: "✓", bad: "✗", warn: "!" };
+  $("jList").innerHTML = list.length ? list.slice(0, 60).map(e => {
+    const s = e.seen, o = outcome(e), v = verdict(e, o.kind), g = normGrade(e.grade);
+    const seen = [
+      t("seen.trend", { up: s.up }), t("seen.rsi", { r: s.rsi.toFixed(0) }), t("seen.mom", { p: fmtPct(s.mom30) }), t("seen.day", { p: fmtPct(s.dayChg) }),
+      t("seen.vol", { p: pct0(s.vol) }), t(e.side === "buy" ? "seen.posAfter" : "seen.posBefore", { p: pct0(s.posPct) }),
+      s.pl != null ? t(e.side === "sell" ? "seen.pl" : "seen.holding", { p: fmtPct(s.pl) }) : null,
+      s.news ? t("seen.news", { h: typeof s.news === "string" ? s.news : (s.news.headline || newsHeadline(s.news)) }) : null,
+    ].filter(Boolean).join(" · ");
+    return `<article class="card">
+      <div class="j-top">
+        <span class="side-pill side-${e.side}">${t("rec." + (e.side === "buy" ? "BUY" : "SELL"))}</span>
+        <b>${t("shares", { n: e.shares })} ${e.sym}</b> @ ${fmtP(e.sym, e.px)}
+        <span class="time">${e.t || stampText(e.day, e.tick)}</span>
+        <span class="who">${t("who." + e.by)}</span>
+        <span class="grade grade-${g}">${t("g." + g)}</span>
       </div>
-      ${key("plan the exit before you enter. Know why you're buying, how much, and when you'd sell.")}
-      ${live(`The Coach's view on <b>${selected}</b>: ${co.summary}<br><br><b>Its suggestion:</b> ${first}`)}`;
-    },
-    quiz: {
-      q: "You bought a stock at $100 with a rule to sell if it falls 8%. It's now $91. What does your plan say?",
-      opts: ["Sell, because it's below your $92 stop-loss", "Buy more to lower your average cost", "Ignore it; it will come back"],
-      a: 0,
-      why: "8% below $100 is $92, and $91 is past that line. Sticking to the rule keeps a small loss from growing.",
-    },
-    tryIt: { label: "Read the Coach card" },
-  },
-  {
-    id: "taiwan", title: "Investing in Taiwan stocks",
-    body: () => {
-      const p = price("2330");
-      return `
-      <p>The <b>Taiwan Stock Exchange</b> (臺灣證券交易所, TWSE) uses numbers instead of letters for tickers: <b>2330</b> is TSMC and <b>2317</b> is Hon Hai, also known as Foxconn. ETFs usually start with 00, like <b>0050</b>.</p>
-      <p>Prices are in <b>New Taiwan dollars (NT$)</b>. This app keeps your cash in US dollars and converts at a fixed NT$${MARKETS.TW.perUSD} = US$1. In real life the exchange rate moves every day, so a Taiwan stock can rise in NT$ and still lose value in US$. That is called <b>currency risk</b>.</p>
-      <div class="facts">
-        <div class="fact"><div class="fact-k">Trading hours</div><div class="fact-v">9:00 to 13:30, Monday to Friday, Taiwan time</div></div>
-        <div class="fact"><div class="fact-k">Board lot (一張)</div><div class="fact-v">1,000 shares. Odd-lot trading (零股) lets you buy fewer.</div></div>
-        <div class="fact"><div class="fact-k">Daily price limit</div><div class="fact-v">At most 10% up or down from the previous close in one day. This app enforces it and shows a LIMIT tag.</div></div>
-        <div class="fact"><div class="fact-k">Price steps</div><div class="fact-v">Prices move in fixed steps. Above NT$1,000 the step is NT$5, so TSMC can't trade at NT$1,083.</div></div>
-        <div class="fact"><div class="fact-k">Colors</div><div class="fact-v"><b>Red means up</b> and green means down, the opposite of this app and of US apps.</div></div>
-      </div>
-      <p>TSMC is by far the largest company on the exchange, so its price has a big effect on the whole Taiwan market.</p>
-      ${key("Taiwan stocks trade in NT$, in lots of 1,000 shares, with a 10% daily limit, and red means up.")}
-      ${live(`TSMC (2330) is <b>${fmtP("2330", p)}</b> per share, about <b>${fmt$(usd("2330"))}</b>. One full board lot of 1,000 shares would cost <b>${fmtP("2330", p * 1000)}</b>. In this app you can buy single shares, like odd-lot trading.`)}`;
-    },
-    quiz: {
-      q: "On a Taiwanese stock app, a price shown in red means…",
-      opts: ["The price went up", "The price went down", "Trading is paused"],
-      a: 0,
-      why: "In Taiwan, as in mainland China, Hong Kong and Japan, red marks a rising price. In the US and Europe it is usually the other way round.",
-    },
-    tryIt: { label: "Look at TSMC (2330)", sym: "2330" },
-  },
-  {
-    id: "predict", title: "Why nobody can predict the market",
-    body: () => {
-      const { total } = portfolioTotals();
-      const change = total - START_CASH;
-      return `
-      <p>Every signal in these lessons is a <b>hint, not a promise</b>. Prices react to news that nobody knows in advance: a surprise profit report, a new law, a factory fire.</p>
-      <p>This simulator works the same way. Trends tend to last a while, so the signals help a little, but surprise news and random moves often overwhelm them. Turn on auto-pilot and watch: it wins some trades and loses others.</p>
-      <p>Even professionals find it hard. Over long periods, most professional fund managers fail to beat a simple fund that just holds the whole market.</p>
-      <p>If you invest real money someday, a few habits help:</p>
-      <ul>
-        <li>Learn first, and think in years rather than days.</li>
-        <li>Spread your money out, for example with a broad market fund.</li>
-        <li>Only invest money you won't need soon.</li>
-        <li>Watch out for fees, and for anyone promising guaranteed returns.</li>
-        <li>Talk it over with someone you trust before you start.</li>
-      </ul>
-      ${key("anyone who says they can predict the market for sure is wrong, or selling something.")}
-      ${live(`Your simulated account is <b class="${change >= 0 ? "pos" : "neg"}">${change >= 0 ? "up" : "down"} ${fmt$(Math.abs(change))} (${fmtPct(change / START_CASH)})</b> since you started.`)}`;
-    },
-    quiz: {
-      q: "Can any AI or expert reliably predict tomorrow's stock prices?",
-      opts: ["No. Signals can help you think, but nobody predicts prices reliably", "Yes, with enough data", "Only for big, famous companies"],
-      a: 0,
-      why: "Markets react to new information that nobody has yet. That is why risk control and diversification matter more than predictions.",
-    },
-    tryIt: { label: "Try auto-pilot" },
-  },
-];
+      <div class="j-seen"><b>${t("seen." + e.by)}</b> ${seen}</div>
+      <ul class="j-checks">${e.checks.map(c => `<li class="ck-${c.level}"><span class="ck-icon" aria-hidden="true">${icon[c.level]}</span>
+        <div><b>${ckTitle(c)}.</b> ${ckWhy(c)} <button type="button" class="lesson-link" data-lesson="${c.lesson}">${t("lesson.named", { t: lessonName(c.lesson) })}</button></div></li>`).join("")}</ul>
+      <div class="j-outcome"><b>${t("o.title")}</b> ${o.text}${v ? `<span class="verdict">${v}</span>` : ""}</div>
+    </article>`;
+  }).join("") : `<div class="card j-empty">
+      <p><b>${t("j.emptyTitle", { auto: state.jFilter === "auto" })}</b></p>
+      <p>${t(state.jFilter === "auto" ? "j.emptyAuto" : "j.emptyYou")}</p>
+      <button type="button" class="btn btn-primary" data-goto="trade">${t("j.go")}</button>
+    </div>`;
+}
 
 /* ============ Rendering: learn view ============ */
 function lessonIndex(id) { return Math.max(0, LESSONS.findIndex(l => l.id === id)); }
 
 function renderLessonList() {
   const doneCount = LESSONS.filter(l => learn.done[l.id]).length;
-  $("progressText").textContent = `${doneCount} of ${LESSONS.length}`;
+  $("progressText").textContent = t("l.of", { a: doneCount, b: LESSONS.length });
   $("progressFill").style.width = (doneCount / LESSONS.length * 100) + "%";
   $("progressBar").setAttribute("aria-valuenow", String(doneCount));
   $("progressBar").setAttribute("aria-valuemax", String(LESSONS.length));
@@ -1478,84 +2366,74 @@ function renderLessonList() {
   $("lessonList").innerHTML = LESSONS.map((l, i) => `
     <button type="button" class="lesson-btn${learn.done[l.id] ? " done" : ""}" data-id="${l.id}" aria-current="${l.id === learn.current}">
       <span class="lesson-num" aria-hidden="true">${learn.done[l.id] ? "✓" : i + 1}</span>
-      <span>${l.title}${learn.done[l.id] ? '<span class="sr-only"> (completed)</span>' : ""}</span>
+      <span>${LT(l).title}${learn.done[l.id] ? `<span class="sr-only">${t("l.done")}</span>` : ""}</span>
     </button>`).join("");
 }
 
 function renderLesson() {
   const i = lessonIndex(learn.current);
-  const l = LESSONS[i];
+  const l = LESSONS[i], tx = LT(l);
   const prev = LESSONS[i - 1], next = LESSONS[i + 1];
   $("lessonPanel").innerHTML = `
-    <div class="eyebrow">Lesson ${i + 1} of ${LESSONS.length}${learn.done[l.id] ? " · completed" : ""}</div>
-    <h2>${l.title}</h2>
-    <div class="lesson-body">${l.body()}</div>
+    <div class="eyebrow">${t("l.lessonN", { i: i + 1, n: LESSONS.length })}${learn.done[l.id] ? t("l.completed") : ""}</div>
+    <h2>${tx.title}</h2>
+    <div class="lesson-body">${tx.body(l.data())}</div>
     <div class="quiz">
-      <h3>Quick check</h3>
-      <p class="q">${l.quiz.q}</p>
-      <div class="quiz-opts">
-        ${l.quiz.opts.map((o, k) => `<button type="button" class="quiz-opt" data-k="${k}">${o}</button>`).join("")}
-      </div>
+      <h3>${t("l.check")}</h3>
+      <p class="q">${tx.q}</p>
+      <div class="quiz-opts">${tx.opts.map((o, k) => `<button type="button" class="quiz-opt" data-k="${k}">${o}</button>`).join("")}</div>
       <div class="quiz-feedback" id="quizFeedback"></div>
     </div>
     <div class="lesson-nav">
-      ${prev ? `<button type="button" class="btn btn-ghost" id="prevLesson">← ${prev.title}</button>` : ""}
+      ${prev ? `<button type="button" class="btn btn-ghost" id="prevLesson">← ${LT(prev).title}</button>` : ""}
       <span class="spacer"></span>
-      <button type="button" class="btn btn-ghost" id="tryIt">${l.tryIt.label} →</button>
-      ${next ? `<button type="button" class="btn btn-primary" id="nextLesson">Next lesson</button>` : ""}
+      <button type="button" class="btn btn-ghost" id="tryIt">${tx.try} →</button>
+      ${next ? `<button type="button" class="btn btn-primary" id="nextLesson">${t("l.next")}</button>` : ""}
     </div>`;
-
-  const panel = $("lessonPanel");
-  panel.querySelectorAll(".quiz-opt").forEach(b => b.addEventListener("click", () => answerQuiz(l, +b.dataset.k)));
+  $("lessonPanel").querySelectorAll(".quiz-opt").forEach(b => b.addEventListener("click", () => answerQuiz(l, +b.dataset.k)));
   if (prev) $("prevLesson").addEventListener("click", () => openLesson(prev.id, true));
   if (next) $("nextLesson").addEventListener("click", () => openLesson(next.id, true));
   $("tryIt").addEventListener("click", () => tryIt(l));
 }
 
 function answerQuiz(l, k) {
-  const fb = $("quizFeedback");
+  const fb = $("quizFeedback"), tx = LT(l);
   const buttons = $("lessonPanel").querySelectorAll(".quiz-opt");
-  if (k === l.quiz.a) {
+  if (k === l.a) {
     buttons.forEach(b => { b.disabled = true; if (+b.dataset.k === k) b.classList.add("right"); });
-    fb.innerHTML = `<b class="pos">Correct!</b> ${l.quiz.why}`;
+    fb.innerHTML = `<b class="pos">${t("l.correct")}</b> ${tx.why}`;
     if (!learn.done[l.id]) {
       learn.done[l.id] = true;
       saveLearn();
       renderLessonList();
       const eb = $("lessonPanel").querySelector(".eyebrow");
-      if (eb && !eb.textContent.includes("completed")) eb.textContent += " · completed";
+      if (eb) eb.textContent = t("l.lessonN", { i: lessonIndex(l.id) + 1, n: LESSONS.length }) + t("l.completed");
     }
-    if (LESSONS.every(x => learn.done[x.id])) {
-      fb.innerHTML += `<br><br><b>You finished all ${LESSONS.length} lessons.</b> Try putting them into practice on the Trade tab.`;
-    }
+    if (LESSONS.every(x => learn.done[x.id])) fb.innerHTML += "<br><br>" + t("l.allDone", { n: LESSONS.length });
   } else {
     buttons[k].classList.add("wrong");
     buttons[k].disabled = true;
-    fb.innerHTML = `<b class="neg">Not quite.</b> Have another look at the lesson and try again.`;
+    fb.innerHTML = `<b class="neg">${t("l.wrong")}</b> ${t("l.wrongMsg")}`;
   }
 }
 
-function openLesson(id, focusPanel) {
+function openLesson(id, scroll) {
   learn.current = id;
+  learn.pane = "lessons";
   saveLearn();
-  renderLessonList();
-  renderLesson();
-  if (focusPanel && window.matchMedia("(max-width: 860px)").matches) {
-    $("lessonPanel").scrollIntoView({ block: "start" });
-  }
+  renderLearn();
+  if (scroll && window.matchMedia("(max-width: 860px)").matches) $("lessonPanel").scrollIntoView({ block: "start" });
 }
 
 function tryIt(l) {
-  const t = l.tryIt;
-  let sym = t.sym;
-  if (t.pick === "mostVolatile") {
-    sym = STOCKS.map(s => ({ sym: s.sym, v: volatility(series(s.sym)) })).sort((a, b) => b.v - a.v)[0].sym;
-  }
+  const tr = l.tryIt;
+  let sym = tr.sym;
+  if (tr.pick === "mostVolatile") sym = STOCKS.map(s => ({ sym: s.sym, v: volatility(series(s.sym)) })).sort((a, b) => b.v - a.v)[0].sym;
   if (sym) {
     selected = sym;
     if (state.mktFilter !== "ALL" && state.mktFilter !== market[sym].mkt) state.mktFilter = "ALL";
   }
-  if (t.qty) $("qty").value = t.qty;
+  if (tr.qty) $("qty").value = tr.qty;
   showView("trade");
   renderAll();
   const target = { news: "newsFeed", rsi: "recReasons", whenact: "coachSummary", ma: "chartWrap", chart: "chartWrap",
@@ -1565,33 +2443,60 @@ function tryIt(l) {
   else window.scrollTo({ top: 0 });
 }
 
-/* ============ Views (Trade / Learn) ============ */
+/* ============ Vocabulary ============ */
+const CATS = ["basics", "trading", "analysis", "risk", "economy"];
+function renderVocab() {
+  const q = ($("vocabSearch").value || "").trim().toLowerCase();
+  $("vocabCats").innerHTML = ["all", ...CATS].map(c =>
+    `<button type="button" class="chip" data-vcat="${c}" aria-pressed="${learn.vcat === c}">${c === "all" ? t("v.all") : t("cat." + c)}</button>`).join("");
+  const rows = GLOSSARY.filter(g => (learn.vcat === "all" || g[0] === learn.vcat) && (!q || g.slice(1).join(" ").toLowerCase().includes(q)));
+  $("vocabCount").textContent = t("v.count", { n: rows.length });
+  $("vocabGrid").innerHTML = rows.length ? rows.map(g => {
+    const [cat, enT, enD, enE, zhT, zhD, zhE] = g;
+    const zh = lang === "zh";
+    return `<article class="card term-card">
+      <span class="cat">${t("cat." + cat)}</span>
+      <h3 class="term">${zh ? zhT : enT}<span class="alt">${zh ? enT : zhT}</span></h3>
+      <p>${zh ? zhD : enD}</p>
+      <p class="ex"><b>${t("v.ex")}</b> ${zh ? zhE : enE}</p>
+    </article>`;
+  }).join("") : `<p class="empty">${t("v.none")}</p>`;
+}
+
+function renderLearn() {
+  document.querySelectorAll("[data-pane]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pane === learn.pane)));
+  $("lessonsPane").hidden = learn.pane !== "lessons";
+  $("vocabPane").hidden = learn.pane !== "vocab";
+  renderLessonList();
+  if (learn.pane === "lessons") renderLesson(); else renderVocab();
+}
+
+/* ============ Views (Trade / Journal / Learn) ============ */
+const VIEWS = ["trade", "journal", "learn"];
+let currentView = "trade";
 function showView(v) {
-  const isLearn = v === "learn";
-  $("tradeView").hidden = isLearn;
-  $("learnView").hidden = !isLearn;
-  $("tabTrade").setAttribute("aria-pressed", String(!isLearn));
-  $("tabLearn").setAttribute("aria-pressed", String(isLearn));
-  if (isLearn) { renderLessonList(); renderLesson(); }
-  const want = isLearn ? "#learn" : "";
+  if (v === "vocabulary") { learn.pane = "vocab"; v = "learn"; }
+  if (!VIEWS.includes(v)) v = "trade";
+  currentView = v;
+  $("tradeView").hidden = v !== "trade";
+  $("journalView").hidden = v !== "journal";
+  $("learnView").hidden = v !== "learn";
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (v === "learn") renderLearn();
+  if (v === "journal") renderJournal();
+  const want = v === "trade" ? "" : "#" + v;
   if (location.hash !== want) {
     try { history.replaceState(null, "", want || location.pathname + location.search); } catch (e) { /* ignore */ }
   }
 }
 
 /* ============ Wire up ============ */
-$("buyBtn").addEventListener("click", () => {
-  const q = parseInt($("qty").value || "0", 10);
-  if (trade(selected, q, "buy")) renderAll();
-});
-$("sellBtn").addEventListener("click", () => {
-  const q = parseInt($("qty").value || "0", 10);
-  if (trade(selected, q, "sell")) renderAll();
-});
+$("buyBtn").addEventListener("click", () => { if (trade(selected, parseInt($("qty").value || "0", 10), "buy")) renderAll(); });
+$("sellBtn").addEventListener("click", () => { if (trade(selected, parseInt($("qty").value || "0", 10), "sell")) renderAll(); });
 $("qty").addEventListener("input", updateTradeCost);
 $("autoPilot").addEventListener("change", e => {
   state.autoPilot = e.target.checked;
-  state.aiFeed.unshift({ t: now(), msg: state.autoPilot ? "Auto-pilot <b>enabled</b> — the AI will now manage this paper portfolio." : "Auto-pilot <b>disabled</b>." });
+  state.aiFeed.unshift({ d: sim.day, tk: sim.tick, k: state.autoPilot ? "ap.on" : "ap.off", v: {} });
   renderAll();
 });
 
@@ -1600,61 +2505,62 @@ let resetArmed = null;
 $("resetBtn").addEventListener("click", () => {
   const btn = $("resetBtn");
   if (!resetArmed) {
-    btn.textContent = "Click again to reset to $100,000";
+    btn.textContent = t("reset.confirm");
     btn.className = "btn btn-danger-ghost";
-    resetArmed = setTimeout(() => {
-      resetArmed = null; btn.textContent = "Reset account"; btn.className = "btn btn-ghost";
-    }, 4000);
+    resetArmed = setTimeout(() => { resetArmed = null; btn.textContent = t("reset"); btn.className = "btn btn-ghost"; }, 4000);
     return;
   }
   clearTimeout(resetArmed); resetArmed = null;
-  btn.textContent = "Reset account"; btn.className = "btn btn-ghost";
-  state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: state.news, autoPilot: false, mktFilter: state.mktFilter, dayStartTotal: START_CASH };
+  btn.textContent = t("reset"); btn.className = "btn btn-ghost";
+  state = { ...state, cash: START_CASH, holdings: {}, history: [], aiFeed: [], journal: [], autoPilot: false, dayStartTotal: START_CASH };
   $("autoPilot").checked = false;
-  $("tradeMsg").textContent = "Account reset to $100,000."; $("tradeMsg").className = "trade-msg pos";
+  $("tradeMsg").textContent = t("reset.done"); $("tradeMsg").className = "trade-msg pos";
   renderAll();
 });
 
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
-  state.mktFilter = b.dataset.mkt;
-  const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
-  if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
+$("langSel").addEventListener("change", e => {
+  lang = I18N[e.target.value] ? e.target.value : "en";
+  store(LANG_KEY, lang);
+  applyStatic();
   renderAll();
-}));
+  showView(currentView);
+});
+$("vocabSearch").addEventListener("input", renderVocab);
 
-$("tabTrade").addEventListener("click", () => showView("trade"));
-$("tabLearn").addEventListener("click", () => showView("learn"));
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => { showView(b.dataset.view); window.scrollTo({ top: 0 }); }));
 
-// One click handler for lesson links, "?" buttons, stock buttons and the lesson list
+// One click handler for everything rendered dynamically
 document.addEventListener("click", e => {
-  const lessonBtn = e.target.closest("[data-lesson]");
-  if (lessonBtn) {
-    learn.current = lessonBtn.dataset.lesson;
-    saveLearn();
-    showView("learn");
-    window.scrollTo({ top: 0 });
-    return;
+  const el = sel => e.target.closest(sel);
+  let b;
+  if ((b = el("[data-lesson]"))) { learn.current = b.dataset.lesson; learn.pane = "lessons"; saveLearn(); showView("learn"); window.scrollTo({ top: 0 }); return; }
+  if ((b = el("[data-goto]"))) { showView(b.dataset.goto); window.scrollTo({ top: 0 }); return; }
+  if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
+  if ((b = el("[data-pane]"))) { learn.pane = b.dataset.pane; saveLearn(); renderLearn(); return; }
+  if ((b = el("[data-vcat]"))) { learn.vcat = b.dataset.vcat; saveLearn(); renderVocab(); return; }
+  if ((b = el("[data-mkt]"))) {
+    state.mktFilter = b.dataset.mkt;
+    const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
+    if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
+    renderAll(); return;
   }
-  const listBtn = e.target.closest(".lesson-btn");
-  if (listBtn) { openLesson(listBtn.dataset.id, true); return; }
-  const symBtn = e.target.closest("[data-sym]");
-  if (symBtn && market[symBtn.dataset.sym]) {
-    selected = symBtn.dataset.sym;
+  if ((b = el(".lesson-btn"))) { openLesson(b.dataset.id, true); return; }
+  if ((b = el("[data-sym]")) && market[b.dataset.sym]) {
+    selected = b.dataset.sym;
     if (state.mktFilter !== "ALL" && state.mktFilter !== market[selected].mkt) state.mktFilter = "ALL";
     renderAll();
-    if (symBtn.classList.contains("news-sym")) $("dSym").scrollIntoView({ block: "center" });
+    if (b.classList.contains("news-sym")) $("dSym").scrollIntoView({ block: "center" });
   }
 });
-window.addEventListener("hashchange", () => showView(location.hash === "#learn" ? "learn" : "trade"));
-
+window.addEventListener("hashchange", () => showView(location.hash.slice(1) || "trade"));
 $("chartWrap").addEventListener("mousemove", chartHover);
 $("chartWrap").addEventListener("mouseleave", chartLeave);
 
 if (state.dayStartTotal == null) state.dayStartTotal = portfolioTotals().total;
 $("autoPilot").checked = state.autoPilot;
+applyStatic();
 renderAll();
-renderLessonList();
-showView(location.hash === "#learn" ? "learn" : "trade");
+showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);
 </script>
 </body>
