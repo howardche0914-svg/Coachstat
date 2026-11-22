@@ -17,7 +17,9 @@ $100,000 paper-trading account, a Coach that summarizes each stock and
 suggests what a careful trader might do, an optional auto-pilot, a trade
 Journal that records every buy and sell and reviews each step against the
 lessons' rules, and a Learn tab with 12 beginner lessons, quizzes and a
-45-word stock and economics vocabulary. The whole app is available in
-English and Traditional Chinese (繁體中文). All prices and news are simulated
+45-word stock and economics vocabulary. The price chart has 1M / 3M / 6M /
+All ranges and an enlarged view with both moving averages and your trades
+marked. The whole app is available in English, Traditional Chinese
+(繁體中文) and Simplified Chinese (简体中文). All prices and news are simulated
 and no real money or brokerage account is involved. Open the file in any
 browser — no build step or server needed.

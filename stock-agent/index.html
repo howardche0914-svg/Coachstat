@@ -371,6 +371,28 @@
   footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
   footer a { color: var(--accent); }
   @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
+  /* ============ Chart range + zoom ============ */
+  .chart-tools { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .btn-sm { padding: 4px 12px; font-size: 13px; }
+  .chart-modal {
+    position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center;
+    padding: calc(env(safe-area-inset-top, 0px) + 16px) max(16px, env(safe-area-inset-right, 0px))
+             calc(env(safe-area-inset-bottom, 0px) + 16px) max(16px, env(safe-area-inset-left, 0px));
+  }
+  .cm-box {
+    background: var(--surface); color: var(--ink); border-radius: 14px; border: 1px solid var(--border);
+    width: min(1280px, 100%); max-height: 100%; overflow: auto; padding: 18px;
+    display: flex; flex-direction: column; gap: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .cm-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cm-head h2 { margin: 0; font-size: 22px; }
+  .cm-head .spacer { flex: 1; }
+  .cm-stats { display: flex; gap: 8px 20px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .cm-stats b { color: var(--ink); }
+  .cm-stats b.pos { color: var(--up); } .cm-stats b.neg { color: var(--down); }
+  body.modal-open { overflow: hidden; }
+
   /* ============ Language picker + vocabulary ============ */
   .lang-select {
     font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px;
@@ -414,6 +436,7 @@
   <select id="langSel" class="lang-select" aria-label="Language">
     <option value="en">English</option>
     <option value="zh">繁體中文</option>
+    <option value="zhs">简体中文</option>
   </select>
   <div class="cash">
     <div class="label" data-i18n="cash">Cash available</div>
@@ -450,6 +473,10 @@
         <span class="big-chg" id="dChg"></span>
       </div>
       <div class="fx-note" id="dFx"></div>
+      <div class="chart-tools">
+        <div class="seg range-seg" role="group" aria-label="Chart time range" data-i18n-aria="chart.rangeAria"></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="zoomBtn"><span aria-hidden="true">⤢</span> <span data-i18n="chart.zoom">Enlarge chart</span></button>
+      </div>
       <div class="chart-wrap" id="chartWrap">
         <div class="tooltip" id="chartTip"><span class="t-date"></span><br><span class="t-val"></span></div>
       </div>
@@ -567,6 +594,26 @@
     <div class="vocab-grid" id="vocabGrid"></div>
   </div>
 </section>
+
+<div class="chart-modal" id="chartModal" hidden>
+  <div class="cm-box" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+    <div class="cm-head">
+      <h2 id="cmTitle"></h2>
+      <span id="cmName" style="color:var(--muted)"></span>
+      <span class="big-px" id="cmPx"></span>
+      <span class="big-chg" id="cmChg"></span>
+      <span class="spacer"></span>
+      <div class="seg range-seg" role="group" aria-label="Chart time range" data-i18n-aria="chart.rangeAria"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="cmClose"><span aria-hidden="true">✕</span> <span data-i18n="chart.close">Close</span></button>
+    </div>
+    <div class="cm-stats" id="cmStats"></div>
+    <div class="chart-wrap" id="bigChartWrap">
+      <div class="tooltip"><span class="t-date"></span><br><span class="t-val"></span></div>
+    </div>
+    <div class="cm-stats" id="cmLegend"></div>
+    <p class="coach-note" data-i18n="cm.hint"></p>
+  </div>
+</div>
 
 <footer>
   <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
@@ -769,6 +816,16 @@ const I18N = {
     "l.allDone": v => `<b>You finished all ${v.n} lessons.</b> Try putting them into practice on the Trade tab.`,
     "v.count": v => `${v.n} word${v.n === 1 ? "" : "s"}`, "v.all": "All", "v.ex": "Example:", "v.none": "No words match your search.",
     "cat.basics": "Basics", "cat.trading": "Trading", "cat.analysis": "Analysis", "cat.risk": "Risk", "cat.economy": "Economy",
+
+    // zoomed chart
+    "chart.zoom": "Enlarge chart", "chart.close": "Close", "chart.rangeAria": "Chart time range",
+    "range.1m": "1M", "range.3m": "3M", "range.6m": "6M", "range.all": "All",
+    "chart.legendBig": "— price   - - 20-day average   ··· 50-day average",
+    "chart.markers": "▲ your buys   ▼ your sells",
+    "chart.dialog": v => `${v.sym} price chart`,
+    "cm.change": "Change", "cm.high": "High", "cm.low": "Low", "cm.ma20": "20-day avg", "cm.ma50": "50-day avg",
+    "cm.hint": "Hover over the chart to see the price on any day. Triangles mark your trades in this stock.",
+    "punct.stop": ".", "marker.buy": v => `You bought ${v.n} @ ${v.px}`, "marker.sell": v => `You sold ${v.n} @ ${v.px}`,
   },
 
   zh: {
@@ -954,8 +1011,27 @@ const I18N = {
     "l.allDone": v => `<b>你完成了全部 ${v.n} 課。</b>到交易頁面實際練習看看吧。`,
     "v.count": v => `${v.n} 個詞彙`, "v.all": "全部", "v.ex": "例子：", "v.none": "沒有符合搜尋的詞彙。",
     "cat.basics": "基礎", "cat.trading": "交易", "cat.analysis": "分析", "cat.risk": "風險", "cat.economy": "經濟",
+
+    "chart.zoom": "放大圖表", "chart.close": "關閉", "chart.rangeAria": "走勢圖時間範圍",
+    "range.1m": "1個月", "range.3m": "3個月", "range.6m": "6個月", "range.all": "全部",
+    "chart.legendBig": "— 價格   - - 20 日均線   ··· 50 日均線",
+    "chart.markers": "▲ 你的買進   ▼ 你的賣出",
+    "chart.dialog": v => `${v.sym} 走勢圖`,
+    "cm.change": "區間漲跌", "cm.high": "最高", "cm.low": "最低", "cm.ma20": "20 日均線", "cm.ma50": "50 日均線",
+    "cm.hint": "把滑鼠移到走勢圖上，可以看到每一天的價格。三角形標示你在這檔股票的交易。",
+    "punct.stop": "。", "marker.buy": v => `你買進 ${v.n} 股 @ ${v.px}`, "marker.sell": v => `你賣出 ${v.n} 股 @ ${v.px}`,
   },
 };
+
+/* ============ Simplified Chinese ============ */
+// 简体中文 reuses the Traditional Chinese text and converts it character by character.
+const TS_MAP = {"並":"并","亞":"亚","來":"来","個":"个","們":"们","債":"债","僅":"仅","價":"价","億":"亿","優":"优","內":"内","兩":"两","別":"别","則":"则","剛":"刚","劃":"划","勁":"劲","動":"动","務":"务","勢":"势","匯":"汇","區":"区","卻":"却","參":"参","問":"问","啟":"启","單":"单","嗎":"吗","國":"国","圍":"围","圓":"圆","圖":"图","報":"报","場":"场","壞":"坏","夠":"够","奮":"奋","學":"学","實":"实","將":"将","專":"专","尋":"寻","對":"对","師":"师","帳":"帐","帶":"带","幣":"币","幫":"帮","幾":"几","廠":"厂","張":"张","強":"强","彈":"弹","彙":"汇","後":"后","從":"从","慣":"惯","慮":"虑","憂":"忧","應":"应","懼":"惧","戰":"战","戶":"户","換":"换","損":"损","擁":"拥","擊":"击","擔":"担","據":"据","擬":"拟","擴":"扩","擺":"摆","攤":"摊","數":"数","斷":"断","於":"于","時":"时","暫":"暂","會":"会","東":"东","條":"条","業":"业","榮":"荣","構":"构","標":"标","樣":"样","機":"机","檔":"档","檢":"检","權":"权","歐":"欧","歡":"欢","氣":"气","決":"决","沒":"没","況":"况","減":"减","測":"测","準":"准","溫":"温","漲":"涨","濟":"济","瀏":"浏","灣":"湾","為":"为","無":"无","熱":"热","營":"营","狀":"状","獲":"获","現":"现","產":"产","畫":"画","當":"当","發":"发","盡":"尽","盤":"盘","眾":"众","確":"确","碼":"码","礎":"础","種":"种","稱":"称","積":"积","穩":"稳","筆":"笔","範":"范","篩":"筛","簡":"简","籃":"篮","籌":"筹","籤":"签","紀":"纪","約":"约","紅":"红","紐":"纽","純":"纯","級":"级","組":"组","結":"结","給":"给","經":"经","綠":"绿","網":"网","線":"线","緩":"缓","練":"练","縮":"缩","總":"总","繼":"继","續":"续","義":"义","習":"习","聞":"闻","聯":"联","聽":"听","脹":"胀","臺":"台","與":"与","興":"兴","舊":"旧","華":"华","萬":"万","蓋":"盖","蘋":"苹","處":"处","虛":"虚","號":"号","虧":"亏","衝":"冲","裡":"里","見":"见","規":"规","視":"视","覺":"觉","覽":"览","觀":"观","訂":"订","計":"计","訊":"讯","討":"讨","託":"托","記":"记","訟":"讼","設":"设","許":"许","訴":"诉","評":"评","詞":"词","試":"试","話":"话","該":"该","誌":"志","誤":"误","說":"说","誰":"谁","課":"课","調":"调","談":"谈","論":"论","謹":"谨","證":"证","議":"议","變":"变","讓":"让","財":"财","貨":"货","貴":"贵","貶":"贬","買":"买","貸":"贷","費":"费","資":"资","賠":"赔","賣":"卖","賴":"赖","賺":"赚","贏":"赢","趨":"趋","跡":"迹","蹤":"踪","軟":"软","較":"较","輕":"轻","輝":"辉","輸":"输","轉":"转","這":"这","連":"连","週":"周","進":"进","運":"运","過":"过","達":"达","違":"违","遜":"逊","遠":"远","選":"选","還":"还","邊":"边","銀":"银","銷":"销","錄":"录","錢":"钱","錯":"错","鎖":"锁","鐘":"钟","長":"长","門":"门","閉":"闭","開":"开","間":"间","關":"关","陣":"阵","陸":"陆","際":"际","隨":"随","險":"险","雖":"虽","雙":"双","雜":"杂","雞":"鸡","難":"难","電":"电","靜":"静","響":"响","頁":"页","頂":"顶","順":"顺","預":"预","頭":"头","題":"题","額":"额","顏":"颜","顛":"颠","類":"类","顯":"显","風":"风","飆":"飙","飛":"飞","餘":"余","馬":"马","駕":"驾","駛":"驶","騙":"骗","驗":"验","體":"体","鴻":"鸿","麼":"么","點":"点"};
+function toS(x) {
+  if (typeof x === "string") { let o = ""; for (const ch of x) o += TS_MAP[ch] || ch; return o; }
+  if (Array.isArray(x)) return x.map(toS);
+  if (x && typeof x === "object") { const o = {}; for (const k in x) o[k] = toS(x[k]); return o; }
+  return x;
+}
 
 /* ============ Vocabulary ============ */
 // [category, English term, definition, example, 中文詞彙, 定義, 例子]
@@ -1507,23 +1583,36 @@ const LESSONS = [
     },
   },
 ];
-const LT = l => l[lang] || l.en;  // lesson text in the current language
+// Lesson text in the current language (简体中文 is converted from 繁體中文)
+const LT = l => {
+  if (lang !== "zhs") return l[lang] || l.en;
+  const z = l.zh;
+  return { title: toS(z.title), try: toS(z.try), q: toS(z.q), opts: toS(z.opts), why: toS(z.why), body: d => toS(z.body(d)) };
+};
 
 /* ============ Language ============ */
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
 function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
 const LANG_KEY = "stockpilot-lang";
-let lang = load(LANG_KEY) || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
-if (!I18N[lang]) lang = "en";
+const LANGS = ["en", "zh", "zhs"];
+function detectLang() {
+  const n = (navigator.language || "").toLowerCase();
+  if (!n.startsWith("zh")) return "en";
+  return /(cn|sg|hans)/.test(n) ? "zhs" : "zh";
+}
+let lang = load(LANG_KEY) || detectLang();
+if (!LANGS.includes(lang)) lang = "en";
+const dictLang = () => lang === "zhs" ? "zh" : lang;   // 简体中文 uses the 繁體中文 dictionary, converted
 function t(k, v = {}) {
-  const s = I18N[lang][k] !== undefined ? I18N[lang][k] : I18N.en[k];
+  const d = I18N[dictLang()];
+  const s = d[k] !== undefined ? d[k] : I18N.en[k];
   if (s === undefined) return k;
-  if (typeof s === "function") return s(v);
-  if (typeof s === "string") return s.replace(/\{(\w+)\}/g, (_, x) => v[x] !== undefined ? v[x] : "");
-  return s;
+  let out = typeof s === "function" ? s(v)
+    : typeof s === "string" ? s.replace(/\{(\w+)\}/g, (_, x) => v[x] !== undefined ? v[x] : "") : s;
+  return lang === "zhs" ? toS(out) : out;
 }
 function applyStatic() {
-  document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en";
+  document.documentElement.lang = { en: "en", zh: "zh-Hant", zhs: "zh-Hans" }[lang];
   document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
@@ -1653,7 +1742,7 @@ const SAVE_KEY = "stockpilot-v1";
 const MARKET_KEY = "stockpilot-market-v2";
 const LEARN_KEY = "stockpilot-learn-v1";
 
-let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", dayStartTotal: null };
+let state = { cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", dayStartTotal: null };
 const saved = load(SAVE_KEY);
 if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
 for (const k of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[k])) state[k] = [];
@@ -1700,8 +1789,8 @@ const pct0 = x => (x * 100).toFixed(0) + "%";
 const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
 const cur = sym => mktOf(sym).cur;
-const nameOf = sym => lang === "zh" ? market[sym].zh : market[sym].name;
-const shortOf = sym => lang === "zh" ? market[sym].zhShort : market[sym].short;
+const nameOf = sym => lang === "en" ? market[sym].name : lang === "zhs" ? toS(market[sym].zh) : market[sym].zh;
+const shortOf = sym => lang === "en" ? market[sym].short : lang === "zhs" ? toS(market[sym].zhShort) : market[sym].zhShort;
 function fmtP(sym, v) {
   return cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -1856,43 +1945,65 @@ function sparkline(sym, w = 64, h = 24) {
   </svg>`;
 }
 
-let chartGeom = null;
-function drawChart(sym) {
-  const wrap = $("chartWrap");
+const RANGES = [["1m", 21], ["3m", 63], ["6m", 126], ["all", 0]];
+const geoms = {};
+function rangeDays() { const r = RANGES.find(x => x[0] === state.chartRange) || RANGES[1]; return r[1]; }
+function renderRanges() {
+  document.querySelectorAll(".range-seg").forEach(el => {
+    el.innerHTML = RANGES.map(([k]) => `<button type="button" data-range="${k}" aria-pressed="${state.chartRange === k}">${t("range." + k)}</button>`).join("");
+  });
+}
+function maAt(all, j, n) {
+  if (j < n - 1) return null;
+  let s = 0; for (let k = j - n + 1; k <= j; k++) s += all[k];
+  return s / n;
+}
+
+// Draws the price chart into a wrapper. `big` is the enlarged view with both averages.
+function drawChart(sym, wrapId, big) {
+  const wrap = $(wrapId);
   const old = wrap.querySelector("svg");
   if (old) old.remove();
 
   const c = cur(sym);
   const all = series(sym);
-  const a = all.slice(-91);
-  const W = 720, H = 260, padL = 62, padR = 12, padT = 12, padB = 26;
+  const n = rangeDays();
+  const a = n ? all.slice(-(n + 1)) : all;
+  const off = all.length - a.length;
+  // The enlarged chart is drawn at the wrapper's real pixel size, so text stays readable on phones
+  const cw = big ? Math.round(Math.min(1200, Math.max(300, wrap.clientWidth || 1200))) : 720;
+  const W = cw, H = big ? Math.round(Math.min(520, Math.max(260, W < 600 ? innerHeight * 0.5 : W * 0.42))) : 260;
+  const padL = big ? (W < 600 ? 54 : 72) : 62, padR = 14, padT = big ? 14 : 12, padB = 26;
   const min = Math.min(...a), max = Math.max(...a);
   const span = (max - min) || 1;
   const x = i => padL + i / (a.length - 1) * (W - padL - padR);
-  const y = v => padT + (1 - (v - min) / span) * (H - padT - padB);
+  const y = v => padT + (1 - (Math.min(max, Math.max(min, v)) - min) / span) * (H - padT - padB);
 
   let grid = "", labels = "";
   for (let g = 0; g <= 4; g++) {
     const v = min + span * g / 4, yy = y(v);
     grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
-    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${c}${v.toFixed(0)}</text>`;
+    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="${big ? 12 : 11}" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${c}${v.toFixed(v < 100 ? 1 : 0)}</text>`;
   }
-  for (const d of [-90, -60, -30, 0]) {
-    const i = a.length - 1 + d;
-    if (i < 0) continue;
-    labels += `<text x="${x(i)}" y="${H - 8}" text-anchor="${d === 0 ? "end" : "middle"}" font-size="11" fill="var(--muted)">${d === 0 ? t("chart.today") : t("chart.days", { d })}</text>`;
+  const last = a.length - 1;
+  for (let k = 0; k <= 3; k++) {
+    const i = Math.round(last - k * last / 3), ago = last - i;
+    labels += `<text x="${x(i)}" y="${H - 8}" text-anchor="${k === 0 ? "end" : k === 3 ? "start" : "middle"}" font-size="${big ? 12 : 11}" fill="var(--muted)">${ago === 0 ? t("chart.today") : t("chart.days", { d: -ago })}</text>`;
   }
-  // 20-day moving average line, so learners can see the trend signal
-  const maPts = a.map((_, i) => {
-    const j = all.length - a.length + i;
-    if (j < 19) return null;
-    let s = 0; for (let k = j - 19; k <= j; k++) s += all[k];
-    return `${x(i).toFixed(1)},${y(Math.min(max, Math.max(min, s / 20))).toFixed(1)}`;
-  }).filter(Boolean).join(" ");
-
+  const maLine = len => a.map((_, i) => { const v = maAt(all, off + i, len); return v == null ? null : `${x(i).toFixed(1)},${y(v).toFixed(1)}`; }).filter(Boolean).join(" ");
   const line = a.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
   const area = `${padL},${H - padB} ` + line + ` ${W - padR},${H - padB}`;
-  const last = a.length - 1;
+
+  // your trades in this stock, placed on the day they happened
+  const marks = state.journal.filter(e => e.sym === sym && e.by === "you").map(e => {
+    const i = (all.length - 1) - (sim.day - e.day) - off;
+    if (i < 0 || i > last) return "";
+    const xx = x(i), yy = y(e.px), buy = e.side === "buy", s = big ? 7 : 5;
+    const pts = buy ? `${xx},${yy + 3} ${xx - s},${yy + 3 + s * 1.6} ${xx + s},${yy + 3 + s * 1.6}`
+                    : `${xx},${yy - 3} ${xx - s},${yy - 3 - s * 1.6} ${xx + s},${yy - 3 - s * 1.6}`;
+    return `<polygon points="${pts}" fill="${buy ? "var(--up)" : "var(--down)"}" stroke="var(--surface)" stroke-width="1"><title>${t(buy ? "marker.buy" : "marker.sell", { n: e.shares, px: fmtP(sym, e.px) })}</title></polygon>`;
+  }).join("");
+  const legend = (big ? t("chart.legendBig") : t("chart.legend")) + (marks ? "   " + t("chart.markers") : "");
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -1901,30 +2012,31 @@ function drawChart(sym) {
   svg.innerHTML = `
     ${grid}
     <polygon points="${area}" fill="var(--series-soft)"/>
-    <polyline points="${maPts}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
-    <polyline points="${line}" fill="none" stroke="var(--series)" stroke-width="2"/>
-    <circle cx="${x(last)}" cy="${y(a[last])}" r="3.5" fill="var(--series)"/>
+    ${big ? `<polyline points="${maLine(50)}" fill="none" stroke="var(--ink-2)" stroke-width="1.5" stroke-dasharray="1.5 3"/>` : ""}
+    <polyline points="${maLine(20)}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <polyline points="${line}" fill="none" stroke="var(--series)" stroke-width="${big ? 2.2 : 2}"/>
+    <circle cx="${x(last)}" cy="${y(a[last])}" r="${big ? 4.5 : 3.5}" fill="var(--series)"/>
+    ${marks}
     <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1"/>
     ${labels}
-    <text x="${padL + 6}" y="${padT + 12}" font-size="11" fill="var(--muted)">${t("chart.legend")}</text>
-    <line id="xhair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
-    <circle id="xdot" r="4" fill="var(--series)" stroke="var(--surface)" stroke-width="2" style="display:none"/>
+    ${big ? "" : `<text x="${padL + 6}" y="${padT + 12}" font-size="11" fill="var(--muted)" style="white-space:pre">${legend}</text>`}
+    <line class="xhair" x1="0" y1="${padT}" x2="0" y2="${H - padB}" stroke="var(--baseline)" stroke-width="1" style="display:none"/>
+    <circle class="xdot" r="4" fill="var(--series)" stroke="var(--surface)" stroke-width="2" style="display:none"/>
   `;
   wrap.appendChild(svg);
-  chartGeom = { sym, a, x, y, padL, padR, W, H, svg };
+  if (big) $("cmLegend").innerHTML = legend.split(/\s{3}/).map(x => `<span>${x}</span>`).join("");
+  geoms[wrapId] = { sym, a, x, y, padL, padR, W, H, svg };
 }
 
-function chartHover(ev) {
-  if (!chartGeom) return;
-  const { sym, a, x, y, padL, padR, W, svg } = chartGeom;
+function chartHover(ev, wrapId) {
+  const g = geoms[wrapId];
+  if (!g) return;
+  const { sym, a, x, y, padL, padR, W, svg } = g;
   const rect = svg.getBoundingClientRect();
   const px = (ev.clientX - rect.left) / rect.width * W;
-  const tip = $("chartTip");
-  const hair = svg.querySelector("#xhair"), dot = svg.querySelector("#xdot");
-  if (px < padL || px > W - padR) {
-    tip.style.display = "none"; hair.style.display = "none"; dot.style.display = "none";
-    return;
-  }
+  const tip = $(wrapId).querySelector(".tooltip");
+  const hair = svg.querySelector(".xhair"), dot = svg.querySelector(".xdot");
+  if (px < padL || px > W - padR) { chartLeave(wrapId); return; }
   const i = Math.round((px - padL) / (W - padL - padR) * (a.length - 1));
   const v = a[i], xx = x(i), yy = y(v);
   hair.setAttribute("x1", xx); hair.setAttribute("x2", xx); hair.style.display = "";
@@ -1933,17 +2045,49 @@ function chartHover(ev) {
   tip.querySelector(".t-date").textContent = daysAgo === 0 ? t("tip.today") : daysAgo === 1 ? t("tip.yday") : t("tip.ago", { d: daysAgo });
   tip.querySelector(".t-val").textContent = fmtP(sym, v);
   tip.style.display = "block";
-  const wrapRect = $("chartWrap").getBoundingClientRect();
+  const wrapRect = $(wrapId).getBoundingClientRect();
   const tx = xx / W * rect.width;
   tip.style.left = Math.min(wrapRect.width - 140, Math.max(0, tx + 12)) + "px";
-  tip.style.top = (yy / chartGeom.H * rect.height - 48) + "px";
+  tip.style.top = Math.max(0, yy / g.H * rect.height - 48) + "px";
 }
-function chartLeave() {
-  $("chartTip").style.display = "none";
-  if (chartGeom) {
-    chartGeom.svg.querySelector("#xhair").style.display = "none";
-    chartGeom.svg.querySelector("#xdot").style.display = "none";
-  }
+function chartLeave(wrapId) {
+  const g = geoms[wrapId];
+  $(wrapId).querySelector(".tooltip").style.display = "none";
+  if (g) { g.svg.querySelector(".xhair").style.display = "none"; g.svg.querySelector(".xdot").style.display = "none"; }
+}
+
+/* ============ Enlarged chart ============ */
+const zoomOpen = () => !$("chartModal").hidden;
+function renderZoom() {
+  const sym = selected, all = series(sym), n = rangeDays();
+  const a = n ? all.slice(-(n + 1)) : all;
+  const p = price(sym), chg = dayChange(sym), an = analyze(sym), c = cur(sym), rc = p / a[0] - 1;
+  $("cmTitle").textContent = sym;
+  $("cmName").textContent = nameOf(sym);
+  $("cmPx").textContent = fmtP(sym, p);
+  $("cmChg").textContent = t("chg.today", { p: fmtPct(chg) });
+  $("cmChg").className = "big-chg " + (chg >= 0 ? "pos" : "neg");
+  $("chartModal").querySelector(".cm-box").setAttribute("aria-label", t("chart.dialog", { sym }));
+  $("cmStats").innerHTML = [
+    `${t("cm.change")} (${t("range." + state.chartRange)}): ${colored(rc, fmtPct(rc))}`,
+    `${t("cm.high")}: <b>${fmtP(sym, Math.max(...a))}</b>`, `${t("cm.low")}: <b>${fmtP(sym, Math.min(...a))}</b>`,
+    `${t("cm.ma20")}: <b>${c}${an.s20.toFixed(2)}</b>`, `${t("cm.ma50")}: <b>${c}${an.s50.toFixed(2)}</b>`,
+    `RSI: <b>${an.rsi.toFixed(0)}</b>`,
+  ].map(x => `<span>${x}</span>`).join("");
+  renderRanges();
+  drawChart(sym, "bigChartWrap", true);
+}
+function openZoom() {
+  $("chartModal").hidden = false;
+  document.body.classList.add("modal-open");
+  renderZoom();
+  $("cmClose").focus();
+}
+function closeZoom() {
+  if (!zoomOpen()) return;
+  $("chartModal").hidden = true;
+  document.body.classList.remove("modal-open");
+  $("zoomBtn").focus();
 }
 
 /* ============ Rendering: trade view ============ */
@@ -1989,7 +2133,8 @@ function renderDetail() {
   const h = state.holdings[selected];
   $("sOwn").textContent = t("shares", { n: h ? h.shares : 0 });
 
-  drawChart(selected);
+  renderRanges();
+  drawChart(selected, "chartWrap", false);
 
   const co = coach(selected);
   const pill = $("recPill");
@@ -2199,6 +2344,7 @@ function tick() {
   saveMarket();
   renderAll();
   if (!$("journalView").hidden) renderJournal();
+  if (zoomOpen()) renderZoom();
 }
 
 /* ============ Trade journal: record every step and review it ============ */
@@ -2343,7 +2489,7 @@ function renderJournal() {
       </div>
       <div class="j-seen"><b>${t("seen." + e.by)}</b> ${seen}</div>
       <ul class="j-checks">${e.checks.map(c => `<li class="ck-${c.level}"><span class="ck-icon" aria-hidden="true">${icon[c.level]}</span>
-        <div><b>${ckTitle(c)}.</b> ${ckWhy(c)} <button type="button" class="lesson-link" data-lesson="${c.lesson}">${t("lesson.named", { t: lessonName(c.lesson) })}</button></div></li>`).join("")}</ul>
+        <div><b>${ckTitle(c)}${t("punct.stop")}</b> ${ckWhy(c)} <button type="button" class="lesson-link" data-lesson="${c.lesson}">${t("lesson.named", { t: lessonName(c.lesson) })}</button></div></li>`).join("")}</ul>
       <div class="j-outcome"><b>${t("o.title")}</b> ${o.text}${v ? `<span class="verdict">${v}</span>` : ""}</div>
     </article>`;
   }).join("") : `<div class="card j-empty">
@@ -2449,16 +2595,16 @@ function renderVocab() {
   const q = ($("vocabSearch").value || "").trim().toLowerCase();
   $("vocabCats").innerHTML = ["all", ...CATS].map(c =>
     `<button type="button" class="chip" data-vcat="${c}" aria-pressed="${learn.vcat === c}">${c === "all" ? t("v.all") : t("cat." + c)}</button>`).join("");
-  const rows = GLOSSARY.filter(g => (learn.vcat === "all" || g[0] === learn.vcat) && (!q || g.slice(1).join(" ").toLowerCase().includes(q)));
+  const rows = GLOSSARY.filter(g => (learn.vcat === "all" || g[0] === learn.vcat) && (!q || (g.slice(1).join(" ") + toS(g.slice(4).join(" "))).toLowerCase().includes(q)));
   $("vocabCount").textContent = t("v.count", { n: rows.length });
   $("vocabGrid").innerHTML = rows.length ? rows.map(g => {
     const [cat, enT, enD, enE, zhT, zhD, zhE] = g;
-    const zh = lang === "zh";
+    const zh = lang !== "en", cv = lang === "zhs" ? toS : x => x;
     return `<article class="card term-card">
       <span class="cat">${t("cat." + cat)}</span>
-      <h3 class="term">${zh ? zhT : enT}<span class="alt">${zh ? enT : zhT}</span></h3>
-      <p>${zh ? zhD : enD}</p>
-      <p class="ex"><b>${t("v.ex")}</b> ${zh ? zhE : enE}</p>
+      <h3 class="term">${zh ? cv(zhT) : enT}<span class="alt">${zh ? enT : cv(zhT)}</span></h3>
+      <p>${zh ? cv(zhD) : enD}</p>
+      <p class="ex"><b>${t("v.ex")}</b> ${zh ? cv(zhE) : enE}</p>
     </article>`;
   }).join("") : `<p class="empty">${t("v.none")}</p>`;
 }
@@ -2519,11 +2665,13 @@ $("resetBtn").addEventListener("click", () => {
 });
 
 $("langSel").addEventListener("change", e => {
-  lang = I18N[e.target.value] ? e.target.value : "en";
+  lang = LANGS.includes(e.target.value) ? e.target.value : "en";
   store(LANG_KEY, lang);
   applyStatic();
+  $("tradeMsg").textContent = "";
   renderAll();
   showView(currentView);
+  if (zoomOpen()) renderZoom();
 });
 $("vocabSearch").addEventListener("input", renderVocab);
 
@@ -2534,6 +2682,7 @@ document.addEventListener("click", e => {
   const el = sel => e.target.closest(sel);
   let b;
   if ((b = el("[data-lesson]"))) { learn.current = b.dataset.lesson; learn.pane = "lessons"; saveLearn(); showView("learn"); window.scrollTo({ top: 0 }); return; }
+  if ((b = el("[data-range]"))) { state.chartRange = b.dataset.range; save(); renderDetail(); if (zoomOpen()) renderZoom(); return; }
   if ((b = el("[data-goto]"))) { showView(b.dataset.goto); window.scrollTo({ top: 0 }); return; }
   if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
   if ((b = el("[data-pane]"))) { learn.pane = b.dataset.pane; saveLearn(); renderLearn(); return; }
@@ -2553,8 +2702,15 @@ document.addEventListener("click", e => {
   }
 });
 window.addEventListener("hashchange", () => showView(location.hash.slice(1) || "trade"));
-$("chartWrap").addEventListener("mousemove", chartHover);
-$("chartWrap").addEventListener("mouseleave", chartLeave);
+for (const id of ["chartWrap", "bigChartWrap"]) {
+  $(id).addEventListener("pointermove", e => chartHover(e, id));
+  $(id).addEventListener("pointerleave", () => chartLeave(id));
+}
+$("zoomBtn").addEventListener("click", openZoom);
+$("cmClose").addEventListener("click", closeZoom);
+$("chartModal").addEventListener("click", e => { if (e.target === $("chartModal")) closeZoom(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeZoom(); });
+window.addEventListener("resize", () => { if (zoomOpen()) renderZoom(); });
 
 if (state.dayStartTotal == null) state.dayStartTotal = portfolioTotals().total;
 $("autoPilot").checked = state.autoPilot;
