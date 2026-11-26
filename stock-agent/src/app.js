@@ -2,17 +2,20 @@
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
 function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
 const LANG_KEY = "stockpilot-lang";
-const LANGS = ["en", "zh", "zhs"];
+const LANGS = ["en", "zh", "zhs", "es", "fr", "hi", "ar", "bn"];
+const RTL = ["ar"];
+const isZh = () => lang === "zh" || lang === "zhs";
 function detectLang() {
   const n = (navigator.language || "").toLowerCase();
-  if (!n.startsWith("zh")) return "en";
-  return /(cn|sg|hans)/.test(n) ? "zhs" : "zh";
+  if (n.startsWith("zh")) return /(cn|sg|hans)/.test(n) ? "zhs" : "zh";
+  const two = n.slice(0, 2);
+  return LANGS.includes(two) ? two : "en";
 }
 let lang = load(LANG_KEY) || detectLang();
 if (!LANGS.includes(lang)) lang = "en";
 const dictLang = () => lang === "zhs" ? "zh" : lang;   // 简体中文 uses the 繁體中文 dictionary, converted
 function t(k, v = {}) {
-  const d = I18N[dictLang()];
+  const d = I18N[dictLang()] || I18N.en;
   const s = d[k] !== undefined ? d[k] : I18N.en[k];
   if (s === undefined) return k;
   let out = typeof s === "function" ? s(v)
@@ -20,7 +23,8 @@ function t(k, v = {}) {
   return lang === "zhs" ? toS(out) : out;
 }
 function applyStatic() {
-  document.documentElement.lang = { en: "en", zh: "zh-Hant", zhs: "zh-Hans" }[lang];
+  document.documentElement.lang = { zh: "zh-Hant", zhs: "zh-Hans" }[lang] || lang;
+  document.documentElement.dir = RTL.includes(lang) ? "rtl" : "ltr";
   document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll("[data-i18n-html]").forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
   document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
@@ -217,8 +221,8 @@ const pct0 = x => (x * 100).toFixed(0) + "%";
 const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
 const cur = sym => mktOf(sym).cur;
-const nameOf = sym => lang === "en" ? market[sym].name : lang === "zhs" ? toS(market[sym].zh) : market[sym].zh;
-const shortOf = sym => lang === "en" ? market[sym].short : lang === "zhs" ? toS(market[sym].zhShort) : market[sym].zhShort;
+const nameOf = sym => !isZh() ? market[sym].name : lang === "zhs" ? toS(market[sym].zh) : market[sym].zh;
+const shortOf = sym => !isZh() ? market[sym].short : lang === "zhs" ? toS(market[sym].zhShort) : market[sym].zhShort;
 function fmtP(sym, v) {
   return cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -237,7 +241,8 @@ function simTime(tick) {
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, "0")}`;
 }
 const stampText = (d, tk) => t("stamp", { d, time: simTime(tk) });
-const LOCALE = () => ({ en: "en-US", zh: "zh-TW", zhs: "zh-CN" })[lang];
+// Latin digits everywhere, so prices and times read the same in every language
+const LOCALE = () => ({ en: "en-US", zh: "zh-TW", zhs: "zh-CN", es: "es-ES", fr: "fr-FR", hi: "hi-IN-u-nu-latn", ar: "ar-u-nu-latn", bn: "bn-BD-u-nu-latn" })[lang] || "en-US";
 const fmtTs = ts => new Date(ts).toLocaleString(LOCALE(), { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
 const stampNow = () => state.mode === "real" ? { ts: Date.now() } : { d: sim.day, tk: sim.tick };
 const itemTime = it => it.ts ? fmtTs(it.ts) : it.d != null ? stampText(it.d, it.tk) : (it.t || "");
@@ -1324,7 +1329,7 @@ const VIS = {
 /* ============ Video player (narration via Claude's voice where available) ============ */
 const vp = { l: null, i: 0, playing: false, tok: 0 };
 let narrP = null;
-const ttsLang = () => ({ en: "en", zh: "zh-TW", zhs: "zh-CN" })[lang] || lang;
+const ttsLang = () => ({ en: "en", zh: "zh-TW", zhs: "zh-CN", es: "es", fr: "fr", hi: "hi", ar: "ar", bn: "bn" })[lang] || "en";
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 function getNarrator() {
   if (narrP) return narrP;
@@ -1350,7 +1355,7 @@ function getNarrator() {
 }
 function stopSpeech() { if (narrP) narrP.then(n => n && n.stop()); }
 const sceneText = sc => pickLang(sc) || sc.en;
-const sceneMs = sc => Math.max(4200, (sceneText(sc) || "").length * (lang === "en" || lang === "es" || lang === "fr" ? 62 : 150) + 1600);
+const sceneMs = sc => Math.max(4200, (sceneText(sc) || "").length * (isZh() ? 150 : 66) + 1600);
 const videoSecs = l => Math.round(l.video.reduce((s, sc) => s + sceneMs(sc), 0) / 1000);
 
 function videoMarkup(l) {
@@ -1609,9 +1614,9 @@ function renderLesson() {
     <div class="quiz"><h3>${t("l.check")}</h3>${quiz.map((q, qi) => quizBlock(q, qi, quiz.length, qs)).join("")}
       <div class="quiz-feedback" id="quizDone"></div></div>
     <div class="lesson-nav">
-      ${prev ? `<button type="button" class="btn btn-ghost" id="prevLesson">← ${LT(prev).title}</button>` : ""}
+      ${prev ? `<button type="button" class="btn btn-ghost" id="prevLesson">${RTL.includes(lang) ? "→" : "←"} ${LT(prev).title}</button>` : ""}
       <span class="spacer"></span>
-      <button type="button" class="btn btn-ghost" id="tryIt">${tx2.try} →</button>
+      <button type="button" class="btn btn-ghost" id="tryIt">${tx2.try} ${RTL.includes(lang) ? "←" : "→"}</button>
       ${next ? `<button type="button" class="btn btn-primary" id="nextLesson">${t("l.next")}</button>` : ""}
     </div>`;
   const panel = $("lessonPanel");
@@ -1701,10 +1706,10 @@ const CATS = ["basics", "trading", "analysis", "risk", "economy"];
 let fc = null;   // active flashcard game: { deck, i, flipped, known, seen }
 function glossRow(g) {   // [term, definition, example, otherTerm] in the current language
   const [, enT, enD, enE, zhT, zhD, zhE] = g;
-  if (lang === "en") return [enT, enD, enE, cv(zhT)];
-  const tr = typeof glossaryFor === "function" ? glossaryFor(g) : null;
-  if (tr) return [tr[0], tr[1], tr[2], enT];
-  return [cv(zhT), cv(zhD), cv(zhE), enT];
+  if (lang === "en") return [enT, enD, enE, zhT];
+  if (isZh()) return [cv(zhT), cv(zhD), cv(zhE), enT];
+  const tr = glossaryFor(g);
+  return tr ? [tr[0], tr[1], tr[2], enT] : [enT, enD, enE, ""];
 }
 function vocabRows() {
   const q = ($("vocabSearch").value || "").trim().toLowerCase();

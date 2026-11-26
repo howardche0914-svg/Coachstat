@@ -160,3 +160,18 @@
   .fc-ex { font-size: 14px; color: var(--ink-2); }
   .fc-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
   @media (prefers-reduced-motion: reduce) { .fc-inner { transition: none; } }
+
+  /* ============ Hindi, Bengali, Arabic fonts and right-to-left layout ============ */
+  :lang(hi) body { font-family: system-ui, -apple-system, "Segoe UI", "Nirmala UI", "Noto Sans Devanagari", "Mangal", sans-serif; }
+  :lang(bn) body { font-family: system-ui, -apple-system, "Segoe UI", "Nirmala UI", "Noto Sans Bengali", "Vrinda", sans-serif; }
+  :lang(ar) body { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Arabic", "Geeza Pro", "Tahoma", sans-serif; }
+  /* charts, sparklines and the lesson video always read left to right */
+  .chart-wrap, .vstage, .stock-row svg, .vprog { direction: ltr; }
+  [dir="rtl"] .disclaimer { border-left: 0; border-right: 4px solid var(--warn-border); }
+  [dir="rtl"] .key-idea { border-left: 0; border-right: 3px solid var(--accent); border-radius: 8px 0 0 8px; }
+  [dir="rtl"] th { text-align: right; }
+  [dir="rtl"] .topbar .cash { margin-left: 0; margin-right: auto; text-align: left; }
+  [dir="rtl"] .stock-row, [dir="rtl"] .lesson-btn, [dir="rtl"] .quiz-opt { text-align: right; }
+  [dir="rtl"] .stock-row .right, [dir="rtl"] .stock-row .px, [dir="rtl"] .stock-row .chg { text-align: left; }
+  [dir="rtl"] .reasons, [dir="rtl"] .coach-actions, [dir="rtl"] .lesson-body ul, [dir="rtl"] .j-habits ul, [dir="rtl"] .checklist ul { padding-left: 0; padding-right: 20px; }
+  [dir="rtl"] .help, [dir="rtl"] .lesson-link { margin-left: 0; margin-right: 4px; }

@@ -627,7 +627,7 @@ const unitOf = id => UNITS.find(u => u.ids.includes(id));
 
 // Language helpers for lesson parts (简体中文 is converted from 繁體中文)
 const cv = s => lang === "zhs" ? toS(s) : s;
-const pickLang = o => o ? (lang === "en" ? o.en : cv(o.zh)) : o;
+const pickLang = o => !o ? o : o[lang] != null ? o[lang] : lang === "zhs" ? cv(o.zh) : o.en;
 // Small deterministic shuffle so the right answer isn't always in the same place
 function seededOrder(seed, n) {
   let h = 2166136261;
@@ -638,11 +638,34 @@ function seededOrder(seed, n) {
 }
 // The lesson's 3 questions in the current language, options shuffled
 function quizOf(l) {
-  const d = lang === "en" ? "en" : "zh";
+  const d = l[lang] ? lang : lang === "zhs" ? "zh" : "en";
   const base = { a: l.a, q: l[d].q, opts: l[d].opts, why: l[d].why };
-  const list = [base, ...(l.more || []).map(m => ({ a: m.a, ...m[d] }))];
+  const list = [base, ...(l.more || []).map(m => ({ a: m.a, ...(m[d] || m.en) }))];
   return list.map((x, qi) => {
     const order = seededOrder(l.id + qi, x.opts.length);
     return { q: cv(x.q), why: cv(x.why), opts: order.map(i => cv(x.opts[i])), a: order.indexOf(x.a) };
   });
 }
+
+/* ============ Extra languages ============ */
+// Each lang_xx.js file adds its interface text to I18N and calls addLanguage()
+// with translated lessons (same option order as English), missions, video
+// captions and labels, and the vocabulary list in GLOSSARY order.
+const GLOSS_TR = {};
+function addLanguage(code, c) {
+  for (const l of LESSONS) {
+    const x = c.lessons[l.id];
+    if (!x) continue;
+    l[code] = { title: x.title, try: x.try, body: x.body, q: x.quiz[0][0], opts: x.quiz[0][1], why: x.quiz[0][2] };
+    (l.more || []).forEach((m, j) => { const qq = x.quiz[j + 1]; if (qq) m[code] = { q: qq[0], opts: qq[1], why: qq[2] }; });
+    if (x.mission && l.mission) l.mission[code] = x.mission;
+    (x.video || []).forEach((v, i) => {
+      const sc = l.video[i];
+      if (!sc || !v) return;
+      sc[code] = v[0];
+      if (v[1]) { sc.lab = sc.lab || {}; sc.lab[code] = v[1]; }
+    });
+  }
+  if (c.glossary) GLOSS_TR[code] = c.glossary;
+}
+function glossaryFor(g) { const tr = GLOSS_TR[lang]; return tr ? tr[GLOSSARY.indexOf(g)] || null : null; }
