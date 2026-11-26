@@ -215,8 +215,10 @@ let selected = STOCKS[0].sym;
 
 /* ============ Helpers ============ */
 const $ = id => document.getElementById(id);
-const fmt$ = n => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
-const fmtPct = n => (n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%";
+// keep signs and currency symbols on the correct side in right-to-left languages
+const ltr = s => RTL.includes(lang) ? "\u2066" + s + "\u2069" : s;
+const fmt$ = n => ltr(n.toLocaleString("en-US", { style: "currency", currency: "USD" }));
+const fmtPct = n => ltr((n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%");
 const pct0 = x => (x * 100).toFixed(0) + "%";
 const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
@@ -224,7 +226,7 @@ const cur = sym => mktOf(sym).cur;
 const nameOf = sym => !isZh() ? market[sym].name : lang === "zhs" ? toS(market[sym].zh) : market[sym].zh;
 const shortOf = sym => !isZh() ? market[sym].short : lang === "zhs" ? toS(market[sym].zhShort) : market[sym].zhShort;
 function fmtP(sym, v) {
-  return cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return ltr(cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 }
 function price(sym) { return market[sym].px; }
 function prevClose(sym) { const d = market[sym].daily; return d[d.length - 1]; }

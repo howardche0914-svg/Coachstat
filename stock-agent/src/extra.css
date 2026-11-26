@@ -175,3 +175,4 @@
   [dir="rtl"] .stock-row .right, [dir="rtl"] .stock-row .px, [dir="rtl"] .stock-row .chg { text-align: left; }
   [dir="rtl"] .reasons, [dir="rtl"] .coach-actions, [dir="rtl"] .lesson-body ul, [dir="rtl"] .j-habits ul, [dir="rtl"] .checklist ul { padding-left: 0; padding-right: 20px; }
   [dir="rtl"] .help, [dir="rtl"] .lesson-link { margin-left: 0; margin-right: 4px; }
+[dir="rtl"] .pos, [dir="rtl"] .neg, [dir="rtl"] .vstage text { unicode-bidi: plaintext; }
