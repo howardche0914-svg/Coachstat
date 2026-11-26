@@ -22,8 +22,10 @@ whole-market moves, daily recaps and Taiwan's 10% price limit), a virtual
 $100,000 paper-trading account, a Coach that summarizes each stock and
 suggests what a careful trader might do, an optional auto-pilot, a trade
 Journal that records every buy and sell and reviews each step against the
-lessons' rules, and a Learn tab with 12 beginner lessons, quizzes and a
-45-word stock and economics vocabulary. The price chart has 1M / 3M / 6M /
+lessons' rules, and a Learn tab with 20 lessons in 5 units (each with an
+animated, narrated video, a 3-question quiz and a hands-on mission), XP,
+levels, badges, daily streaks, a 45-word stock and economics vocabulary
+and a flashcard game. The price chart has 1M / 3M / 6M /
 All ranges and an enlarged view with both moving averages and your trades
 marked. The whole app is available in English, Traditional Chinese
 (繁體中文) and Simplified Chinese (简体中文). All prices and news are simulated
