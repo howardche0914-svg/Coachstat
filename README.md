@@ -27,7 +27,9 @@ animated, narrated video, a 3-question quiz and a hands-on mission), XP,
 levels, badges, daily streaks, a 45-word stock and economics vocabulary
 and a flashcard game. The price chart has 1M / 3M / 6M /
 All ranges and an enlarged view with both moving averages and your trades
-marked. The whole app is available in English, Traditional Chinese
-(繁體中文) and Simplified Chinese (简体中文). All prices and news are simulated
+marked. The whole app, including every lesson, video and vocabulary
+word, is available in 8 languages: English, Traditional Chinese (繁體中文),
+Simplified Chinese (简体中文), Spanish (Español), French (Français), Hindi
+(हिन्दी), Arabic (العربية, right-to-left) and Bengali (বাংলা). All prices and news are simulated
 and no real money or brokerage account is involved. Open the file in any
 browser — no build step or server needed.
