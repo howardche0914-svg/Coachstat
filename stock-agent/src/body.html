@@ -1,0 +1,208 @@
+<body>
+
+<header class="topbar">
+  <div class="logo">Stock<span>Pilot</span> AI</div>
+  <span class="badge" data-i18n="badge">Paper trading — virtual money</span>
+  <nav class="tabs" aria-label="Sections" data-i18n-aria="nav.label">
+    <button type="button" data-view="trade" aria-pressed="true"><span data-i18n="tab.trade">Trade</span></button>
+    <button type="button" data-view="journal" aria-pressed="false"><span data-i18n="tab.journal">Journal</span><span class="count" id="journalCount"></span></button>
+    <button type="button" data-view="learn" aria-pressed="false"><span data-i18n="tab.learn">Learn</span><span class="count" id="learnCount"></span></button>
+  </nav>
+  <div class="seg zone-seg" role="group" aria-label="Practice area" data-i18n-aria="zone.aria">
+    <button type="button" data-zone="practice" aria-pressed="true"><span aria-hidden="true">🎮</span> <span data-i18n="zone.practice">Practice zone</span></button>
+    <button type="button" data-zone="real" aria-pressed="false"><span aria-hidden="true">🕘</span> <span data-i18n="zone.real">Real-hours zone</span></button>
+  </div>
+  <select id="langSel" class="lang-select" aria-label="Language">
+    <option value="en">English</option>
+    <option value="zh">繁體中文</option>
+    <option value="zhs">简体中文</option>
+  </select>
+  <div class="cash">
+    <div class="label" data-i18n="cash">Cash available</div>
+    <div class="value" id="cashValue">$0.00</div>
+  </div>
+</header>
+
+<div class="disclaimer" data-i18n-html="disclaimer"></div>
+
+<main id="tradeView">
+  <!-- LEFT: watchlist -->
+  <div class="col-left">
+    <div class="card">
+      <div class="wl-head">
+        <h2 data-i18n="wl.title">Market watchlist</h2>
+        <div class="seg" role="group" aria-label="Filter by market" data-i18n-aria="wl.filter">
+          <button type="button" data-mkt="ALL" aria-pressed="true" data-i18n="wl.all">All</button>
+          <button type="button" data-mkt="US" aria-pressed="false" data-i18n="wl.us">US</button>
+          <button type="button" data-mkt="TW" aria-pressed="false" data-i18n="wl.tw">Taiwan</button>
+        </div>
+      </div>
+      <div class="clock" id="simClock"></div>
+      <div id="watchlist"></div>
+    </div>
+  </div>
+
+  <!-- CENTER: detail + coach + trade, then news -->
+  <div class="col-center">
+    <div class="card">
+      <div class="detail-head">
+        <h2 id="dSym">—</h2>
+        <span id="dName" style="color:var(--muted)"></span>
+        <span class="big-px" id="dPx"></span>
+        <span class="big-chg" id="dChg"></span>
+      </div>
+      <div class="fx-note" id="dFx"></div>
+      <div class="chart-tools">
+        <div class="seg range-seg" role="group" aria-label="Chart time range" data-i18n-aria="chart.rangeAria"></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="zoomBtn"><span aria-hidden="true">⤢</span> <span data-i18n="chart.zoom">Enlarge chart</span></button>
+      </div>
+      <div class="chart-wrap" id="chartWrap">
+        <div class="tooltip" id="chartTip"><span class="t-date"></span><br><span class="t-val"></span></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label"><span data-i18n="stat.30d">30-day change</span><button type="button" class="help" data-lesson="chart" data-i18n-aria="help.chart">?</button></div><div class="value" id="s30"></div></div>
+        <div class="stat"><div class="label" data-i18n="stat.high">90-day high</div><div class="value" id="sHigh"></div></div>
+        <div class="stat"><div class="label" data-i18n="stat.low">90-day low</div><div class="value" id="sLow"></div></div>
+        <div class="stat"><div class="label"><span data-i18n="stat.vol">Volatility</span><button type="button" class="help" data-lesson="risk" data-i18n-aria="help.risk">?</button></div><div class="value" id="sVol"></div></div>
+        <div class="stat"><div class="label" data-i18n="stat.own">You own</div><div class="value" id="sOwn"></div></div>
+      </div>
+
+      <div class="card coach-card">
+        <h2><span data-i18n="coach.title">🧭 Coach</span> <span class="sub" data-i18n="coach.sub">· what's happening and what to consider</span><button type="button" class="help" data-lesson="whenact" data-i18n-aria="help.coach">?</button></h2>
+        <div class="rec-line">
+          <span class="rec-pill" id="recPill">—</span>
+          <span class="conf" id="recConf"></span>
+        </div>
+        <p class="coach-summary" id="coachSummary"></p>
+        <div class="coach-h" data-i18n="coach.h">What a careful trader might do</div>
+        <ul class="coach-actions" id="coachActions"></ul>
+        <details class="signals">
+          <summary data-i18n="coach.signals">Show the signals behind this</summary>
+          <ul class="reasons" id="recReasons"></ul>
+        </details>
+        <p class="coach-note" data-i18n="coach.note"></p>
+      </div>
+
+      <div class="trade">
+        <input type="number" id="qty" min="1" step="1" value="10" aria-label="Number of shares" data-i18n-aria="qty.label" />
+        <button class="btn btn-buy" id="buyBtn" data-i18n="btn.buy">Buy</button>
+        <button class="btn btn-sell" id="sellBtn" data-i18n="btn.sell">Sell</button>
+        <span style="font-size:13px;color:var(--muted)" id="tradeCost"></span>
+      </div>
+      <div class="trade-msg" id="tradeMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2><span data-i18n="news.title">📰 Market news</span> <span class="sub" data-i18n="news.sub">· simulated headlines</span><button type="button" class="help" data-lesson="news" data-i18n-aria="help.news">?</button></h2>
+      <ul class="feed news-feed" id="newsFeed"></ul>
+    </div>
+  </div>
+
+  <!-- RIGHT: portfolio + autopilot -->
+  <div class="col-right">
+    <div class="card">
+      <div class="hero">
+        <div class="label" data-i18n="pv.label">Portfolio value (US$)</div>
+        <div class="value" id="pvValue">$0.00</div>
+        <div class="delta" id="pvDelta"></div>
+      </div>
+      <p class="coach-line" id="portfolioCoach"></p>
+      <h2><span data-i18n="holdings">Holdings</span><button type="button" class="help" data-lesson="pnl" data-i18n-aria="help.pnl">?</button></h2>
+      <div id="holdings"></div>
+    </div>
+
+    <div class="card">
+      <h2><span data-i18n="ap.title">🤖 AI auto-pilot</span> <span class="sub" data-i18n="ap.sub">· paper money only</span><button type="button" class="help" data-lesson="diversify" data-i18n-aria="help.ap">?</button></h2>
+      <div class="switch-row">
+        <input type="checkbox" id="autoPilot" />
+        <label for="autoPilot" data-i18n="ap.label">Let the AI trade automatically for me</label>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin:8px 0 0" data-i18n="ap.desc"></p>
+      <ul class="feed" id="aiFeed"></ul>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="hist.title">Trade history</h2>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+        <button class="btn btn-ghost" id="resetBtn" style="padding:5px 12px;font-size:12px" data-i18n="reset">Reset account</button>
+      </div>
+      <ul class="feed" id="history"></ul>
+    </div>
+  </div>
+</main>
+
+<section class="journal" id="journalView" hidden>
+  <div class="journal-head">
+    <div>
+      <h2 class="j-title" data-i18n="j.title">Trade journal</h2>
+      <p class="j-sub" data-i18n="j.sub"></p>
+    </div>
+    <div class="seg" role="group" aria-label="Whose trades to show" data-i18n-aria="j.filter">
+      <button type="button" data-jfilter="you" aria-pressed="true" data-i18n="j.mine">My trades</button>
+      <button type="button" data-jfilter="auto" aria-pressed="false" data-i18n="j.auto">Auto-pilot</button>
+      <button type="button" data-jfilter="all" aria-pressed="false" data-i18n="j.all">All</button>
+    </div>
+  </div>
+  <div class="j-stats" id="jStats"></div>
+  <div class="card j-habits" id="jHabits"></div>
+  <div class="j-list" id="jList"></div>
+</section>
+
+<section id="learnView" hidden>
+  <div class="learn-switch">
+    <div class="seg" role="group" aria-label="Learn sections" data-i18n-aria="l.sections">
+      <button type="button" data-pane="lessons" aria-pressed="true" data-i18n="l.lessons">Lessons</button>
+      <button type="button" data-pane="vocab" aria-pressed="false" data-i18n="l.vocab">Vocabulary</button>
+    </div>
+  </div>
+  <div class="learn" id="lessonsPane">
+    <aside class="card">
+      <h2 data-i18n="l.title">Stock market basics</h2>
+      <div class="xp-card" id="xpCard"></div>
+      <div class="badge-row" id="badgeRow"></div>
+      <div class="progress-label"><span data-i18n="l.progress">Your progress</span><b id="progressText"></b></div>
+      <div class="progress" role="progressbar" aria-label="Lessons completed" data-i18n-aria="l.progressAria" id="progressBar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><div id="progressFill" style="width:0%"></div></div>
+      <div class="lesson-list" id="lessonList"></div>
+    </aside>
+    <article class="card lesson-panel" id="lessonPanel" aria-live="polite"></article>
+  </div>
+  <div class="vocab" id="vocabPane" hidden>
+    <div id="vocabList" class="vocab">
+      <div class="vocab-tools">
+        <input type="search" id="vocabSearch" placeholder="Search words…" data-i18n-ph="v.search" aria-label="Search words" data-i18n-aria="v.search" />
+        <span class="vocab-count" id="vocabCount"></span>
+        <button type="button" class="btn btn-primary btn-sm" id="fcOpen" data-i18n="fc.open">🃏 Flashcard game</button>
+      </div>
+      <div class="chips" id="vocabCats" role="group" aria-label="Word categories" data-i18n-aria="v.cats"></div>
+      <div class="vocab-grid" id="vocabGrid"></div>
+    </div>
+    <div id="fcPane" hidden></div>
+  </div>
+</section>
+
+<div class="chart-modal" id="chartModal" hidden>
+  <div class="cm-box" role="dialog" aria-modal="true" aria-labelledby="cmTitle">
+    <div class="cm-head">
+      <h2 id="cmTitle"></h2>
+      <span id="cmName" style="color:var(--muted)"></span>
+      <span class="big-px" id="cmPx"></span>
+      <span class="big-chg" id="cmChg"></span>
+      <span class="spacer"></span>
+      <div class="seg range-seg" role="group" aria-label="Chart time range" data-i18n-aria="chart.rangeAria"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="cmClose"><span aria-hidden="true">✕</span> <span data-i18n="chart.close">Close</span></button>
+    </div>
+    <div class="cm-stats" id="cmStats"></div>
+    <div class="chart-wrap" id="bigChartWrap">
+      <div class="tooltip"><span class="t-date"></span><br><span class="t-val"></span></div>
+    </div>
+    <div class="cm-stats" id="cmLegend"></div>
+    <p class="coach-note" data-i18n="cm.hint"></p>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<footer>
+  <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
+  <a href="../index.html" data-i18n="footer.back">back to CoachStat</a>
+</footer>
