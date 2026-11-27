@@ -9,7 +9,7 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE / "src"
 # Script order matters: translations and content first, the app last.
 SCRIPTS = ["i18n.js", "lessons.js", "lessons2.js",
-           "lang_es.js", "lang_fr.js", "lang_hi.js", "lang_ar.js", "lang_bn.js", "app.js"]
+           "lang_es.js", "lang_fr.js", "lang_hi.js", "lang_ar.js", "lang_bn.js", "i18n_markets.js", "app.js"]
 
 def read(name):
     return (SRC / name).read_text(encoding="utf-8")

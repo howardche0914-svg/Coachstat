@@ -235,7 +235,7 @@ addLanguage("fr", {
         <p>Les entreprises vendent d’abord des actions pour lever de l’argent. Ensuite, les gens s’échangent les actions entre eux sur une <b>Bourse</b>, comme le Nasdaq et la Bourse de New York aux États-Unis, ou la Bourse de Taïwan.</p>
         <p>Le prix change toute la journée, car acheteurs et vendeurs se mettent sans cesse d’accord sur de nouveaux prix. Quand il y a plus d’acheteurs que de vendeurs, le prix monte. Quand il y a plus de vendeurs, il baisse.</p>
         ${key("le prix d’une action, c’est ce qu’acheteurs et vendeurs s’accordent à payer pour une part de l’entreprise, maintenant.")}
-        ${live(`La liste contient <b>${d.n} actions</b> : ${d.us} américaines et ${d.tw} taïwanaises. Chacune a un code court appelé <b>ticker</b> : AAPL pour Apple, 2330 pour TSMC.`)}`,
+        ${live(`La liste contient <b>${d.n} actions</b> de ${d.mk} marchés, dont ${d.us} américaines et ${d.tw} taïwanaises. Chacune a un code court appelé <b>ticker</b> : AAPL pour Apple, 2330 pour TSMC.`)}`,
       quiz: [
         ["Que signifie posséder une action d’une entreprise ?", ["Vous possédez une petite part de l’entreprise", "Vous avez prêté de l’argent à l’entreprise, qui vous rembourse avec intérêts", "Vous travaillez pour l’entreprise"], "Une action est une part de propriété. Prêter de l’argent à une entreprise, c’est une obligation, un autre type de placement."],
         ["Où les gens s’échangent-ils des actions ?", ["Sur une Bourse", "Seulement au siège de l’entreprise", "Dans le coffre-fort d’une banque"], "Les Bourses comme le Nasdaq ou la Bourse de Taïwan mettent en relation acheteurs et vendeurs."],

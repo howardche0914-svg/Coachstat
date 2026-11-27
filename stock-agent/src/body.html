@@ -36,12 +36,9 @@
     <div class="card">
       <div class="wl-head">
         <h2 data-i18n="wl.title">Market watchlist</h2>
-        <div class="seg" role="group" aria-label="Filter by market" data-i18n-aria="wl.filter">
-          <button type="button" data-mkt="ALL" aria-pressed="true" data-i18n="wl.all">All</button>
-          <button type="button" data-mkt="US" aria-pressed="false" data-i18n="wl.us">US</button>
-          <button type="button" data-mkt="TW" aria-pressed="false" data-i18n="wl.tw">Taiwan</button>
-        </div>
+        <select id="mktSel" class="mkt-select" aria-label="Filter by market" data-i18n-aria="wl.filter"></select>
       </div>
+      <input type="search" id="stockSearch" class="stock-search" placeholder="Search stocks…" data-i18n-ph="wl.search" aria-label="Search stocks" data-i18n-aria="wl.search" />
       <div class="clock" id="simClock"></div>
       <div id="watchlist"></div>
     </div>

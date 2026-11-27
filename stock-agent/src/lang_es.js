@@ -235,7 +235,7 @@ addLanguage("es", {
         <p>Las empresas venden acciones primero para conseguir dinero. Después, la gente compra y vende acciones entre sí en una <b>bolsa de valores</b>, como el Nasdaq y la Bolsa de Nueva York en EE. UU., o la Bolsa de Taiwán.</p>
         <p>El precio cambia todo el día porque compradores y vendedores acuerdan precios nuevos sin parar. Cuando más gente quiere comprar que vender, el precio sube. Cuando más gente quiere vender, baja.</p>
         ${key("el precio de una acción es lo que compradores y vendedores acuerdan que vale ahora esa parte de la empresa.")}
-        ${live(`La lista tiene <b>${d.n} acciones</b>: ${d.us} de EE. UU. y ${d.tw} de Taiwán. Cada una tiene un código corto llamado <b>ticker</b>: AAPL es Apple y 2330 es TSMC.`)}`,
+        ${live(`La lista tiene <b>${d.n} acciones</b> de ${d.mk} mercados, entre ellas ${d.us} de EE. UU. y ${d.tw} de Taiwán. Cada una tiene un código corto llamado <b>ticker</b>: AAPL es Apple y 2330 es TSMC.`)}`,
       quiz: [
         ["¿Qué significa tener una acción de una empresa?", ["Eres dueño de una pequeña parte de la empresa", "Le prestaste dinero a la empresa y te lo devuelve con intereses", "Trabajas para la empresa"], "Una acción es una parte de la propiedad. Prestar dinero a una empresa se llama bono, que es otro tipo de inversión."],
         ["¿Dónde compra y vende acciones la gente entre sí?", ["En una bolsa de valores", "Solo en la oficina de la empresa", "En la cámara acorazada de un banco"], "Las bolsas como el Nasdaq o la Bolsa de Taiwán ponen en contacto a compradores y vendedores."],

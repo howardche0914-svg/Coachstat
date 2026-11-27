@@ -33,14 +33,28 @@ function applyStatic() {
 }
 
 /* ============ Markets ============ */
-// Cash is kept in US dollars. Taiwan stocks are priced in New Taiwan dollars
-// and converted at a fixed, simulated exchange rate.
+// Cash is kept in US dollars. Other markets' stocks are priced in their own
+// currency and converted at a fixed, simulated exchange rate.
+// open/close/lunch are minutes after midnight in the market's own time zone;
+// days = trading weekdays (0 = Sunday). limit = daily price limit (0 = none).
+function twTick(p) { return p < 10 ? 0.01 : p < 50 ? 0.05 : p < 100 ? 0.1 : p < 500 ? 0.5 : p < 1000 ? 1 : 5; }
+function hkTick(p) { return p < 0.25 ? 0.001 : p < 0.5 ? 0.005 : p < 10 ? 0.01 : p < 20 ? 0.02 : p < 100 ? 0.05 : p < 200 ? 0.1 : p < 500 ? 0.2 : p < 1000 ? 0.5 : 1; }
+function saTick(p) { return p < 10 ? 0.01 : p < 25 ? 0.02 : p < 50 ? 0.05 : p < 100 ? 0.1 : 0.2; }
+function jpTick(p) { return p < 10000 ? 1 : p < 30000 ? 5 : 10; }
+const MON_FRI = [1, 2, 3, 4, 5];
 const MARKETS = {
-  US: { cur: "$",   perUSD: 1,  vol: 0.009 },
-  TW: { cur: "NT$", perUSD: 32, vol: 0.010 },
+  US: { cur: "$",    perUSD: 1,    vol: 0.009, dp: 2, limit: 0,    tick: () => 0.01, tz: "America/New_York", open: 570, close: 960,  days: MON_FRI, flag: "🇺🇸" },
+  TW: { cur: "NT$",  perUSD: 32,   vol: 0.010, dp: 2, limit: 0.10, tick: twTick,     tz: "Asia/Taipei",      open: 540, close: 810,  days: MON_FRI, flag: "🇹🇼" },
+  JP: { cur: "¥",    perUSD: 150,  vol: 0.011, dp: 0, limit: 0,    tick: jpTick,     tz: "Asia/Tokyo",       open: 540, close: 930,  days: MON_FRI, flag: "🇯🇵", lunch: [690, 750] },
+  IN: { cur: "₹",    perUSD: 85,   vol: 0.010, dp: 2, limit: 0,    tick: () => 0.05, tz: "Asia/Kolkata",     open: 555, close: 930,  days: MON_FRI, flag: "🇮🇳" },
+  HK: { cur: "HK$",  perUSD: 7.8,  vol: 0.013, dp: 2, limit: 0,    tick: hkTick,     tz: "Asia/Hong_Kong",   open: 570, close: 960,  days: MON_FRI, flag: "🇭🇰", lunch: [720, 780] },
+  EU: { cur: "€",    perUSD: 0.9,  vol: 0.009, dp: 2, limit: 0,    tick: () => 0.01, tz: "Europe/Paris",     open: 540, close: 1050, days: MON_FRI, flag: "🇪🇺" },
+  SA: { cur: "SAR ", perUSD: 3.75, vol: 0.009, dp: 2, limit: 0.10, tick: saTick,     tz: "Asia/Riyadh",      open: 600, close: 900,  days: [0, 1, 2, 3, 4], flag: "🇸🇦" },
 };
+const MKS = Object.keys(MARKETS);
 // Daily volatility of each industry's shared moves
-const SECTORS = { chips: 0.014, tech: 0.008, finance: 0.007, consumer: 0.008, shipping: 0.016, telecom: 0.003, fund: 0 };
+const SECTORS = { chips: 0.014, tech: 0.008, finance: 0.007, consumer: 0.008, shipping: 0.016, telecom: 0.003,
+                  health: 0.006, energy: 0.012, industrial: 0.008, staples: 0.004, fund: 0 };
 
 /* ============ Universe (starting prices are rough, simulated levels) ============ */
 const STOCKS = [
@@ -64,12 +78,80 @@ const STOCKS = [
   { sym: "2881",  name: "Fubon 富邦金",      zh: "富邦金",           short: "Fubon",      zhShort: "富邦金", base: 88,   drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance",  mkt: "TW" },
   { sym: "2603",  name: "Evergreen 長榮",    zh: "長榮",             short: "Evergreen",  zhShort: "長榮",   base: 198,  drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping", mkt: "TW" },
   { sym: "0050",  name: "Taiwan 50 ETF 元大台灣50", zh: "元大台灣50", short: "Taiwan 50 ETF", zhShort: "元大台灣50", base: 192, drift: 0.0003, vol: 0.011, beta: 1.0, sector: "fund", mkt: "TW" },
+  // --- more US ---
+  { sym: "AMD",   name: "AMD",               zh: "超微 AMD",        short: "AMD",        zhShort: "超微",   base: 165,  drift: 0.0004, vol: 0.030, beta: 1.6, sector: "chips",      mkt: "US" },
+  { sym: "AVGO",  name: "Broadcom",          zh: "博通 Broadcom",   short: "Broadcom",   zhShort: "博通",   base: 340,  drift: 0.0005, vol: 0.026, beta: 1.4, sector: "chips",      mkt: "US" },
+  { sym: "PLTR",  name: "Palantir",          zh: "Palantir",        short: "Palantir",   zhShort: "Palantir", base: 160, drift: 0.0005, vol: 0.038, beta: 1.8, sector: "tech",     mkt: "US" },
+  { sym: "LLY",   name: "Eli Lilly",         zh: "禮來 Eli Lilly",  short: "Eli Lilly",  zhShort: "禮來",   base: 820,  drift: 0.0004, vol: 0.018, beta: 0.6, sector: "health",     mkt: "US" },
+  { sym: "JNJ",   name: "Johnson & Johnson", zh: "嬌生 J&J",        short: "J&J",        zhShort: "嬌生",   base: 165,  drift: 0.0002, vol: 0.010, beta: 0.5, sector: "health",     mkt: "US" },
+  { sym: "XOM",   name: "ExxonMobil",        zh: "埃克森美孚",      short: "ExxonMobil", zhShort: "埃克森美孚", base: 115, drift: 0.0002, vol: 0.015, beta: 0.8, sector: "energy",  mkt: "US" },
+  { sym: "KO",    name: "Coca-Cola",         zh: "可口可樂",        short: "Coca-Cola",  zhShort: "可口可樂", base: 70,  drift: 0.0002, vol: 0.009, beta: 0.5, sector: "staples",  mkt: "US" },
+  { sym: "WMT",   name: "Walmart",           zh: "沃爾瑪 Walmart",  short: "Walmart",    zhShort: "沃爾瑪", base: 98,   drift: 0.0003, vol: 0.012, beta: 0.5, sector: "staples",    mkt: "US" },
+  { sym: "COST",  name: "Costco",            zh: "好市多 Costco",   short: "Costco",     zhShort: "好市多", base: 920,  drift: 0.0003, vol: 0.013, beta: 0.7, sector: "staples",    mkt: "US" },
+  { sym: "MCD",   name: "McDonald's",        zh: "麥當勞",          short: "McDonald's", zhShort: "麥當勞", base: 300,  drift: 0.0002, vol: 0.010, beta: 0.6, sector: "consumer",   mkt: "US" },
+  { sym: "NKE",   name: "Nike",              zh: "耐吉 Nike",       short: "Nike",       zhShort: "耐吉",   base: 72,   drift: 0.0001, vol: 0.020, beta: 1.0, sector: "consumer",   mkt: "US" },
+  { sym: "BA",    name: "Boeing",            zh: "波音 Boeing",     short: "Boeing",     zhShort: "波音",   base: 210,  drift: 0.0002, vol: 0.022, beta: 1.2, sector: "industrial", mkt: "US" },
+  { sym: "VOO",   name: "S&P 500 ETF (Vanguard)", zh: "標普500 ETF (VOO)", short: "S&P 500 ETF", zhShort: "標普500 ETF", base: 560, drift: 0.0003, vol: 0.010, beta: 1.0, sector: "fund", mkt: "US" },
+  { sym: "QQQ",   name: "Nasdaq-100 ETF (Invesco)", zh: "那斯達克100 ETF (QQQ)", short: "Nasdaq-100 ETF", zhShort: "那斯達克100 ETF", base: 560, drift: 0.0004, vol: 0.013, beta: 1.2, sector: "fund", mkt: "US" },
+  // --- more Taiwan ---
+  { sym: "2382",  name: "Quanta 廣達",       zh: "廣達",   short: "Quanta",           zhShort: "廣達",   base: 290,  drift: 0.0005, vol: 0.026, beta: 1.3, sector: "tech",       mkt: "TW" },
+  { sym: "3231",  name: "Wistron 緯創",      zh: "緯創",   short: "Wistron",          zhShort: "緯創",   base: 115,  drift: 0.0004, vol: 0.030, beta: 1.4, sector: "tech",       mkt: "TW" },
+  { sym: "2357",  name: "ASUS 華碩",         zh: "華碩",   short: "ASUS",             zhShort: "華碩",   base: 600,  drift: 0.0003, vol: 0.018, beta: 1.0, sector: "tech",       mkt: "TW" },
+  { sym: "3008",  name: "Largan 大立光",     zh: "大立光", short: "Largan",           zhShort: "大立光", base: 2400, drift: 0.0002, vol: 0.022, beta: 1.0, sector: "tech",       mkt: "TW" },
+  { sym: "2303",  name: "UMC 聯電",          zh: "聯電",   short: "UMC",              zhShort: "聯電",   base: 45,   drift: 0.0002, vol: 0.018, beta: 1.0, sector: "chips",      mkt: "TW" },
+  { sym: "3711",  name: "ASE 日月光投控",    zh: "日月光投控", short: "ASE",          zhShort: "日月光", base: 150,  drift: 0.0003, vol: 0.020, beta: 1.1, sector: "chips",      mkt: "TW" },
+  { sym: "2891",  name: "CTBC 中信金",       zh: "中信金", short: "CTBC",             zhShort: "中信金", base: 40,   drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",    mkt: "TW" },
+  { sym: "2886",  name: "Mega 兆豐金",       zh: "兆豐金", short: "Mega Financial",   zhShort: "兆豐金", base: 40,   drift: 0.0002, vol: 0.009, beta: 0.6, sector: "finance",    mkt: "TW" },
+  { sym: "1301",  name: "Formosa Plastics 台塑", zh: "台塑", short: "Formosa Plastics", zhShort: "台塑", base: 40,   drift: 0.0000, vol: 0.017, beta: 0.9, sector: "industrial", mkt: "TW" },
+  { sym: "2002",  name: "China Steel 中鋼",  zh: "中鋼",   short: "China Steel",      zhShort: "中鋼",   base: 21,   drift: 0.0000, vol: 0.012, beta: 0.8, sector: "industrial", mkt: "TW" },
+  { sym: "2609",  name: "Yang Ming 陽明",    zh: "陽明",   short: "Yang Ming",        zhShort: "陽明",   base: 65,   drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping",   mkt: "TW" },
+  { sym: "00878", name: "High Dividend ETF 國泰永續高股息", zh: "國泰永續高股息", short: "High Dividend ETF", zhShort: "國泰永續高股息", base: 21, drift: 0.0002, vol: 0.008, beta: 0.8, sector: "fund", mkt: "TW" },
+  // --- Japan (Tokyo Stock Exchange, yen) ---
+  { sym: "7203",  name: "Toyota",            zh: "豐田 Toyota",     short: "Toyota",     zhShort: "豐田",   base: 2800,  drift: 0.0002, vol: 0.017, beta: 1.0, sector: "consumer", mkt: "JP" },
+  { sym: "6758",  name: "Sony",              zh: "索尼 Sony",       short: "Sony",       zhShort: "索尼",   base: 3500,  drift: 0.0004, vol: 0.020, beta: 1.1, sector: "tech",     mkt: "JP" },
+  { sym: "7974",  name: "Nintendo",          zh: "任天堂",          short: "Nintendo",   zhShort: "任天堂", base: 11000, drift: 0.0004, vol: 0.021, beta: 0.9, sector: "consumer", mkt: "JP" },
+  { sym: "9984",  name: "SoftBank Group",    zh: "軟銀集團",        short: "SoftBank",   zhShort: "軟銀",   base: 9500,  drift: 0.0004, vol: 0.032, beta: 1.5, sector: "tech",     mkt: "JP" },
+  { sym: "8306",  name: "Mitsubishi UFJ",    zh: "三菱日聯 MUFG",   short: "MUFG",       zhShort: "三菱日聯", base: 2100, drift: 0.0003, vol: 0.018, beta: 1.0, sector: "finance", mkt: "JP" },
+  { sym: "8035",  name: "Tokyo Electron",    zh: "東京威力科創",    short: "Tokyo Electron", zhShort: "東京威力科創", base: 24000, drift: 0.0004, vol: 0.028, beta: 1.4, sector: "chips", mkt: "JP" },
+  { sym: "9983",  name: "Fast Retailing (Uniqlo)", zh: "迅銷 (Uniqlo)", short: "Uniqlo", zhShort: "迅銷", base: 50000, drift: 0.0003, vol: 0.018, beta: 1.0, sector: "consumer", mkt: "JP" },
+  // --- India (National Stock Exchange, rupees) ---
+  { sym: "RELIANCE",   name: "Reliance Industries", zh: "信實工業",        short: "Reliance",  zhShort: "信實",     base: 1400, drift: 0.0003, vol: 0.015, beta: 1.0, sector: "energy",  mkt: "IN" },
+  { sym: "TCS",        name: "Tata Consultancy",    zh: "塔塔諮詢 TCS",    short: "TCS",       zhShort: "塔塔諮詢", base: 3400, drift: 0.0002, vol: 0.014, beta: 0.8, sector: "tech",    mkt: "IN" },
+  { sym: "INFY",       name: "Infosys",             zh: "印孚瑟斯 Infosys", short: "Infosys",  zhShort: "印孚瑟斯", base: 1550, drift: 0.0002, vol: 0.016, beta: 0.9, sector: "tech",    mkt: "IN" },
+  { sym: "HDFCBANK",   name: "HDFC Bank",           zh: "HDFC 銀行",       short: "HDFC Bank", zhShort: "HDFC 銀行", base: 980, drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance", mkt: "IN" },
+  { sym: "BHARTIARTL", name: "Bharti Airtel",       zh: "巴蒂電信 Airtel", short: "Airtel",    zhShort: "巴蒂電信", base: 1900, drift: 0.0004, vol: 0.014, beta: 0.8, sector: "telecom", mkt: "IN" },
+  { sym: "ITC",        name: "ITC",                 zh: "ITC",             short: "ITC",       zhShort: "ITC",      base: 420,  drift: 0.0002, vol: 0.011, beta: 0.6, sector: "staples", mkt: "IN" },
+  // --- Hong Kong (Hong Kong Exchange, HK dollars) ---
+  { sym: "0700",  name: "Tencent",           zh: "騰訊",     short: "Tencent",      zhShort: "騰訊",     base: 600, drift: 0.0004, vol: 0.022, beta: 1.2, sector: "tech",     mkt: "HK" },
+  { sym: "9988",  name: "Alibaba",           zh: "阿里巴巴", short: "Alibaba",      zhShort: "阿里巴巴", base: 150, drift: 0.0003, vol: 0.030, beta: 1.4, sector: "tech",     mkt: "HK" },
+  { sym: "0005",  name: "HSBC",              zh: "匯豐控股", short: "HSBC",         zhShort: "匯豐",     base: 100, drift: 0.0003, vol: 0.013, beta: 0.8, sector: "finance",  mkt: "HK" },
+  { sym: "1810",  name: "Xiaomi",            zh: "小米",     short: "Xiaomi",       zhShort: "小米",     base: 45,  drift: 0.0005, vol: 0.033, beta: 1.4, sector: "tech",     mkt: "HK" },
+  { sym: "1211",  name: "BYD",               zh: "比亞迪",   short: "BYD",          zhShort: "比亞迪",   base: 110, drift: 0.0004, vol: 0.030, beta: 1.3, sector: "consumer", mkt: "HK" },
+  { sym: "0941",  name: "China Mobile",      zh: "中國移動", short: "China Mobile", zhShort: "中國移動", base: 85,  drift: 0.0002, vol: 0.010, beta: 0.5, sector: "telecom",  mkt: "HK" },
+  // --- Europe (Paris, Amsterdam, Frankfurt, Madrid; euros) ---
+  { sym: "MC",    name: "LVMH",              zh: "LVMH 路威酩軒",   short: "LVMH",       zhShort: "路威酩軒", base: 560, drift: 0.0002, vol: 0.019, beta: 1.1, sector: "consumer",   mkt: "EU" },
+  { sym: "ASML",  name: "ASML",              zh: "艾司摩爾 ASML",   short: "ASML",       zhShort: "艾司摩爾", base: 700, drift: 0.0004, vol: 0.025, beta: 1.4, sector: "chips",      mkt: "EU" },
+  { sym: "SAP",   name: "SAP",               zh: "思愛普 SAP",      short: "SAP",        zhShort: "思愛普",   base: 230, drift: 0.0004, vol: 0.017, beta: 1.0, sector: "tech",       mkt: "EU" },
+  { sym: "AIR",   name: "Airbus",            zh: "空中巴士 Airbus", short: "Airbus",     zhShort: "空中巴士", base: 180, drift: 0.0003, vol: 0.017, beta: 1.0, sector: "industrial", mkt: "EU" },
+  { sym: "TTE",   name: "TotalEnergies",     zh: "道達爾能源",      short: "TotalEnergies", zhShort: "道達爾", base: 55, drift: 0.0001, vol: 0.014, beta: 0.8, sector: "energy",   mkt: "EU" },
+  { sym: "SAN",   name: "Banco Santander",   zh: "桑坦德銀行",      short: "Santander",  zhShort: "桑坦德",   base: 7,   drift: 0.0003, vol: 0.018, beta: 1.2, sector: "finance",    mkt: "EU" },
+  { sym: "ITX",   name: "Inditex (Zara)",    zh: "Inditex (Zara)",  short: "Inditex",    zhShort: "Inditex",  base: 47,  drift: 0.0003, vol: 0.015, beta: 0.9, sector: "consumer",   mkt: "EU" },
+  // --- Saudi Arabia (Saudi Exchange / Tadawul, riyals; trades Sunday to Thursday) ---
+  { sym: "2222",  name: "Saudi Aramco",        zh: "沙烏地阿美",     short: "Aramco",   zhShort: "沙烏地阿美",     ar: "أرامكو السعودية", arShort: "أرامكو",    base: 25, drift: 0.0001, vol: 0.009, beta: 0.8, sector: "energy",     mkt: "SA" },
+  { sym: "1120",  name: "Al Rajhi Bank",       zh: "拉吉哈銀行",     short: "Al Rajhi", zhShort: "拉吉哈銀行",     ar: "مصرف الراجحي",   arShort: "الراجحي",   base: 95, drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance",    mkt: "SA" },
+  { sym: "2010",  name: "SABIC",               zh: "沙烏地基礎工業", short: "SABIC",    zhShort: "沙烏地基礎工業", ar: "سابك",           arShort: "سابك",      base: 60, drift: 0.0000, vol: 0.015, beta: 1.0, sector: "industrial", mkt: "SA" },
+  { sym: "7010",  name: "stc",                 zh: "沙烏地電信 stc", short: "stc",      zhShort: "沙烏地電信",     ar: "إس تي سي",       arShort: "إس تي سي",  base: 42, drift: 0.0002, vol: 0.011, beta: 0.7, sector: "telecom",    mkt: "SA" },
+  { sym: "1180",  name: "Saudi National Bank", zh: "沙烏地國家銀行", short: "SNB",      zhShort: "沙烏地國家銀行", ar: "البنك الأهلي السعودي", arShort: "البنك الأهلي", base: 35, drift: 0.0002, vol: 0.013, beta: 1.0, sector: "finance", mkt: "SA" },
 ];
 const HISTORY_DAYS = 180;
 const TICK_MS = 2500;
 const TICKS_PER_DAY = 26;   // one tick = 15 simulated minutes, 9:30 to 16:00
 const START_CASH = 100000;
-const TW_LIMIT = 0.10;      // Taiwan daily price limit: ±10% from previous close
+// keep a price inside its market's daily limit (Taiwan and Saudi Arabia: ±10% from the previous close)
+function clampLimit(sym, raw, pc) {
+  const L = MARKETS[market[sym].mkt].limit;
+  return L ? Math.max(pc * (1 - L), Math.min(pc * (1 + L), raw)) : raw;
+}
 
 /* ============ Random numbers ============ */
 function mulberry32(a) {
@@ -97,15 +179,15 @@ for (const s of STOCKS) {
       (0.3 * s.vol) ** 2)),
   };
 }
-function twTick(p) { return p < 10 ? 0.01 : p < 50 ? 0.05 : p < 100 ? 0.1 : p < 500 ? 0.5 : p < 1000 ? 1 : 5; }
 function roundPx(sym, p) {
-  if (market[sym].mkt === "TW") { const s = twTick(p); return +(Math.round(p / s) * s).toFixed(2); }
-  return Math.round(p * 100) / 100;
+  const M = MARKETS[market[sym].mkt], st = M.tick(p);
+  return +(Math.round(p / st) * st).toFixed(Math.max(M.dp, st < 0.01 ? 3 : 2));
 }
-// Shared moves for one period: a global factor links the US and Taiwan markets.
+// Shared moves for one period: a global factor links all the markets.
 function drawFactors(rnd) {
   const g = rnd();
-  const f = { US: 0.6 * g + 0.8 * rnd(), TW: 0.6 * g + 0.8 * rnd(), sector: {} };
+  const f = { sector: {} };
+  for (const mk of MKS) f[mk] = 0.6 * g + 0.8 * rnd();
   for (const k of Object.keys(SECTORS)) f.sector[k] = rnd();
   return f;
 }
@@ -134,7 +216,8 @@ function buildHistory() {
         r += shock;
         if (d >= HISTORY_DAYS - 6) recent.push({ sym: s.sym, chg: shock, ago: HISTORY_DAYS - 1 - d, i: Math.floor(rng() * 5) });
       }
-      if (s.mkt === "TW") r = Math.max(-TW_LIMIT, Math.min(TW_LIMIT, r));
+      const L = MARKETS[s.mkt].limit;
+      if (L) r = Math.max(-L, Math.min(L, r));
       const arr = raw[s.sym];
       arr.push(Math.max(1, arr[arr.length - 1] * (1 + r)));
     }
@@ -158,7 +241,8 @@ const zoneKeys = z => ({ s: `stockpilot-${z}-state`, m: `stockpilot-${z}-market`
 let zone = load(ZONE_KEY);
 if (!ZONES.includes(zone)) zone = "practice";
 const freshState = () => ({ cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "fast", dayStartTotal: null });
-const freshSim = () => ({ day: 1, tick: 0, ticks: 0, sess: { US: { date: null, open: false }, TW: { date: null, open: false } } });
+const freshSess = () => Object.fromEntries(MKS.map(mk => [mk, { date: null, open: false }]));
+const freshSim = () => ({ day: 1, tick: 0, ticks: 0, sess: freshSess() });
 let state = freshState(), sim = freshSim();
 
 function loadZone(z) {
@@ -174,11 +258,14 @@ function loadZone(z) {
 
   sim = freshSim();
   for (const s of STOCKS) { market[s.sym].closes = 0; market[s.sym].closedNow = false; }
-  const ok = savedMarket && savedMarket.s && STOCKS.every(s => savedMarket.s[s.sym] && Array.isArray(savedMarket.s[s.sym].d));
+  const hasSaved = s => savedMarket && savedMarket.s && savedMarket.s[s.sym] && Array.isArray(savedMarket.s[s.sym].d);
+  const ok = STOCKS.some(hasSaved);
   if (ok) {
+    // stocks added in a newer version get a fresh history; saved ones keep theirs
+    if (!STOCKS.every(hasSaved)) buildHistory();
     sim = { ...sim, day: savedMarket.day || 1, tick: savedMarket.tick || 0, ticks: savedMarket.ticks || 0,
-            sess: z === "real" && savedMarket.sess ? savedMarket.sess : sim.sess };
-    for (const s of STOCKS) {
+            sess: z === "real" && savedMarket.sess ? { ...freshSess(), ...savedMarket.sess } : sim.sess };
+    for (const s of STOCKS.filter(hasSaved)) {
       const m = market[s.sym], v = savedMarket.s[s.sym];
       m.daily = [...v.d]; m.raw = v.r; m.mu = v.mu || 0; m.closes = v.c || 0;
       m.closedNow = z === "real" && !!v.cl;
@@ -223,10 +310,11 @@ const pct0 = x => (x * 100).toFixed(0) + "%";
 const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
 const cur = sym => mktOf(sym).cur;
-const nameOf = sym => !isZh() ? market[sym].name : lang === "zhs" ? toS(market[sym].zh) : market[sym].zh;
-const shortOf = sym => !isZh() ? market[sym].short : lang === "zhs" ? toS(market[sym].zhShort) : market[sym].zhShort;
+const nameOf = sym => lang === "ar" && market[sym].ar ? market[sym].ar : !isZh() ? market[sym].name : lang === "zhs" ? toS(market[sym].zh) : market[sym].zh;
+const shortOf = sym => lang === "ar" && market[sym].arShort ? market[sym].arShort : !isZh() ? market[sym].short : lang === "zhs" ? toS(market[sym].zhShort) : market[sym].zhShort;
 function fmtP(sym, v) {
-  return ltr(cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  const dp = MARKETS[market[sym].mkt].dp;
+  return ltr(cur(sym) + v.toLocaleString("en-US", { minimumFractionDigits: dp, maximumFractionDigits: dp }));
 }
 function price(sym) { return market[sym].px; }
 function prevClose(sym) { const d = market[sym].daily; return d[d.length - 1]; }
@@ -254,10 +342,11 @@ function portfolioTotals() {
   return { mv, total: state.cash + mv };
 }
 function atLimit(sym) {
-  if (market[sym].mkt !== "TW" || market[sym].closedNow) return 0;
+  const L = MARKETS[market[sym].mkt].limit;
+  if (!L || market[sym].closedNow) return 0;
   const pc = prevClose(sym), p = price(sym);
-  if (p >= roundPx(sym, pc * (1 + TW_LIMIT)) - 1e-9) return 1;
-  if (p <= roundPx(sym, pc * (1 - TW_LIMIT)) + 1e-9) return -1;
+  if (p >= roundPx(sym, pc * (1 + L)) - 1e-9) return 1;
+  if (p <= roundPx(sym, pc * (1 - L)) + 1e-9) return -1;
   return 0;
 }
 
@@ -332,7 +421,7 @@ function coach(sym) {
   summary += an.rsi > 70 ? t("c.rsiHigh", { r }) : an.rsi < 30 ? t("c.rsiLow", { r }) : t("c.rsiMid", { r });
   summary += t("c.vol", { w: an.vol < 0.2 ? 0 : an.vol < 0.4 ? 1 : 2, p: (an.vol * 100).toFixed(0) });
   const lim = atLimit(sym);
-  if (lim) summary += t("c.limit", { up: lim > 0 });
+  if (lim) summary += t("c.limit", { up: lim > 0, m: t("mkt." + market[sym].mkt) });
   const news = state.news.find(n => n.sym === sym && (n.cn != null ? market[sym].closes - n.cn <= 2 : n.dayNum >= sim.day - 2));
   if (news) summary += t("c.news", { h: newsHeadline(news), c: fmtPct(news.chg) });
 
@@ -372,7 +461,7 @@ function portfolioCoach() {
   const mkts = new Set(rows.map(r => market[r.sym].mkt));
   if (mkts.size === 1) return P + t("pc.oneMkt", { m: t("mkt." + [...mkts][0]) });
   if (state.cash / total > 0.7) return P + t("pc.cash", { p: (state.cash / total * 100).toFixed(0) });
-  return P + t("pc.good", { n: rows.length });
+  return P + t("pc.good", { n: rows.length, k: mkts.size });
 }
 
 /* ============ Charts (SVG, hand-built) ============ */
@@ -536,18 +625,31 @@ function closeZoom() {
 }
 
 /* ============ Rendering: trade view ============ */
+// market filter menu: rebuilt only when the language changes, so an open menu is never reset
+function renderMktOptions() {
+  const sel = $("mktSel");
+  sel.innerHTML = [`<option value="ALL">${t("wl.all")} (${STOCKS.length})</option>`]
+    .concat(MKS.map(mk => `<option value="${mk}">${MARKETS[mk].flag} ${t("mkt." + mk)} (${poolOf(mk).length})</option>`)).join("");
+  sel.value = MARKETS[state.mktFilter] ? state.mktFilter : "ALL";
+}
+let wlQuery = "";
+const matchesQuery = s => {
+  if (!wlQuery) return true;
+  const q = wlQuery.toLowerCase();
+  return [s.sym, s.name, s.short, s.zh, s.zhShort, toS(s.zh), s.ar || "", nameOf(s.sym)].some(x => x.toLowerCase().includes(q));
+};
 function renderWatchlist() {
-  document.querySelectorAll(".seg button[data-mkt]").forEach(b =>
-    b.setAttribute("aria-pressed", String(b.dataset.mkt === state.mktFilter)));
+  if ($("mktSel").value !== (MARKETS[state.mktFilter] ? state.mktFilter : "ALL")) $("mktSel").value = MARKETS[state.mktFilter] ? state.mktFilter : "ALL";
   document.querySelectorAll("[data-zone]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.zone === zone)));
   $("simClock").innerHTML = state.mode === "real"
-    ? `${marketLine("TW")}${marketLine("US")}<span class="mhint">${t("mode.realHint")}</span>`
+    ? `${(MARKETS[state.mktFilter] ? [state.mktFilter] : MKS).map(marketLine).join("")}<span class="mhint">${t("mode.realHint")}</span>`
     : `${t("clock", { d: sim.day, time: simTime(sim.tick) })} · ${t("mode.fastHint")}`;
-  const list = STOCKS.filter(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
+  const list = STOCKS.filter(s => (state.mktFilter === "ALL" || s.mkt === state.mktFilter) && matchesQuery(s));
+  if (!list.length) { $("watchlist").innerHTML = `<p class="empty wl-none">${t("wl.none")}</p>`; return; }
   $("watchlist").innerHTML = list.map(s => {
     const chg = dayChange(s.sym), lim = atLimit(s.sym);
     return `<button class="stock-row${s.sym === selected ? " active" : ""}" data-sym="${s.sym}">
-      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt === "TW" ? '<span class="mkt-tag">TW</span>' : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : ""}
+      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt !== "US" ? `<span class="mkt-tag">${s.mkt}</span>` : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : ""}
       <span class="name">${nameOf(s.sym)}</span></span>
       ${sparkline(s.sym)}
       <span class="right"><span class="px">${fmtP(s.sym, price(s.sym))}</span><br>
@@ -566,9 +668,12 @@ function renderDetail() {
   chgEl.textContent = t(s.closedNow ? "chg.last" : "chg.today", { p: fmtPct(chg) });
   chgEl.className = "big-chg " + (chg >= 0 ? "pos" : "neg");
   const pc = prevClose(selected);
+  const M = MARKETS[s.mkt], L = M.limit;
   $("dFx").textContent = s.closedNow ? t("fx.closed", { pc: fmtP(selected, pc) }) : s.mkt === "TW"
-    ? t("fx.tw", { usd: fmt$(usd(selected)), rate: MARKETS.TW.perUSD, lo: fmtP(selected, roundPx(selected, pc * (1 - TW_LIMIT))), hi: fmtP(selected, roundPx(selected, pc * (1 + TW_LIMIT))) })
-    : t("fx.us", { pc: fmtP(selected, pc) });
+    ? t("fx.tw", { usd: fmt$(usd(selected)), rate: M.perUSD, lo: fmtP(selected, roundPx(selected, pc * (1 - L))), hi: fmtP(selected, roundPx(selected, pc * (1 + L))) })
+    : s.mkt === "US" ? t("fx.us", { pc: fmtP(selected, pc) })
+    : t("fx.intl", { ex: t("ex." + s.mkt), usd: fmt$(usd(selected)), rate: ltr(M.cur.trim() + " " + M.perUSD) })
+      + (L ? t("fx.limit", { lo: fmtP(selected, roundPx(selected, pc * (1 - L))), hi: fmtP(selected, roundPx(selected, pc * (1 + L))) }) : "");
 
   const a = series(selected);
   const c30 = p / a[a.length - 31] - 1;
@@ -600,7 +705,7 @@ function updateTradeCost() {
   const q = Math.max(0, parseInt($("qty").value || "0", 10));
   if (q <= 0) { $("tradeCost").textContent = ""; return; }
   const native = fmtP(selected, q * price(selected));
-  $("tradeCost").textContent = market[selected].mkt === "TW" ? `≈ ${native} (≈ ${fmt$(q * usd(selected))})` : `≈ ${native}`;
+  $("tradeCost").textContent = market[selected].mkt !== "US" ? `≈ ${native} (≈ ${fmt$(q * usd(selected))})` : `≈ ${native}`;
 }
 
 function renderPortfolio() {
@@ -646,6 +751,9 @@ function renderFeeds() {
         if (n.recap) {
           const r = n.recap;
           if (typeof r === "string") return `<li class="recap"><span class="time">${n.t || ""}</span>${r}</li>`;
+          if (r.avgs) return `<li class="recap"><span class="time">${t("recap.t", { d: r.d })}</span>${t("recap.all", {
+            d: r.d, list: Object.entries(r.avgs).map(([mk, a]) => `${t("mkt." + mk)} ${colored(a, fmtPct(a))}`).join(" · "),
+            pd: colored(r.pd, `${r.pd >= 0 ? "+" : "−"}${fmt$(Math.abs(r.pd))}`), sym: r.sym, c: fmtPct(r.c) })}</li>`;
           return `<li class="recap"><span class="time">${t("recap.t", { d: r.d })}</span>${t("recap", {
             d: r.d, us: colored(r.us, fmtPct(r.us)), tw: colored(r.tw, fmtPct(r.tw)),
             pd: colored(r.pd, `${r.pd >= 0 ? "+" : "−"}${fmt$(Math.abs(r.pd))}`), sym: r.sym, c: fmtPct(r.c) })}</li>`;
@@ -748,7 +856,7 @@ function closeDay() {
   const avg = mk => { const xs = STOCKS.filter(s => s.mkt === mk).map(s => dayChange(s.sym)); return xs.reduce((a, b) => a + b, 0) / xs.length; };
   const top = STOCKS.map(s => ({ sym: s.sym, c: dayChange(s.sym) })).sort((a, b) => Math.abs(b.c) - Math.abs(a.c))[0];
   const start = state.dayStartTotal || total;
-  state.news.unshift({ dayNum: sim.day, recap: { d: sim.day, us: avg("US"), tw: avg("TW"), pd: total - start, sym: top.sym, c: top.c } });
+  state.news.unshift({ dayNum: sim.day, recap: { d: sim.day, avgs: Object.fromEntries(MKS.map(mk => [mk, avg(mk)])), pd: total - start, sym: top.sym, c: top.c } });
   state.news = state.news.slice(0, 60);
   for (const s of STOCKS) {
     const m = market[s.sym];
@@ -794,10 +902,7 @@ function moveStocks(pool, f, scale, shock) {
   for (const s of pool) {
     const m = market[s.sym];
     let raw = m.raw * (1 + periodReturn(m, f, scale, gauss) + (shock[s.sym] || 0));
-    if (s.mkt === "TW") {
-      const pc = prevClose(s.sym);
-      raw = Math.max(pc * (1 - TW_LIMIT), Math.min(pc * (1 + TW_LIMIT), raw));
-    }
+    raw = clampLimit(s.sym, raw, prevClose(s.sym));
     m.raw = Math.max(1, raw);
     m.px = roundPx(s.sym, m.raw);
   }
@@ -812,44 +917,49 @@ function tickFast() {
 }
 
 /* ---- Real market hours ---- */
-const HOURS = {
-  TW: { tz: "Asia/Taipei",      open: 9 * 60,      close: 13 * 60 + 30, flag: "🇹🇼" },
-  US: { tz: "America/New_York", open: 9 * 60 + 30, close: 16 * 60,      flag: "🇺🇸" },
-};
+const HOURS = MARKETS;
 const WD = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+const inLunch = (H, mins) => !!H.lunch && mins >= H.lunch[0] && mins < H.lunch[1];
+const lunchMins = H => H.lunch ? H.lunch[1] - H.lunch[0] : 0;
+// open = inside today's session (a lunch break still counts); lunch = paused for lunch
 function mktStatus(mk, now = new Date()) {
   const H = HOURS[mk];
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: H.tz, weekday: "short", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
     .formatToParts(now).map(x => [x.type, x.value]));
   const wd = WD[p.weekday], mins = (+p.hour % 24) * 60 + (+p.minute);
-  const weekday = wd >= 1 && wd <= 5;
-  return { wd, mins, weekday, date: `${p.year}-${p.month}-${p.day}`, open: weekday && mins >= H.open && mins < H.close };
+  const weekday = H.days.includes(wd);
+  const open = weekday && mins >= H.open && mins < H.close;
+  return { wd, mins, weekday, date: `${p.year}-${p.month}-${p.day}`, open, lunch: open && inLunch(H, mins) };
 }
 const addDays = (ds, k) => { const d = new Date(ds + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return d.toISOString().slice(0, 10); };
-const isWeekday = ds => { const w = new Date(ds + "T00:00:00Z").getUTCDay(); return w >= 1 && w <= 5; };
+const isTradingDay = (mk, ds) => HOURS[mk].days.includes(new Date(ds + "T00:00:00Z").getUTCDay());
 function lastCompleted(mk, st) {     // date of the most recent session that has already closed
   if (st.weekday && st.mins >= HOURS[mk].close) return st.date;
   let d = addDays(st.date, -1);
-  while (!isWeekday(d)) d = addDays(d, -1);
+  while (!isTradingDay(mk, d)) d = addDays(d, -1);
   return d;
 }
+const minsFromNow = (st, m) => new Date(Date.now() + (m * 60 - new Date().getSeconds()) * 1000);
 function nextOpen(mk, st) {
   const H = HOURS[mk];
+  if (st.lunch) return minsFromNow(st, H.lunch[1] - st.mins);
   for (let k = 0; k < 8; k++) {
     const wd = (st.wd + k) % 7;
-    if (wd >= 1 && wd <= 5 && (k > 0 || st.mins < H.open)) return new Date(Date.now() + ((k * 1440 + H.open - st.mins) * 60 - new Date().getSeconds()) * 1000);
+    if (H.days.includes(wd) && (k > 0 || st.mins < H.open)) return minsFromNow(st, k * 1440 + H.open - st.mins);
   }
   return new Date();
 }
 const fmtIn = (date, tz, wd) => new Intl.DateTimeFormat(LOCALE(), { ...(tz ? { timeZone: tz } : {}), ...(wd ? { weekday: "short" } : {}), hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(date);
 function marketLine(mk) {
   const st = mktStatus(mk), H = HOURS[mk];
-  const at = st.open ? new Date(Date.now() + (H.close - st.mins) * 60000) : nextOpen(mk, st);
-  const there = fmtIn(at, H.tz, !st.open), here = fmtIn(at, null, !st.open);
+  const trading = st.open && !st.lunch;
+  const at = trading ? new Date(Date.now() + ((H.lunch && st.mins < H.lunch[0] ? H.lunch[0] : H.close) - st.mins) * 60000) : nextOpen(mk, st);
+  const sameDay = trading || st.lunch;
+  const there = fmtIn(at, H.tz, !sameDay), here = fmtIn(at, null, !sameDay);
   const v = { flag: H.flag, m: t("mkt." + mk), tz: t("tz." + mk), local: there === here ? "" : t("ms.local", { t: here }) };
-  return `<span class="mline">${st.open ? t("ms.open", { ...v, close: there }) : t("ms.closed", { ...v, when: there })}</span>`;
+  return `<span class="mline">${trading ? t("ms.open", { ...v, close: there }) : st.lunch ? t("ms.lunch", { ...v, when: there }) : t("ms.closed", { ...v, when: there })}</span>`;
 }
-const canTrade = sym => state.mode !== "real" || !!sim.sess[market[sym].mkt].open;
+const canTrade = sym => { if (state.mode !== "real") return true; const s = sim.sess[market[sym].mkt]; return !!s.open && !s.lunch; };
 const poolOf = mk => STOCKS.filter(s => s.mkt === mk);
 
 function closeMarket(mk) {
@@ -873,7 +983,8 @@ function simulateDay(mk) {           // a whole session that passed while the pa
   for (const s of poolOf(mk)) {
     const m = market[s.sym];
     let r = periodReturn(m, f, 1, gauss);
-    if (s.mkt === "TW") r = Math.max(-TW_LIMIT, Math.min(TW_LIMIT, r));
+    const L = MARKETS[s.mkt].limit;
+    if (L) r = Math.max(-L, Math.min(L, r));
     m.raw = Math.max(1, m.raw * (1 + r));
     m.px = roundPx(s.sym, m.raw);
     m.daily.push(m.px);
@@ -886,20 +997,21 @@ function simulateDay(mk) {           // a whole session that passed while the pa
 function catchUp(mk, from, to) {     // sessions after `from`, up to and including `to`
   if (!from || from >= to) return;
   let d = addDays(from, 1), n = 0;
-  while (d <= to && n < 60) { if (isWeekday(d)) { simulateDay(mk); n++; } d = addDays(d, 1); }
+  while (d <= to && n < 60) { if (isTradingDay(mk, d)) { simulateDay(mk); n++; } d = addDays(d, 1); }
 }
 function openMarket(mk, date) {
   for (const s of poolOf(mk)) {
     const m = market[s.sym];
     let raw = m.raw * (1 + 0.004 * gauss());   // small overnight gap at the open
-    if (s.mkt === "TW") { const pc = prevClose(s.sym); raw = Math.max(pc * (1 - TW_LIMIT), Math.min(pc * (1 + TW_LIMIT), raw)); }
+    raw = clampLimit(s.sym, raw, prevClose(s.sym));
     m.raw = raw; m.px = roundPx(s.sym, raw); m.closedNow = false;
   }
   sim.sess[mk] = { date, open: true };
 }
 function syncReal() {                // bring each market in line with the real clock
-  for (const mk of ["TW", "US"]) {
-    const st = mktStatus(mk), s = sim.sess[mk];
+  for (const mk of MKS) {
+    const st = mktStatus(mk), s = sim.sess[mk] || (sim.sess[mk] = { date: null, open: false });
+    s.lunch = st.lunch;
     if (s.open && (!st.open || s.date !== st.date)) { closeMarket(mk); s.open = false; }
     if (st.open) {
       if (s.date !== st.date) { catchUp(mk, s.date, addDays(st.date, -1)); openMarket(mk, st.date); }
@@ -917,14 +1029,15 @@ function syncReal() {                // bring each market in line with the real 
       }
       else if (s.date < lc) { catchUp(mk, s.date, lc); s.date = lc; }
     }
+    sim.sess[mk].lunch = st.lunch;   // openMarket replaces the session object
   }
 }
 function tickReal() {
   syncReal();
   const f = drawFactors(gauss);
-  for (const mk of ["TW", "US"]) {
-    if (!sim.sess[mk].open) continue;
-    const H = HOURS[mk], sessionMs = (H.close - H.open) * 60000;
+  for (const mk of MKS) {
+    if (!sim.sess[mk].open || sim.sess[mk].lunch) continue;
+    const H = HOURS[mk], sessionMs = (H.close - H.open - lunchMins(H)) * 60000;
     const pool = poolOf(mk);
     // about 3 company stories, 1 industry story and half a market story per session
     const shock = maybeNews(pool, 100 * TICK_MS / sessionMs);
@@ -1836,12 +1949,20 @@ $("langSel").addEventListener("change", e => {
   lang = LANGS.includes(e.target.value) ? e.target.value : "en";
   store(LANG_KEY, lang);
   applyStatic();
+  renderMktOptions();
   $("tradeMsg").textContent = "";
   renderAll();
   showView(currentView);
   if (zoomOpen()) renderZoom();
 });
 $("vocabSearch").addEventListener("input", () => { fc = null; renderVocab(); });
+$("mktSel").addEventListener("change", e => {
+  state.mktFilter = e.target.value; save();
+  const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
+  if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
+  renderAll();
+});
+$("stockSearch").addEventListener("input", e => { wlQuery = e.target.value.trim(); renderWatchlist(); });
 $("fcOpen").addEventListener("click", openFlash);
 
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => { showView(b.dataset.view); window.scrollTo({ top: 0 }); }));
@@ -1858,12 +1979,6 @@ document.addEventListener("click", e => {
   if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
   if ((b = el("[data-pane]"))) { learn.pane = b.dataset.pane; saveLearn(); renderLearn(); return; }
   if ((b = el("[data-vcat]"))) { learn.vcat = b.dataset.vcat; saveLearn(); renderVocab(); return; }
-  if ((b = el("[data-mkt]"))) {
-    state.mktFilter = b.dataset.mkt;
-    const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
-    if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
-    renderAll(); return;
-  }
   if ((b = el(".lesson-btn"))) { openLesson(b.dataset.id, true); return; }
   if ((b = el("[data-sym]")) && market[b.dataset.sym]) {
     selected = b.dataset.sym;
@@ -1888,6 +2003,7 @@ window.addEventListener("resize", () => { if (zoomOpen()) renderZoom(); });
 loadZone(zone);
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
+renderMktOptions();
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);

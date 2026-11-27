@@ -13,12 +13,15 @@ AI can guarantee profitable decisions.
 `stock-agent/index.html` is a standalone stock trading practice app with
 two zones, each with its own $100,000 virtual account and journal: a
 Practice zone where prices move all the time (~1-minute trading days), and
-a Real-hours zone where Taiwan stocks move only during Taiwan trading hours
-(Mon–Fri 9:00–13:30 Taipei) and US stocks only during US hours (Mon–Fri
-9:30–16:00 New York); closed markets can't be traded there, and sessions
+a Real-hours zone where each market moves only during its own trading hours
+(including Tokyo's and Hong Kong's lunch breaks and Saudi Arabia's
+Sunday–Thursday week); closed markets can't be traded there, and sessions
 missed while the page was closed are filled in on return. It has
-a simulated market of 12 US and 8 Taiwan stocks (with trends, news headlines,
-whole-market moves, daily recaps and Taiwan's 10% price limit), a virtual
+a simulated market of 77 stocks from 7 markets: 26 US (including S&P 500 and
+Nasdaq-100 ETFs), 20 Taiwan, 7 Japan, 6 India, 6 Hong Kong, 7 Europe and
+5 Saudi Arabia, each priced in its own currency, with a market menu and
+search box, trends, news headlines, whole-market moves, daily recaps and the
+10% daily price limits of Taiwan and Saudi Arabia. It also has a virtual
 $100,000 paper-trading account, a Coach that summarizes each stock and
 suggests what a careful trader might do, an optional auto-pilot, a trade
 Journal that records every buy and sell and reviews each step against the

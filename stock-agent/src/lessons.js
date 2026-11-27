@@ -6,7 +6,7 @@ const B = (cls, txt) => `<b class="${cls}">${txt}</b>`;
 const LESSONS = [
   {
     id: "basics", a: 0, tryIt: {},
-    data: () => ({ n: STOCKS.length, us: STOCKS.filter(s => s.mkt === "US").length, tw: STOCKS.filter(s => s.mkt === "TW").length }),
+    data: () => ({ n: STOCKS.length, mk: new Set(STOCKS.map(s => s.mkt)).size, us: STOCKS.filter(s => s.mkt === "US").length, tw: STOCKS.filter(s => s.mkt === "TW").length }),
     en: {
       title: "What is a stock?", try: "Browse the watchlist",
       body: d => `
@@ -14,7 +14,7 @@ const LESSONS = [
         <p>Companies first sell shares to raise money. After that, people buy and sell shares with each other on a <b>stock exchange</b>, such as Nasdaq and the New York Stock Exchange in the US, or the Taiwan Stock Exchange.</p>
         <p>The price changes all day because buyers and sellers keep agreeing on new prices. When more people want to buy than sell, the price goes up. When more want to sell, it goes down.</p>
         ${key("a stock price is what buyers and sellers agree a slice of the company is worth right now.")}
-        ${live(`The watchlist has <b>${d.n} stocks</b>: ${d.us} from the US and ${d.tw} from Taiwan. Each one has a short code called a <b>ticker</b>: AAPL is Apple, and 2330 is TSMC.`)}`,
+        ${live(`The watchlist has <b>${d.n} stocks</b> from ${d.mk} markets, including ${d.us} from the US and ${d.tw} from Taiwan. Each one has a short code called a <b>ticker</b>: AAPL is Apple, and 2330 is TSMC.`)}`,
       q: "What does owning one share of a company mean?",
       opts: ["You own a small piece of the company", "You lent the company money and it pays you back with interest", "You work for the company"],
       why: "A share is part ownership. Lending money to a company is called a bond, which is a different kind of investment.",
@@ -26,7 +26,7 @@ const LESSONS = [
         <p>公司一開始賣股票來籌措資金。之後，大家在<b>證券交易所</b>互相買賣股票，例如美國的那斯達克、紐約證券交易所，或是台灣證券交易所。</p>
         <p>股價整天都在變，因為買方和賣方不斷談出新的價格。想買的人比想賣的人多，價格就上漲；想賣的人比較多，價格就下跌。</p>
         ${key("股價就是買方和賣方現在同意這一小部分公司值多少錢。")}
-        ${live(`觀察清單裡有 <b>${d.n} 檔股票</b>：${d.us} 檔美股和 ${d.tw} 檔台股。每一檔都有一個簡短的<b>股票代號</b>：AAPL 是蘋果，2330 是台積電。`)}`,
+        ${live(`觀察清單裡有來自 ${d.mk} 個市場的 <b>${d.n} 檔股票</b>，其中 ${d.us} 檔美股、${d.tw} 檔台股。每一檔都有一個簡短的<b>股票代號</b>：AAPL 是蘋果，2330 是台積電。`)}`,
       q: "持有一家公司的一股，代表什麼？",
       opts: ["你擁有這家公司的一小部分", "你借錢給公司，公司會連本帶利還你", "你在這家公司上班"],
       why: "股票代表部分所有權。借錢給公司叫做債券，是另一種投資。",

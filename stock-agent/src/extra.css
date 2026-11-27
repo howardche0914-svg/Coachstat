@@ -176,3 +176,17 @@
   [dir="rtl"] .reasons, [dir="rtl"] .coach-actions, [dir="rtl"] .lesson-body ul, [dir="rtl"] .j-habits ul, [dir="rtl"] .checklist ul { padding-left: 0; padding-right: 20px; }
   [dir="rtl"] .help, [dir="rtl"] .lesson-link { margin-left: 0; margin-right: 4px; }
 [dir="rtl"] .pos, [dir="rtl"] .neg, [dir="rtl"] .vstage text { unicode-bidi: plaintext; }
+
+  /* ============ Watchlist: market menu, search, scrolling list ============ */
+  .mkt-select {
+    font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; max-width: 100%;
+    border: 1px solid var(--border); background: var(--page); color: var(--ink); cursor: pointer;
+  }
+  .stock-search {
+    width: 100%; box-sizing: border-box; margin: 4px 0 6px; padding: 7px 10px; border-radius: 8px;
+    border: 1px solid var(--baseline); background: var(--surface); color: var(--ink); font: inherit; font-size: 13px;
+  }
+  #watchlist { max-height: 640px; overflow-y: auto; overscroll-behavior: contain; }
+  .wl-none { padding: 12px 4px; color: var(--muted); font-size: 13px; }
+  .stock-row .sym { overflow-wrap: anywhere; }
+  @media (max-width: 760px) { #watchlist { max-height: 420px; } }
