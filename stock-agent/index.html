@@ -563,6 +563,69 @@
   .wl-none { padding: 12px 4px; color: var(--muted); font-size: 13px; }
   .stock-row .sym { overflow-wrap: anywhere; }
   @media (max-width: 760px) { #watchlist { max-height: 420px; } }
+
+  /* ============ StockPilot Plus + History challenges ============ */
+  .plus-tag {
+    display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .04em; line-height: 1;
+    padding: 3px 6px; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #8b5cf6, #ec4899); vertical-align: middle;
+  }
+  .plus-ribbon { font-size: 13px; font-weight: 600; color: #7c3aed; background: #f3e8ff; border: 1px solid #e9d5ff; border-radius: 999px; padding: 6px 12px; white-space: nowrap; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .plus-ribbon { color: #e9d5ff; background: #3b2463; border-color: #5b3a94; } }
+  :root[data-theme="dark"] .plus-ribbon { color: #e9d5ff; background: #3b2463; border-color: #5b3a94; }
+  .ch-wrap { max-width: 1180px; margin: 0 auto; padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 14px; }
+  .ch-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .ch-head h2 { margin: 0 0 4px; font-size: 22px; }
+  .ch-sub, .ch-note { margin: 0; color: var(--ink-2); }
+  .ch-note { font-size: 13px; color: var(--muted); }
+  .ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .ch-card { display: flex; gap: 14px; align-items: flex-start; }
+  .ch-card h3 { margin: 0 0 2px; font-size: 17px; }
+  .ch-card p { margin: 8px 0; font-size: 14px; color: var(--ink-2); }
+  .ch-card-body { flex: 1; min-width: 0; }
+  .ch-emoji { font-size: 34px; line-height: 1; }
+  .ch-meta { font-size: 12px; color: var(--muted); }
+  .ch-card-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: space-between; }
+  .ch-stars { color: #eda100; font-size: 18px; letter-spacing: 1px; }
+  .ch-stars .off { color: var(--grid); }
+  .ch-game { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
+  .ch-side { display: flex; flex-direction: column; gap: 14px; }
+  .ch-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .ch-date { font-size: 20px; font-weight: 700; }
+  .ch-px { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .ch-px span { font-size: 14px; }
+  .ch-chart { display: block; max-width: 100%; height: auto; direction: ltr; }
+  .ch-prog { height: 5px; background: var(--grid); border-radius: 99px; overflow: hidden; margin: 6px 0 10px; direction: ltr; }
+  .ch-prog span { display: block; height: 100%; background: var(--series); }
+  .ch-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ch-check { font-size: 13px; display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+  .ch-quit { margin-inline-start: auto; }
+  .ch-hint { margin: 10px 0 0; font-size: 14px; color: var(--ink-2); }
+  .ch-hint.warn { color: var(--warn-ink); background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 8px 10px; }
+  .ch-big { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .ch-big span { font-size: 14px; font-weight: 700; }
+  .ch-rows { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; font-size: 13px; }
+  .ch-rows div { display: flex; justify-content: space-between; gap: 8px; color: var(--ink-2); }
+  .ch-trade { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .ch-trade .btn { padding: 8px 4px; font-size: 13px; }
+  .ch-small { font-size: 12px; margin: 8px 0 0; }
+  .ch-h3 { margin: 0 0 8px; font-size: 15px; }
+  .ch-news li { font-size: 13px; }
+  .ch-result h3 { margin: 0 0 4px; }
+  .ch-result h4 { margin: 16px 0 6px; }
+  .ch-result-top { display: flex; gap: 14px; align-items: center; }
+  .ch-compare { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0 8px; }
+  .ch-compare > div { background: var(--page); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .ch-starlist { list-style: none; padding: 0; margin: 10px 0; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+  .ch-starlist .ok { color: var(--ink); } .ch-starlist .ok::first-letter { color: #eda100; }
+  .ch-starlist .no { color: var(--muted); }
+  .ch-result-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .plus-lock { text-align: center; max-width: 520px; margin: 0 auto; }
+  .plus-lock-icon { font-size: 40px; }
+  .plus-list { text-align: start; display: inline-block; margin: 8px auto 14px; }
+  @media (max-width: 900px) { .ch-game { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .ch-compare { grid-template-columns: 1fr; } .ch-wrap { padding: 12px 16px 32px; } .ch-grid { grid-template-columns: 1fr; } }
+  .ch-wrap .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .ch-news .time { display: block; margin: 0 0 2px; }
 </style>
 </head>
 <body>
@@ -574,6 +637,7 @@
     <button type="button" data-view="trade" aria-pressed="true"><span data-i18n="tab.trade">Trade</span></button>
     <button type="button" data-view="journal" aria-pressed="false"><span data-i18n="tab.journal">Journal</span><span class="count" id="journalCount"></span></button>
     <button type="button" data-view="learn" aria-pressed="false"><span data-i18n="tab.learn">Learn</span><span class="count" id="learnCount"></span></button>
+    <button type="button" data-view="challenges" aria-pressed="false"><span data-i18n="tab.challenges">Challenges</span> <span class="plus-tag" data-i18n="plus.tag">PLUS</span></button>
   </nav>
   <div class="seg zone-seg" role="group" aria-label="Practice area" data-i18n-aria="zone.aria">
     <button type="button" data-zone="practice" aria-pressed="true"><span aria-hidden="true">🎮</span> <span data-i18n="zone.practice">Practice zone</span></button>
@@ -770,6 +834,8 @@
 </div>
 
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<section id="challengeView" hidden></section>
 
 <footer>
   <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
@@ -6614,6 +6680,855 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
   ["空中巴士", "空客"], ["艾司摩尔", "阿斯麦"], ["东京威力科创", "东京电子"], ["利雅德", "利雅得"], ["日圆", "日元"],
   ["波克夏", "伯克希尔"], ["辉达", "英伟达"]);
 
+/* ============ StockPilot Plus + History challenges: texts in every language ============ */
+// UI keys are merged into I18N[lang]; challenge stories live in I18N[lang].chs.
+// Headlines describe real events; dates and index levels are rounded.
+(() => {
+  const TX = {
+    en: {
+      ui: {
+        "tab.challenges": "Challenges", "plus.tag": "PLUS", "plus.preview": "Plus feature · free during the preview",
+        "plus.lockedTitle": "This is a StockPilot Plus feature", "plus.lockedBody": v => `Get Plus for ${v.price} a month to unlock:`,
+        "plus.f1": "History challenges: replay famous market events", "plus.f2": "New Plus features as they come out", "plus.f3": "Your support helps build new lessons and markets",
+        "plus.upgrade": "Upgrade to Plus", "plus.soon": "Payments are not open yet.",
+        "ch.title": "History challenges", "ch.sub": "Travel back to famous market moments with $10,000 of virtual money. Can you do better than the market?",
+        "ch.note": "Prices follow the shape of each real event, with simplified, approximate numbers. The headlines are real events.",
+        "ch.play": "Play", "ch.replay": "Play again", "ch.back": "All challenges", "ch.quit": "Quit",
+        "ch.best": v => `Best result: ${v.p}`, "ch.notPlayed": "Not played yet",
+        "ch.level.1": "Easy", "ch.level.2": "Medium", "ch.level.3": "Hard",
+        "ch.pause": "Pause", "ch.resume": "Play", "ch.speed": "Speed", "ch.autoPause": "Pause when news breaks",
+        "ch.value": "Your money", "ch.cash": "Cash", "ch.invested": "Invested", "ch.hold": "If you had bought at the start and held",
+        "ch.buyPct": v => `Buy ${v.p}%`, "ch.buyAll": "Buy with all cash", "ch.sellPct": v => `Sell ${v.p}%`, "ch.sellAll": "Sell everything",
+        "ch.trades": v => `${v.n} trade${v.n === 1 ? "" : "s"}`, "ch.news": "Headlines", "ch.newsEmpty": "Headlines will appear as the story unfolds.",
+        "ch.startHint": "Press Play to start. Buy and sell any time, and pause whenever you want to think.",
+        "ch.newsPaused": "⏸ Paused for news. Decide what to do, then press Play.",
+        "ch.done": "Challenge complete", "ch.you": "You", "ch.holdShort": "Buy and hold", "ch.cashShort": "Stay in cash",
+        "ch.dd": v => `Your biggest drop: ${v.a} · the market's biggest drop: ${v.b}`,
+        "ch.star1": "Finished the challenge", "ch.star2": "Ended with more money than you started",
+        "ch.star3": "Invested, and your biggest drop was no worse than the market's",
+        "ch.real": "What really happened", "ch.takeaway": "Lesson:", "ch.xp": v => `Challenge: ${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "The dot-com bubble", period: "1999–2002", asset: "Nasdaq Composite index",
+          intro: "Internet stocks are the hottest thing on Earth. Will you ride the bubble, and get out in time?",
+          news: ["Internet stocks soar as investors rush into any company with “.com” in its name",
+                 "The Nasdaq hits a record high above 5,000",
+                 "Tech stocks crash: the Nasdaq falls almost 10% in a single day",
+                 "US markets reopen after the September 11 attacks and fall sharply",
+                 "After falling almost 80% from its peak, the Nasdaq finally hits bottom"],
+          real: "The Nasdaq rose about 85% in 1999 and peaked in March 2000. Many internet companies had no profits, and when investors lost faith, prices collapsed. By October 2002 the Nasdaq had lost almost 80%, and it took about 15 years, until 2015, to get back to its 2000 high.",
+          lesson: "An exciting story is not the same as profits. When everyone says “this time is different,” keep each position small and spread your money out." },
+        gfc: { title: "The 2008 financial crisis", period: "Oct 2007–2009", asset: "S&P 500 index",
+          intro: "Cracks are appearing in the US housing market. Can you protect your money through the worst crisis in decades?",
+          news: ["Bear Stearns, a big US investment bank, is rescued and sold to JPMorgan",
+                 "Lehman Brothers goes bankrupt, the largest bankruptcy in US history",
+                 "The US Congress passes a $700 billion plan to rescue the banks",
+                 "Stocks hit their lowest point, down about 57% from the 2007 high"],
+          real: "Many Americans had borrowed to buy homes they could not afford. When home prices fell, banks that had bet on these loans lost huge amounts, and some failed. The S&P 500 fell about 57% from October 2007 to March 2009. Then it began one of its longest rises ever and was back above its old high by 2013.",
+          lesson: "The scariest moment, when everyone is selling, is often close to the bottom. People who panic-sold in early 2009 missed the recovery." },
+        covid: { title: "The COVID crash", period: "2020", asset: "S&P 500 index",
+          intro: "A new virus is spreading. Markets are about to have one of the fastest crashes ever. What will you do?",
+          news: ["The coronavirus spreads quickly outside China, and stocks start to fall",
+                 "The World Health Organization declares a global pandemic",
+                 "The US central bank promises unlimited support for markets",
+                 "Pfizer and BioNTech say their vaccine is more than 90% effective"],
+          real: "The S&P 500 fell about 34% in just over a month, one of the fastest crashes in history. Governments and central banks then stepped in with huge support. The market won back its losses by August 2020 and ended the year up about 16%.",
+          lesson: "Crashes can be followed by fast recoveries. Selling in a panic and waiting until things “feel safe” often means buying back at higher prices." },
+        rates: { title: "The 2022 rate shock", period: "2022–mid 2023", asset: "Nasdaq Composite index",
+          intro: "Inflation is rising fast and interest rates are about to jump. How will tech stocks handle it?",
+          news: ["The US Federal Reserve raises interest rates for the first time since 2018",
+                 "US inflation hits a 40-year high, and the Fed makes its biggest rate rise since 1994",
+                 "Another high inflation report, but stocks bounce back strongly the same day",
+                 "OpenAI releases ChatGPT, starting a wave of excitement about AI"],
+          real: "To fight the highest inflation in 40 years, the Fed raised interest rates very fast in 2022. Higher rates hurt fast-growing tech companies the most, and the Nasdaq fell about a third that year. In 2023, excitement about AI helped tech stocks recover.",
+          lesson: "Interest rates matter. When they rise quickly, expensive growth stocks often fall the hardest. Knowing what drives a market helps you stay calm." },
+        ai: { title: "The AI chip boom", period: "2023–2024", asset: "NVIDIA stock",
+          intro: "ChatGPT has just launched, and everyone wants AI chips. Can you stay on board through the ups and downs?",
+          news: ["Two months after ChatGPT's launch, companies race to buy AI chips",
+                 "NVIDIA predicts sales far above expectations, and the stock jumps about 24% in one day",
+                 "NVIDIA reports another huge jump in sales from AI chips",
+                 "NVIDIA briefly becomes the most valuable company in the world",
+                 "Worries about the US economy hit markets around the world, and chip stocks fall"],
+          real: "Demand for AI chips exploded after ChatGPT. NVIDIA's sales and profits grew several times over, and its stock rose about nine-fold in two years. Even so, it had several drops of 20% or more along the way.",
+          lesson: "Even big winners have scary drops, and people who sold at the first big dip missed most of the gains. But NVIDIA is a rare case: many hyped stocks never recover." },
+        tsmc: { title: "TSMC's fall and comeback", period: "2022–2024", asset: "TSMC (2330)",
+          intro: "Taiwan's biggest company is about to have a rough year. Will you have the patience for what comes next?",
+          news: ["War in Ukraine and rising interest rates shake world markets",
+                 "Fears of a chip slowdown and new US limits on chip sales to China push TSMC to its lowest level in over two years",
+                 "Warren Buffett's company, Berkshire Hathaway, reveals it bought TSMC shares",
+                 "Demand for AI chips pushes TSMC above NT$1,000 for the first time"],
+          real: "In 2022, higher interest rates and fears of weaker chip demand cut TSMC's price almost in half. Then AI changed the story: TSMC makes the most advanced AI chips for NVIDIA and others, and by the end of 2024 its stock had almost tripled from the 2022 low.",
+          lesson: "A great company's stock can still fall a lot in a bad year. If the business stays strong, patience can pay off, but no one knew in advance when the turn would come." },
+      },
+    },
+    zh: {
+      ui: {
+        "tab.challenges": "挑戰", "plus.tag": "PLUS", "plus.preview": "Plus 功能 · 預覽期間免費",
+        "plus.lockedTitle": "這是 StockPilot Plus 功能", "plus.lockedBody": v => `每月 ${v.price} 升級 Plus，即可解鎖：`,
+        "plus.f1": "歷史挑戰：重溫著名的市場事件", "plus.f2": "之後推出的新 Plus 功能", "plus.f3": "你的支持能幫助我們做出新課程和新市場",
+        "plus.upgrade": "升級到 Plus", "plus.soon": "目前還沒有開放付款。",
+        "ch.title": "歷史挑戰", "ch.sub": "帶著 10,000 美元虛擬資金回到著名的市場時刻。你能做得比大盤更好嗎？",
+        "ch.note": "價格走勢依照真實事件的形狀，數字經過簡化、只是大約。新聞標題都是真實事件。",
+        "ch.play": "開始", "ch.replay": "再玩一次", "ch.back": "所有挑戰", "ch.quit": "離開",
+        "ch.best": v => `最佳成績：${v.p}`, "ch.notPlayed": "還沒玩過",
+        "ch.level.1": "簡單", "ch.level.2": "中等", "ch.level.3": "困難",
+        "ch.pause": "暫停", "ch.resume": "播放", "ch.speed": "速度", "ch.autoPause": "有新聞時自動暫停",
+        "ch.value": "你的資金", "ch.cash": "現金", "ch.invested": "已投資", "ch.hold": "如果一開始買進並一直持有",
+        "ch.buyPct": v => `買進 ${v.p}%`, "ch.buyAll": "用全部現金買進", "ch.sellPct": v => `賣出 ${v.p}%`, "ch.sellAll": "全部賣出",
+        "ch.trades": v => `${v.n} 筆交易`, "ch.news": "新聞標題", "ch.newsEmpty": "隨著故事發展，新聞會出現在這裡。",
+        "ch.startHint": "按「播放」開始。隨時可以買賣，想思考時也可以隨時暫停。",
+        "ch.newsPaused": "⏸ 有新聞，已暫停。想好怎麼做，再按「播放」。",
+        "ch.done": "挑戰完成", "ch.you": "你", "ch.holdShort": "買進持有", "ch.cashShort": "只拿現金",
+        "ch.dd": v => `你的最大跌幅：${v.a} · 大盤的最大跌幅：${v.b}`,
+        "ch.star1": "完成挑戰", "ch.star2": "結束時的錢比開始時多",
+        "ch.star3": "有投資，而且你的最大跌幅沒有比大盤更糟",
+        "ch.real": "真實發生了什麼", "ch.takeaway": "啟示：", "ch.xp": v => `挑戰：${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "網路泡沫", period: "1999–2002", asset: "那斯達克綜合指數",
+          intro: "網路股是全世界最熱門的東西。你會跟著泡沫一起衝，還能及時下車嗎？",
+          news: ["網路股狂飆，投資人搶買任何名字帶「.com」的公司",
+                 "那斯達克創下 5,000 點以上的歷史新高",
+                 "科技股崩跌：那斯達克一天之內大跌將近 10%",
+                 "九一一事件後美股重新開盤，大幅下跌",
+                 "從高點下跌將近 80% 後，那斯達克終於落底"],
+          real: "那斯達克在 1999 年上漲約 85%，並在 2000 年 3 月見頂。很多網路公司根本沒有獲利，當投資人失去信心，股價就崩跌了。到 2002 年 10 月，那斯達克跌掉將近 80%，而且花了大約 15 年，直到 2015 年才回到 2000 年的高點。",
+          lesson: "動人的故事不等於獲利。當大家都說「這次不一樣」時，要把每個部位保持小，並分散資金。" },
+        gfc: { title: "2008 年金融海嘯", period: "2007 年 10 月–2009", asset: "標普 500 指數",
+          intro: "美國房市開始出現裂痕。你能在幾十年來最嚴重的危機中保護好你的錢嗎？",
+          news: ["美國大型投資銀行貝爾斯登獲救，被賣給摩根大通",
+                 "雷曼兄弟破產，成為美國史上最大的破產案",
+                 "美國國會通過 7,000 億美元的銀行紓困計畫",
+                 "股市跌到最低點，比 2007 年高點下跌約 57%"],
+          real: "很多美國人借錢買了自己負擔不起的房子。房價下跌後，押注這些貸款的銀行損失慘重，有些甚至倒閉。標普 500 從 2007 年 10 月到 2009 年 3 月下跌約 57%。之後展開史上最長的上漲之一，到 2013 年就回到舊高點之上。",
+          lesson: "最可怕、大家都在賣的時候，常常離底部不遠。在 2009 年初恐慌賣出的人，錯過了後來的回升。" },
+        covid: { title: "新冠疫情崩盤", period: "2020", asset: "標普 500 指數",
+          intro: "一種新病毒正在擴散，市場即將出現史上最快的崩盤之一。你會怎麼做？",
+          news: ["新冠病毒在中國以外迅速擴散，股市開始下跌",
+                 "世界衛生組織宣布全球大流行",
+                 "美國央行承諾無上限支持市場",
+                 "輝瑞與 BioNTech 宣布疫苗有效率超過 90%"],
+          real: "標普 500 在一個多月內下跌約 34%，是史上最快的崩盤之一。接著各國政府和央行推出大規模支持措施。市場在 2020 年 8 月就收復失地，全年還上漲約 16%。",
+          lesson: "崩盤之後可能很快反彈。恐慌賣出、等到「感覺安全」再買，往往要用更高的價格買回來。" },
+        rates: { title: "2022 年升息衝擊", period: "2022–2023 年中", asset: "那斯達克綜合指數",
+          intro: "通膨快速上升，利率即將大漲。科技股撐得住嗎？",
+          news: ["美國聯準會自 2018 年以來首次升息",
+                 "美國通膨創 40 年新高，聯準會做出 1994 年以來最大的升息",
+                 "通膨數據又偏高，但股市當天強勁反彈",
+                 "OpenAI 推出 ChatGPT，掀起 AI 熱潮"],
+          real: "為了對抗 40 年來最高的通膨，聯準會在 2022 年非常快速地升息。高利率對快速成長的科技公司傷害最大，那斯達克那一年下跌約三分之一。到了 2023 年，AI 熱潮幫助科技股回升。",
+          lesson: "利率很重要。利率快速上升時，昂貴的成長股常常跌得最兇。了解是什麼在推動市場，能幫你保持冷靜。" },
+        ai: { title: "AI 晶片熱潮", period: "2023–2024", asset: "輝達股票",
+          intro: "ChatGPT 剛推出，大家都想要 AI 晶片。你能在大起大落中一路抱住嗎？",
+          news: ["ChatGPT 推出兩個月後，企業搶購 AI 晶片",
+                 "輝達預測營收遠高於預期，股價一天大漲約 24%",
+                 "輝達公布 AI 晶片營收再度大幅成長",
+                 "輝達一度成為全球市值最高的公司",
+                 "對美國經濟的擔憂衝擊全球股市，晶片股下跌"],
+          real: "ChatGPT 之後，AI 晶片的需求爆發。輝達的營收和獲利成長了好幾倍，股價在兩年內上漲約九倍。即使如此，途中也出現好幾次 20% 以上的下跌。",
+          lesson: "就算是大贏家，也會有可怕的下跌，在第一次大跌就賣掉的人錯過了大部分漲幅。但輝達是少見的例子：很多被炒作的股票再也沒有回來。" },
+        tsmc: { title: "台積電的下跌與反彈", period: "2022–2024", asset: "台積電（2330）",
+          intro: "台灣最大的公司即將經歷艱難的一年。你有耐心等到接下來的發展嗎？",
+          news: ["烏克蘭戰爭與升息震撼全球股市",
+                 "晶片需求放緩的擔憂，加上美國限制對中國出售晶片，台積電跌到兩年多來的低點",
+                 "巴菲特的波克夏公司揭露買進台積電股票",
+                 "AI 晶片需求推動台積電首度站上 1,000 元"],
+          real: "2022 年，升息和晶片需求轉弱的擔憂讓台積電股價跌掉將近一半。接著 AI 改變了故事：台積電為輝達等公司製造最先進的 AI 晶片，到 2024 年底，股價已經比 2022 年的低點漲了將近三倍。",
+          lesson: "就算是好公司，在不好的年份股價也可能大跌。如果公司本身依然強健，耐心可能會有回報，但沒有人能事先知道轉折何時出現。" },
+      },
+    },
+    es: {
+      ui: {
+        "tab.challenges": "Retos", "plus.tag": "PLUS", "plus.preview": "Función Plus · gratis durante la prueba",
+        "plus.lockedTitle": "Esta es una función de StockPilot Plus", "plus.lockedBody": v => `Hazte Plus por ${v.price} al mes y desbloquea:`,
+        "plus.f1": "Retos históricos: revive momentos famosos del mercado", "plus.f2": "Las nuevas funciones Plus que vayan saliendo", "plus.f3": "Tu apoyo ayuda a crear nuevas lecciones y mercados",
+        "plus.upgrade": "Pasar a Plus", "plus.soon": "Los pagos todavía no están abiertos.",
+        "ch.title": "Retos históricos", "ch.sub": "Viaja a momentos famosos del mercado con 10.000 $ de dinero virtual. ¿Puedes hacerlo mejor que el mercado?",
+        "ch.note": "Los precios siguen la forma de cada hecho real, con cifras simplificadas y aproximadas. Los titulares son hechos reales.",
+        "ch.play": "Jugar", "ch.replay": "Jugar otra vez", "ch.back": "Todos los retos", "ch.quit": "Salir",
+        "ch.best": v => `Mejor resultado: ${v.p}`, "ch.notPlayed": "Aún sin jugar",
+        "ch.level.1": "Fácil", "ch.level.2": "Medio", "ch.level.3": "Difícil",
+        "ch.pause": "Pausa", "ch.resume": "Jugar", "ch.speed": "Velocidad", "ch.autoPause": "Pausar cuando haya noticias",
+        "ch.value": "Tu dinero", "ch.cash": "Efectivo", "ch.invested": "Invertido", "ch.hold": "Si hubieras comprado al principio y mantenido",
+        "ch.buyPct": v => `Comprar ${v.p} %`, "ch.buyAll": "Comprar con todo el efectivo", "ch.sellPct": v => `Vender ${v.p} %`, "ch.sellAll": "Venderlo todo",
+        "ch.trades": v => `${v.n} operación${v.n === 1 ? "" : "es"}`, "ch.news": "Titulares", "ch.newsEmpty": "Los titulares aparecerán según avance la historia.",
+        "ch.startHint": "Pulsa Jugar para empezar. Compra y vende cuando quieras, y pausa siempre que necesites pensar.",
+        "ch.newsPaused": "⏸ En pausa por una noticia. Decide qué hacer y pulsa Jugar.",
+        "ch.done": "Reto completado", "ch.you": "Tú", "ch.holdShort": "Comprar y mantener", "ch.cashShort": "Quedarse en efectivo",
+        "ch.dd": v => `Tu mayor caída: ${v.a} · la mayor caída del mercado: ${v.b}`,
+        "ch.star1": "Terminaste el reto", "ch.star2": "Acabaste con más dinero del que tenías",
+        "ch.star3": "Invertiste y tu mayor caída no fue peor que la del mercado",
+        "ch.real": "Lo que pasó de verdad", "ch.takeaway": "Lección:", "ch.xp": v => `Reto: ${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "La burbuja puntocom", period: "1999–2002", asset: "índice Nasdaq Composite",
+          intro: "Las acciones de internet son lo más de moda del planeta. ¿Subirás con la burbuja y saldrás a tiempo?",
+          news: ["Las acciones de internet se disparan: los inversores compran cualquier empresa con «.com» en el nombre",
+                 "El Nasdaq marca un récord por encima de 5.000 puntos",
+                 "Desplome tecnológico: el Nasdaq cae casi un 10 % en un solo día",
+                 "La bolsa de EE. UU. reabre tras los atentados del 11 de septiembre y cae con fuerza",
+                 "Tras caer casi un 80 % desde su máximo, el Nasdaq por fin toca fondo"],
+          real: "El Nasdaq subió un 85 % en 1999 y tocó techo en marzo de 2000. Muchas empresas de internet no ganaban dinero y, cuando los inversores perdieron la fe, los precios se hundieron. En octubre de 2002 el Nasdaq había perdido casi un 80 %, y tardó unos 15 años, hasta 2015, en volver a su máximo de 2000.",
+          lesson: "Una historia emocionante no es lo mismo que beneficios. Cuando todos dicen «esta vez es diferente», mantén cada posición pequeña y reparte tu dinero." },
+        gfc: { title: "La crisis financiera de 2008", period: "oct. 2007–2009", asset: "índice S&P 500",
+          intro: "Aparecen grietas en el mercado de la vivienda de EE. UU. ¿Podrás proteger tu dinero en la peor crisis en décadas?",
+          news: ["Rescatan a Bear Stearns, un gran banco de inversión, que se vende a JPMorgan",
+                 "Quiebra Lehman Brothers, la mayor bancarrota de la historia de EE. UU.",
+                 "El Congreso de EE. UU. aprueba un plan de 700.000 millones de dólares para rescatar a los bancos",
+                 "La bolsa toca su punto más bajo, un 57 % por debajo del máximo de 2007"],
+          real: "Muchos estadounidenses se habían endeudado para comprar casas que no podían pagar. Cuando los precios bajaron, los bancos que habían apostado por esos préstamos perdieron enormes sumas y algunos quebraron. El S&P 500 cayó un 57 % entre octubre de 2007 y marzo de 2009. Después empezó una de sus subidas más largas y en 2013 ya superaba su antiguo máximo.",
+          lesson: "El momento más aterrador, cuando todos venden, suele estar cerca del fondo. Quienes vendieron por pánico a principios de 2009 se perdieron la recuperación." },
+        covid: { title: "El desplome de la COVID", period: "2020", asset: "índice S&P 500",
+          intro: "Un nuevo virus se está extendiendo. Los mercados están a punto de sufrir uno de los desplomes más rápidos de la historia. ¿Qué harás?",
+          news: ["El coronavirus se extiende rápido fuera de China y la bolsa empieza a caer",
+                 "La Organización Mundial de la Salud declara una pandemia mundial",
+                 "El banco central de EE. UU. promete apoyo ilimitado a los mercados",
+                 "Pfizer y BioNTech anuncian que su vacuna tiene una eficacia superior al 90 %"],
+          real: "El S&P 500 cayó un 34 % en poco más de un mes, uno de los desplomes más rápidos de la historia. Después, gobiernos y bancos centrales lanzaron enormes ayudas. El mercado recuperó lo perdido en agosto de 2020 y terminó el año con una subida del 16 %.",
+          lesson: "Tras un desplome puede llegar una recuperación rápida. Vender por pánico y esperar a «sentirse seguro» suele significar volver a comprar más caro." },
+        rates: { title: "El golpe de los tipos en 2022", period: "2022–mediados de 2023", asset: "índice Nasdaq Composite",
+          intro: "La inflación sube rápido y los tipos de interés están a punto de dispararse. ¿Cómo lo aguantarán las tecnológicas?",
+          news: ["La Reserva Federal sube los tipos de interés por primera vez desde 2018",
+                 "La inflación de EE. UU. marca un máximo de 40 años y la Fed hace su mayor subida desde 1994",
+                 "Otro dato de inflación alto, pero la bolsa rebota con fuerza ese mismo día",
+                 "OpenAI lanza ChatGPT y empieza la ola de entusiasmo por la IA"],
+          real: "Para combatir la inflación más alta en 40 años, la Fed subió los tipos muy rápido en 2022. Los tipos altos golpearon sobre todo a las tecnológicas de rápido crecimiento, y el Nasdaq cayó cerca de un tercio ese año. En 2023, el entusiasmo por la IA ayudó a las tecnológicas a recuperarse.",
+          lesson: "Los tipos de interés importan. Cuando suben deprisa, las acciones de crecimiento caras suelen ser las que más caen. Saber qué mueve un mercado ayuda a mantener la calma." },
+        ai: { title: "El boom de los chips de IA", period: "2023–2024", asset: "acción de NVIDIA",
+          intro: "ChatGPT acaba de salir y todo el mundo quiere chips de IA. ¿Aguantarás a bordo entre subidas y bajadas?",
+          news: ["Dos meses después del lanzamiento de ChatGPT, las empresas compiten por comprar chips de IA",
+                 "NVIDIA prevé ventas muy por encima de lo esperado y la acción salta un 24 % en un día",
+                 "NVIDIA anuncia otro enorme aumento de ventas gracias a los chips de IA",
+                 "NVIDIA se convierte por un momento en la empresa más valiosa del mundo",
+                 "El miedo por la economía de EE. UU. golpea a las bolsas del mundo y caen los fabricantes de chips"],
+          real: "La demanda de chips de IA explotó tras ChatGPT. Las ventas y los beneficios de NVIDIA se multiplicaron, y su acción subió unas nueve veces en dos años. Aun así, por el camino tuvo varias caídas del 20 % o más.",
+          lesson: "Incluso los grandes ganadores tienen caídas que asustan, y quien vendió en la primera gran bajada se perdió casi toda la subida. Pero NVIDIA es un caso raro: muchas acciones de moda nunca se recuperan." },
+        tsmc: { title: "La caída y el regreso de TSMC", period: "2022–2024", asset: "TSMC (2330)",
+          intro: "La mayor empresa de Taiwán está a punto de vivir un año difícil. ¿Tendrás paciencia para lo que viene después?",
+          news: ["La guerra en Ucrania y la subida de tipos sacuden los mercados mundiales",
+                 "El miedo a un frenazo de los chips y los nuevos límites de EE. UU. a la venta de chips a China llevan a TSMC a su nivel más bajo en más de dos años",
+                 "Berkshire Hathaway, la empresa de Warren Buffett, revela que ha comprado acciones de TSMC",
+                 "La demanda de chips de IA lleva a TSMC por encima de 1.000 NT$ por primera vez"],
+          real: "En 2022, la subida de tipos y el miedo a una menor demanda de chips recortaron el precio de TSMC casi a la mitad. Luego la IA cambió la historia: TSMC fabrica los chips de IA más avanzados para NVIDIA y otras empresas, y a finales de 2024 su acción casi había triplicado el mínimo de 2022.",
+          lesson: "La acción de una gran empresa puede caer mucho en un mal año. Si el negocio sigue fuerte, la paciencia puede dar frutos, pero nadie sabía de antemano cuándo llegaría el giro." },
+      },
+    },
+    fr: {
+      ui: {
+        "tab.challenges": "Défis", "plus.tag": "PLUS", "plus.preview": "Fonction Plus · gratuite pendant l’aperçu",
+        "plus.lockedTitle": "Ceci est une fonction StockPilot Plus", "plus.lockedBody": v => `Passez à Plus pour ${v.price} par mois et débloquez :`,
+        "plus.f1": "Défis historiques : revivez des moments célèbres de la Bourse", "plus.f2": "Les nouvelles fonctions Plus dès leur sortie", "plus.f3": "Votre soutien aide à créer de nouvelles leçons et de nouveaux marchés",
+        "plus.upgrade": "Passer à Plus", "plus.soon": "Les paiements ne sont pas encore ouverts.",
+        "ch.title": "Défis historiques", "ch.sub": "Remontez le temps vers des moments célèbres de la Bourse avec 10 000 $ d’argent fictif. Ferez-vous mieux que le marché ?",
+        "ch.note": "Les prix suivent la forme de chaque événement réel, avec des chiffres simplifiés et approximatifs. Les titres sont des événements réels.",
+        "ch.play": "Jouer", "ch.replay": "Rejouer", "ch.back": "Tous les défis", "ch.quit": "Quitter",
+        "ch.best": v => `Meilleur résultat : ${v.p}`, "ch.notPlayed": "Pas encore joué",
+        "ch.level.1": "Facile", "ch.level.2": "Moyen", "ch.level.3": "Difficile",
+        "ch.pause": "Pause", "ch.resume": "Jouer", "ch.speed": "Vitesse", "ch.autoPause": "Pause quand une nouvelle tombe",
+        "ch.value": "Votre argent", "ch.cash": "Liquidités", "ch.invested": "Investi", "ch.hold": "Si vous aviez acheté au début et gardé",
+        "ch.buyPct": v => `Acheter ${v.p} %`, "ch.buyAll": "Tout acheter", "ch.sellPct": v => `Vendre ${v.p} %`, "ch.sellAll": "Tout vendre",
+        "ch.trades": v => `${v.n} transaction${v.n === 1 ? "" : "s"}`, "ch.news": "Titres", "ch.newsEmpty": "Les titres apparaîtront au fil de l’histoire.",
+        "ch.startHint": "Appuyez sur Jouer pour commencer. Achetez et vendez quand vous voulez, et mettez en pause pour réfléchir.",
+        "ch.newsPaused": "⏸ En pause pour une nouvelle. Décidez quoi faire, puis appuyez sur Jouer.",
+        "ch.done": "Défi terminé", "ch.you": "Vous", "ch.holdShort": "Acheter et garder", "ch.cashShort": "Rester en liquidités",
+        "ch.dd": v => `Votre plus forte baisse : ${v.a} · la plus forte baisse du marché : ${v.b}`,
+        "ch.star1": "Défi terminé", "ch.star2": "Vous finissez avec plus d’argent qu’au départ",
+        "ch.star3": "Vous avez investi et votre plus forte baisse n’a pas été pire que celle du marché",
+        "ch.real": "Ce qui s’est vraiment passé", "ch.takeaway": "Leçon :", "ch.xp": v => `Défi : ${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "La bulle Internet", period: "1999–2002", asset: "indice Nasdaq Composite",
+          intro: "Les actions Internet sont ce qu’il y a de plus en vogue sur Terre. Surferez-vous sur la bulle, et sortirez-vous à temps ?",
+          news: ["Les actions Internet s’envolent : les investisseurs achètent toute entreprise avec « .com » dans son nom",
+                 "Le Nasdaq atteint un record au-dessus de 5 000 points",
+                 "Krach de la tech : le Nasdaq chute de près de 10 % en une seule journée",
+                 "Wall Street rouvre après les attentats du 11 septembre et chute fortement",
+                 "Après une chute de près de 80 % depuis son sommet, le Nasdaq touche enfin le fond"],
+          real: "Le Nasdaq a gagné environ 85 % en 1999 et a culminé en mars 2000. Beaucoup d’entreprises Internet ne faisaient aucun bénéfice, et quand les investisseurs ont perdu confiance, les prix se sont effondrés. En octobre 2002, le Nasdaq avait perdu près de 80 %, et il a fallu environ 15 ans, jusqu’en 2015, pour retrouver son sommet de 2000.",
+          lesson: "Une belle histoire n’est pas la même chose que des bénéfices. Quand tout le monde dit « cette fois, c’est différent », gardez chaque position petite et répartissez votre argent." },
+        gfc: { title: "La crise financière de 2008", period: "oct. 2007–2009", asset: "indice S&P 500",
+          intro: "Des fissures apparaissent dans l’immobilier américain. Protégerez-vous votre argent pendant la pire crise depuis des décennies ?",
+          news: ["Bear Stearns, une grande banque d’investissement américaine, est sauvée et vendue à JPMorgan",
+                 "Lehman Brothers fait faillite, la plus grande faillite de l’histoire des États-Unis",
+                 "Le Congrès américain vote un plan de 700 milliards de dollars pour sauver les banques",
+                 "La Bourse touche son point le plus bas, environ 57 % sous le sommet de 2007"],
+          real: "Beaucoup d’Américains avaient emprunté pour acheter des maisons qu’ils ne pouvaient pas se payer. Quand les prix de l’immobilier ont baissé, les banques qui avaient parié sur ces prêts ont perdu des sommes énormes, et certaines ont fait faillite. Le S&P 500 a chuté d’environ 57 % entre octobre 2007 et mars 2009. Puis il a entamé l’une de ses plus longues hausses et a dépassé son ancien sommet dès 2013.",
+          lesson: "Le moment le plus effrayant, quand tout le monde vend, est souvent proche du creux. Ceux qui ont vendu dans la panique début 2009 ont raté la reprise." },
+        covid: { title: "Le krach du COVID", period: "2020", asset: "indice S&P 500",
+          intro: "Un nouveau virus se propage. Les marchés vont connaître l’un des krachs les plus rapides de l’histoire. Que ferez-vous ?",
+          news: ["Le coronavirus se répand vite hors de Chine et la Bourse commence à baisser",
+                 "L’Organisation mondiale de la santé déclare une pandémie mondiale",
+                 "La banque centrale américaine promet un soutien illimité aux marchés",
+                 "Pfizer et BioNTech annoncent que leur vaccin est efficace à plus de 90 %"],
+          real: "Le S&P 500 a chuté d’environ 34 % en un peu plus d’un mois, l’un des krachs les plus rapides de l’histoire. Les gouvernements et les banques centrales ont ensuite apporté un soutien énorme. Le marché a effacé ses pertes dès août 2020 et a fini l’année en hausse d’environ 16 %.",
+          lesson: "Un krach peut être suivi d’une reprise rapide. Vendre dans la panique et attendre de « se sentir en sécurité » revient souvent à racheter plus cher." },
+        rates: { title: "Le choc des taux de 2022", period: "2022–mi-2023", asset: "indice Nasdaq Composite",
+          intro: "L’inflation grimpe vite et les taux d’intérêt vont bondir. Comment les valeurs tech vont-elles tenir ?",
+          news: ["La Réserve fédérale relève ses taux pour la première fois depuis 2018",
+                 "L’inflation américaine atteint un record depuis 40 ans et la Fed fait sa plus forte hausse depuis 1994",
+                 "Encore une inflation élevée, mais la Bourse rebondit fortement le jour même",
+                 "OpenAI lance ChatGPT, début d’une vague d’enthousiasme pour l’IA"],
+          real: "Pour combattre l’inflation la plus forte depuis 40 ans, la Fed a relevé ses taux très vite en 2022. Les taux élevés ont surtout frappé les entreprises tech à forte croissance, et le Nasdaq a perdu environ un tiers cette année-là. En 2023, l’enthousiasme pour l’IA a aidé la tech à se redresser.",
+          lesson: "Les taux d’intérêt comptent. Quand ils montent vite, les actions de croissance chères baissent souvent le plus. Comprendre ce qui fait bouger un marché aide à rester calme." },
+        ai: { title: "Le boom des puces IA", period: "2023–2024", asset: "action NVIDIA",
+          intro: "ChatGPT vient de sortir et tout le monde veut des puces IA. Resterez-vous à bord malgré les montagnes russes ?",
+          news: ["Deux mois après le lancement de ChatGPT, les entreprises se ruent sur les puces IA",
+                 "NVIDIA prévoit des ventes bien au-dessus des attentes et l’action bondit d’environ 24 % en un jour",
+                 "NVIDIA annonce une nouvelle envolée de ses ventes de puces IA",
+                 "NVIDIA devient brièvement l’entreprise la plus chère du monde",
+                 "Les craintes sur l’économie américaine frappent les Bourses mondiales et les fabricants de puces chutent"],
+          real: "La demande de puces IA a explosé après ChatGPT. Les ventes et les bénéfices de NVIDIA ont été multipliés, et son action a été multipliée par environ neuf en deux ans. Malgré tout, elle a connu plusieurs baisses de 20 % ou plus en chemin.",
+          lesson: "Même les grands gagnants ont des baisses effrayantes, et ceux qui ont vendu à la première grosse baisse ont raté l’essentiel de la hausse. Mais NVIDIA est un cas rare : beaucoup d’actions à la mode ne se relèvent jamais." },
+        tsmc: { title: "La chute et le retour de TSMC", period: "2022–2024", asset: "TSMC (2330)",
+          intro: "La plus grande entreprise de Taïwan va vivre une année difficile. Aurez-vous la patience pour la suite ?",
+          news: ["La guerre en Ukraine et la hausse des taux secouent les marchés mondiaux",
+                 "Les craintes d’un ralentissement des puces et les nouvelles limites américaines aux ventes de puces à la Chine poussent TSMC à son plus bas depuis plus de deux ans",
+                 "Berkshire Hathaway, la société de Warren Buffett, révèle avoir acheté des actions TSMC",
+                 "La demande de puces IA fait passer TSMC au-dessus de 1 000 NT$ pour la première fois"],
+          real: "En 2022, la hausse des taux et la crainte d’une demande de puces plus faible ont presque divisé par deux le prix de TSMC. Puis l’IA a changé l’histoire : TSMC fabrique les puces IA les plus avancées pour NVIDIA et d’autres, et fin 2024 son action avait presque triplé depuis le plus bas de 2022.",
+          lesson: "L’action d’une excellente entreprise peut quand même beaucoup baisser lors d’une mauvaise année. Si l’activité reste solide, la patience peut payer, mais personne ne savait à l’avance quand viendrait le retournement." },
+      },
+    },
+    hi: {
+      ui: {
+        "tab.challenges": "चुनौतियाँ", "plus.tag": "PLUS", "plus.preview": "Plus फ़ीचर · प्रीव्यू के दौरान मुफ़्त",
+        "plus.lockedTitle": "यह StockPilot Plus फ़ीचर है", "plus.lockedBody": v => `${v.price} प्रति माह में Plus लें और खोलें:`,
+        "plus.f1": "ऐतिहासिक चुनौतियाँ: बाज़ार की मशहूर घटनाएँ दोबारा खेलें", "plus.f2": "आने वाले नए Plus फ़ीचर", "plus.f3": "आपका साथ नए पाठ और बाज़ार बनाने में मदद करता है",
+        "plus.upgrade": "Plus में अपग्रेड करें", "plus.soon": "भुगतान अभी शुरू नहीं हुआ है।",
+        "ch.title": "ऐतिहासिक चुनौतियाँ", "ch.sub": "$10,000 के नकली पैसे के साथ बाज़ार के मशहूर पलों में वापस जाएँ। क्या आप बाज़ार से बेहतर कर सकते हैं?",
+        "ch.note": "कीमतें हर असली घटना के आकार पर चलती हैं, संख्याएँ सरल और अनुमानित हैं। सुर्ख़ियाँ असली घटनाएँ हैं।",
+        "ch.play": "खेलें", "ch.replay": "फिर से खेलें", "ch.back": "सभी चुनौतियाँ", "ch.quit": "छोड़ें",
+        "ch.best": v => `सबसे अच्छा नतीजा: ${v.p}`, "ch.notPlayed": "अभी खेला नहीं",
+        "ch.level.1": "आसान", "ch.level.2": "मध्यम", "ch.level.3": "कठिन",
+        "ch.pause": "रोकें", "ch.resume": "चलाएँ", "ch.speed": "रफ़्तार", "ch.autoPause": "ख़बर आने पर रोकें",
+        "ch.value": "आपका पैसा", "ch.cash": "नकद", "ch.invested": "निवेश किया", "ch.hold": "अगर शुरुआत में ख़रीदकर रखे रहते",
+        "ch.buyPct": v => `${v.p}% ख़रीदें`, "ch.buyAll": "सारे नकद से ख़रीदें", "ch.sellPct": v => `${v.p}% बेचें`, "ch.sellAll": "सब बेचें",
+        "ch.trades": v => `${v.n} ट्रेड`, "ch.news": "सुर्ख़ियाँ", "ch.newsEmpty": "कहानी आगे बढ़ने पर सुर्ख़ियाँ यहाँ दिखेंगी।",
+        "ch.startHint": "शुरू करने के लिए चलाएँ दबाएँ। कभी भी ख़रीदें-बेचें, और सोचना हो तो कभी भी रोकें।",
+        "ch.newsPaused": "⏸ ख़बर के लिए रोका गया। तय करें क्या करना है, फिर चलाएँ दबाएँ।",
+        "ch.done": "चुनौती पूरी", "ch.you": "आप", "ch.holdShort": "ख़रीदकर रखना", "ch.cashShort": "नकद में रहना",
+        "ch.dd": v => `आपकी सबसे बड़ी गिरावट: ${v.a} · बाज़ार की सबसे बड़ी गिरावट: ${v.b}`,
+        "ch.star1": "चुनौती पूरी की", "ch.star2": "शुरुआत से ज़्यादा पैसे के साथ ख़त्म किया",
+        "ch.star3": "निवेश किया, और आपकी सबसे बड़ी गिरावट बाज़ार से बदतर नहीं थी",
+        "ch.real": "असल में क्या हुआ", "ch.takeaway": "सीख:", "ch.xp": v => `चुनौती: ${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "डॉट-कॉम बुलबुला", period: "1999–2002", asset: "Nasdaq Composite सूचकांक",
+          intro: "इंटरनेट शेयर दुनिया की सबसे गर्म चीज़ हैं। क्या आप बुलबुले के साथ चढ़ेंगे, और समय पर निकल पाएँगे?",
+          news: ["इंटरनेट शेयर आसमान पर, निवेशक नाम में “.com” वाली हर कंपनी के पीछे भागे",
+                 "Nasdaq 5,000 से ऊपर के रिकॉर्ड स्तर पर",
+                 "टेक शेयर धड़ाम: Nasdaq एक ही दिन में लगभग 10% गिरा",
+                 "11 सितंबर के हमलों के बाद अमेरिकी बाज़ार दोबारा खुले और तेज़ी से गिरे",
+                 "शिखर से लगभग 80% गिरने के बाद Nasdaq आख़िरकार तल पर पहुँचा"],
+          real: "Nasdaq 1999 में लगभग 85% चढ़ा और मार्च 2000 में शिखर पर पहुँचा। कई इंटरनेट कंपनियों का कोई मुनाफ़ा नहीं था, और जब निवेशकों का भरोसा टूटा तो कीमतें ढह गईं। अक्टूबर 2002 तक Nasdaq लगभग 80% गिर चुका था, और 2000 के शिखर पर लौटने में उसे लगभग 15 साल लगे, 2015 तक।",
+          lesson: "रोमांचक कहानी मुनाफ़े के बराबर नहीं होती। जब सब कहें “इस बार अलग है”, तो हर पोज़िशन छोटी रखें और पैसा बाँटें।" },
+        gfc: { title: "2008 का वित्तीय संकट", period: "अक्टूबर 2007–2009", asset: "S&P 500 सूचकांक",
+          intro: "अमेरिकी हाउसिंग बाज़ार में दरारें दिख रही हैं। क्या आप दशकों के सबसे बुरे संकट में अपना पैसा बचा पाएँगे?",
+          news: ["बड़े अमेरिकी इन्वेस्टमेंट बैंक Bear Stearns को बचाकर JPMorgan को बेचा गया",
+                 "Lehman Brothers दिवालिया, अमेरिकी इतिहास का सबसे बड़ा दिवालियापन",
+                 "अमेरिकी संसद ने बैंकों को बचाने के लिए 700 अरब डॉलर की योजना पास की",
+                 "शेयर सबसे निचले स्तर पर, 2007 के शिखर से लगभग 57% नीचे"],
+          real: "कई अमेरिकियों ने ऐसे घर ख़रीदने के लिए कर्ज़ लिया था जो वे वहन नहीं कर सकते थे। घरों की कीमतें गिरीं तो इन कर्ज़ों पर दाँव लगाने वाले बैंकों को भारी नुकसान हुआ, और कुछ डूब गए। S&P 500 अक्टूबर 2007 से मार्च 2009 तक लगभग 57% गिरा। फिर उसकी सबसे लंबी बढ़तों में से एक शुरू हुई, और 2013 तक वह पुराने शिखर से ऊपर था।",
+          lesson: "सबसे डरावना पल, जब सब बेच रहे होते हैं, अक्सर तल के पास होता है। 2009 की शुरुआत में घबराकर बेचने वाले वापसी से चूक गए।" },
+        covid: { title: "कोविड गिरावट", period: "2020", asset: "S&P 500 सूचकांक",
+          intro: "एक नया वायरस फैल रहा है। बाज़ार इतिहास की सबसे तेज़ गिरावटों में से एक के क़रीब है। आप क्या करेंगे?",
+          news: ["कोरोनावायरस चीन के बाहर तेज़ी से फैला, शेयर गिरने लगे",
+                 "विश्व स्वास्थ्य संगठन ने वैश्विक महामारी घोषित की",
+                 "अमेरिकी केंद्रीय बैंक ने बाज़ार को असीमित सहारे का वादा किया",
+                 "Pfizer और BioNTech ने कहा कि उनका टीका 90% से ज़्यादा असरदार है"],
+          real: "S&P 500 एक महीने से थोड़े ज़्यादा समय में लगभग 34% गिरा, जो इतिहास की सबसे तेज़ गिरावटों में से एक है। फिर सरकारों और केंद्रीय बैंकों ने भारी मदद दी। बाज़ार ने अगस्त 2020 तक नुकसान वापस पा लिया और साल लगभग 16% बढ़त के साथ ख़त्म किया।",
+          lesson: "गिरावट के बाद तेज़ वापसी भी हो सकती है। घबराकर बेचना और “सुरक्षित लगने” का इंतज़ार करना अक्सर ऊँची कीमत पर वापस ख़रीदना होता है।" },
+        rates: { title: "2022 का ब्याज दर झटका", period: "2022–2023 के मध्य तक", asset: "Nasdaq Composite सूचकांक",
+          intro: "महँगाई तेज़ी से बढ़ रही है और ब्याज दरें उछलने वाली हैं। टेक शेयर इसे कैसे झेलेंगे?",
+          news: ["अमेरिकी फ़ेडरल रिज़र्व ने 2018 के बाद पहली बार ब्याज दरें बढ़ाईं",
+                 "अमेरिकी महँगाई 40 साल के शिखर पर, फ़ेड ने 1994 के बाद सबसे बड़ी बढ़ोतरी की",
+                 "महँगाई का आँकड़ा फिर ऊँचा, लेकिन उसी दिन शेयरों में ज़ोरदार वापसी",
+                 "OpenAI ने ChatGPT लॉन्च किया, AI को लेकर उत्साह की लहर शुरू"],
+          real: "40 साल की सबसे ऊँची महँगाई से लड़ने के लिए फ़ेड ने 2022 में बहुत तेज़ी से दरें बढ़ाईं। ऊँची दरों ने तेज़ी से बढ़ती टेक कंपनियों को सबसे ज़्यादा चोट पहुँचाई, और उस साल Nasdaq लगभग एक-तिहाई गिरा। 2023 में AI के उत्साह ने टेक शेयरों को उबरने में मदद की।",
+          lesson: "ब्याज दरें मायने रखती हैं। जब वे तेज़ी से बढ़ती हैं, महँगे ग्रोथ शेयर अक्सर सबसे ज़्यादा गिरते हैं। बाज़ार को क्या चलाता है, यह जानना शांत रहने में मदद करता है।" },
+        ai: { title: "AI चिप बूम", period: "2023–2024", asset: "NVIDIA का शेयर",
+          intro: "ChatGPT अभी लॉन्च हुआ है, और सबको AI चिप्स चाहिए। क्या आप उतार-चढ़ाव में टिके रहेंगे?",
+          news: ["ChatGPT लॉन्च के दो महीने बाद कंपनियाँ AI चिप्स ख़रीदने की होड़ में",
+                 "NVIDIA ने उम्मीद से कहीं ज़्यादा बिक्री का अनुमान दिया, शेयर एक दिन में लगभग 24% उछला",
+                 "NVIDIA ने AI चिप्स से बिक्री में फिर भारी उछाल बताया",
+                 "NVIDIA कुछ समय के लिए दुनिया की सबसे मूल्यवान कंपनी बनी",
+                 "अमेरिकी अर्थव्यवस्था की चिंता से दुनिया भर के बाज़ार गिरे, चिप शेयर नीचे"],
+          real: "ChatGPT के बाद AI चिप्स की माँग फट पड़ी। NVIDIA की बिक्री और मुनाफ़ा कई गुना बढ़े, और उसका शेयर दो साल में लगभग नौ गुना हुआ। फिर भी रास्ते में उसमें कई बार 20% या ज़्यादा की गिरावट आई।",
+          lesson: "बड़े विजेताओं में भी डरावनी गिरावटें आती हैं, और पहली बड़ी गिरावट पर बेचने वाले ज़्यादातर बढ़त से चूक गए। लेकिन NVIDIA एक दुर्लभ उदाहरण है: कई चर्चित शेयर कभी वापस नहीं आते।" },
+        tsmc: { title: "TSMC का गिरना और लौटना", period: "2022–2024", asset: "TSMC (2330)",
+          intro: "ताइवान की सबसे बड़ी कंपनी का एक मुश्किल साल आने वाला है। क्या आप आगे के लिए धैर्य रख पाएँगे?",
+          news: ["यूक्रेन युद्ध और बढ़ती ब्याज दरों ने दुनिया के बाज़ार हिलाए",
+                 "चिप मंदी के डर और चीन को चिप बिक्री पर नई अमेरिकी पाबंदियों से TSMC दो साल से ज़्यादा के निचले स्तर पर",
+                 "वॉरेन बफ़ेट की कंपनी Berkshire Hathaway ने TSMC के शेयर ख़रीदने का खुलासा किया",
+                 "AI चिप्स की माँग से TSMC पहली बार NT$1,000 के पार"],
+          real: "2022 में ऊँची ब्याज दरों और कमज़ोर चिप माँग के डर ने TSMC की कीमत लगभग आधी कर दी। फिर AI ने कहानी बदल दी: TSMC NVIDIA और दूसरों के लिए सबसे उन्नत AI चिप्स बनाती है, और 2024 के अंत तक उसका शेयर 2022 के निचले स्तर से लगभग तीन गुना हो गया।",
+          lesson: "बेहतरीन कंपनी का शेयर भी बुरे साल में बहुत गिर सकता है। अगर कारोबार मज़बूत रहे तो धैर्य का फल मिल सकता है, लेकिन किसी को पहले से नहीं पता था कि मोड़ कब आएगा।" },
+      },
+    },
+    ar: {
+      ui: {
+        "tab.challenges": "التحديات", "plus.tag": "PLUS", "plus.preview": "ميزة Plus · مجانية خلال فترة التجربة",
+        "plus.lockedTitle": "هذه ميزة من StockPilot Plus", "plus.lockedBody": v => `اشترك في Plus مقابل ${v.price} شهريًا لتفتح:`,
+        "plus.f1": "تحديات تاريخية: أعد عيش أحداث شهيرة في السوق", "plus.f2": "ميزات Plus الجديدة فور صدورها", "plus.f3": "دعمك يساعد في بناء دروس وأسواق جديدة",
+        "plus.upgrade": "الترقية إلى Plus", "plus.soon": "الدفع غير متاح بعد.",
+        "ch.title": "تحديات تاريخية", "ch.sub": "عد بالزمن إلى لحظات شهيرة في السوق ومعك 10,000 دولار افتراضية. هل تستطيع أن تتفوق على السوق؟",
+        "ch.note": "تتبع الأسعار شكل كل حدث حقيقي، بأرقام مبسطة وتقريبية. العناوين أحداث حقيقية.",
+        "ch.play": "ابدأ", "ch.replay": "العب مجددًا", "ch.back": "كل التحديات", "ch.quit": "خروج",
+        "ch.best": v => `أفضل نتيجة: ${v.p}`, "ch.notPlayed": "لم تلعبه بعد",
+        "ch.level.1": "سهل", "ch.level.2": "متوسط", "ch.level.3": "صعب",
+        "ch.pause": "إيقاف مؤقت", "ch.resume": "تشغيل", "ch.speed": "السرعة", "ch.autoPause": "توقف عند ورود الأخبار",
+        "ch.value": "أموالك", "ch.cash": "النقد", "ch.invested": "المستثمر", "ch.hold": "لو اشتريت في البداية واحتفظت",
+        "ch.buyPct": v => `شراء ${v.p}%`, "ch.buyAll": "شراء بكل النقد", "ch.sellPct": v => `بيع ${v.p}%`, "ch.sellAll": "بيع الكل",
+        "ch.trades": v => `${v.n} صفقة`, "ch.news": "العناوين", "ch.newsEmpty": "ستظهر العناوين مع تقدم القصة.",
+        "ch.startHint": "اضغط تشغيل للبدء. اشترِ وبِع متى شئت، وأوقف مؤقتًا كلما أردت التفكير.",
+        "ch.newsPaused": "⏸ توقف بسبب خبر. قرر ما ستفعله، ثم اضغط تشغيل.",
+        "ch.done": "اكتمل التحدي", "ch.you": "أنت", "ch.holdShort": "الشراء والاحتفاظ", "ch.cashShort": "البقاء نقدًا",
+        "ch.dd": v => `أكبر انخفاض لك: ${v.a} · أكبر انخفاض للسوق: ${v.b}`,
+        "ch.star1": "أنهيت التحدي", "ch.star2": "أنهيت بمال أكثر مما بدأت به",
+        "ch.star3": "استثمرت، ولم يكن أكبر انخفاض لك أسوأ من السوق",
+        "ch.real": "ما الذي حدث فعلًا", "ch.takeaway": "الدرس:", "ch.xp": v => `تحدٍّ: ${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "فقاعة الإنترنت", period: "1999–2002", asset: "مؤشر ناسداك المركب",
+          intro: "أسهم الإنترنت هي الأكثر رواجًا في العالم. هل ستركب الفقاعة وتخرج في الوقت المناسب؟",
+          news: ["أسهم الإنترنت تحلّق والمستثمرون يندفعون نحو أي شركة في اسمها «.com»",
+                 "ناسداك يسجل رقمًا قياسيًا فوق 5,000 نقطة",
+                 "انهيار أسهم التقنية: ناسداك يهبط نحو 10% في يوم واحد",
+                 "الأسواق الأمريكية تعيد فتح أبوابها بعد هجمات 11 سبتمبر وتنخفض بحدة",
+                 "بعد هبوط نحو 80% من قمته، ناسداك يصل أخيرًا إلى القاع"],
+          real: "ارتفع ناسداك نحو 85% في عام 1999 وبلغ قمته في مارس 2000. كثير من شركات الإنترنت لم تكن تحقق أرباحًا، وعندما فقد المستثمرون ثقتهم انهارت الأسعار. بحلول أكتوبر 2002 كان ناسداك قد فقد نحو 80%، واستغرق نحو 15 عامًا، حتى 2015، ليعود إلى قمة عام 2000.",
+          lesson: "القصة المثيرة ليست مثل الأرباح. عندما يقول الجميع «هذه المرة مختلفة»، أبقِ كل مركز صغيرًا ووزّع أموالك." },
+        gfc: { title: "الأزمة المالية 2008", period: "أكتوبر 2007–2009", asset: "مؤشر S&P 500",
+          intro: "بدأت تظهر شقوق في سوق العقارات الأمريكية. هل تستطيع حماية أموالك في أسوأ أزمة منذ عقود؟",
+          news: ["إنقاذ بنك الاستثمار الأمريكي الكبير بير ستيرنز وبيعه إلى JPMorgan",
+                 "إفلاس ليمان براذرز، أكبر إفلاس في تاريخ الولايات المتحدة",
+                 "الكونغرس الأمريكي يقر خطة بقيمة 700 مليار دولار لإنقاذ البنوك",
+                 "الأسهم تصل إلى أدنى نقطة، منخفضة نحو 57% عن قمة 2007"],
+          real: "اقترض كثير من الأمريكيين لشراء منازل لا يستطيعون تحمل ثمنها. وعندما انخفضت أسعار المنازل، خسرت البنوك التي راهنت على هذه القروض مبالغ ضخمة، وانهار بعضها. انخفض مؤشر S&P 500 نحو 57% من أكتوبر 2007 إلى مارس 2009. ثم بدأ واحدة من أطول موجات صعوده، وعاد فوق قمته القديمة بحلول 2013.",
+          lesson: "أكثر اللحظات رعبًا، حين يبيع الجميع، تكون غالبًا قريبة من القاع. من باعوا بذعر في أوائل 2009 فاتهم التعافي." },
+        covid: { title: "انهيار كورونا", period: "2020", asset: "مؤشر S&P 500",
+          intro: "فيروس جديد ينتشر، والأسواق على وشك واحد من أسرع الانهيارات في التاريخ. ماذا ستفعل؟",
+          news: ["فيروس كورونا ينتشر بسرعة خارج الصين والأسهم تبدأ بالهبوط",
+                 "منظمة الصحة العالمية تعلن جائحة عالمية",
+                 "البنك المركزي الأمريكي يتعهد بدعم غير محدود للأسواق",
+                 "فايزر وبيونتك تعلنان أن فعالية لقاحهما تتجاوز 90%"],
+          real: "انخفض مؤشر S&P 500 نحو 34% في أكثر من شهر بقليل، وهو من أسرع الانهيارات في التاريخ. ثم تدخلت الحكومات والبنوك المركزية بدعم ضخم. استعادت السوق خسائرها بحلول أغسطس 2020 وأنهت العام مرتفعة نحو 16%.",
+          lesson: "قد يأتي بعد الانهيار تعافٍ سريع. البيع بذعر وانتظار أن «تشعر بالأمان» يعني غالبًا الشراء مجددًا بأسعار أعلى." },
+        rates: { title: "صدمة الفائدة 2022", period: "2022–منتصف 2023", asset: "مؤشر ناسداك المركب",
+          intro: "التضخم يرتفع بسرعة وأسعار الفائدة على وشك القفز. كيف ستصمد أسهم التقنية؟",
+          news: ["الاحتياطي الفيدرالي يرفع أسعار الفائدة لأول مرة منذ 2018",
+                 "التضخم الأمريكي في أعلى مستوى منذ 40 عامًا والفيدرالي ينفذ أكبر رفع منذ 1994",
+                 "بيانات تضخم مرتفعة مجددًا، لكن الأسهم ترتد بقوة في اليوم نفسه",
+                 "OpenAI تطلق ChatGPT فتبدأ موجة حماس للذكاء الاصطناعي"],
+          real: "لمكافحة أعلى تضخم منذ 40 عامًا، رفع الفيدرالي أسعار الفائدة بسرعة كبيرة في 2022. أضرت الفائدة المرتفعة بشركات التقنية سريعة النمو أكثر من غيرها، وانخفض ناسداك نحو الثلث في ذلك العام. وفي 2023 ساعد الحماس للذكاء الاصطناعي أسهم التقنية على التعافي.",
+          lesson: "أسعار الفائدة مهمة. عندما ترتفع بسرعة، غالبًا ما تنخفض أسهم النمو الغالية أكثر من غيرها. معرفة ما يحرك السوق تساعدك على البقاء هادئًا." },
+        ai: { title: "طفرة رقائق الذكاء الاصطناعي", period: "2023–2024", asset: "سهم NVIDIA",
+          intro: "انطلق ChatGPT للتو والجميع يريد رقائق الذكاء الاصطناعي. هل ستبقى على متن الرحلة رغم الصعود والهبوط؟",
+          news: ["بعد شهرين من إطلاق ChatGPT، الشركات تتسابق لشراء رقائق الذكاء الاصطناعي",
+                 "NVIDIA تتوقع مبيعات أعلى بكثير من المتوقع والسهم يقفز نحو 24% في يوم واحد",
+                 "NVIDIA تعلن قفزة هائلة أخرى في مبيعات رقائق الذكاء الاصطناعي",
+                 "NVIDIA تصبح لفترة قصيرة أعلى شركة قيمة في العالم",
+                 "مخاوف بشأن الاقتصاد الأمريكي تضرب الأسواق العالمية وأسهم الرقائق تنخفض"],
+          real: "انفجر الطلب على رقائق الذكاء الاصطناعي بعد ChatGPT. تضاعفت مبيعات NVIDIA وأرباحها عدة مرات، وارتفع سهمها نحو تسعة أضعاف في عامين. ومع ذلك شهد عدة انخفاضات بنسبة 20% أو أكثر على الطريق.",
+          lesson: "حتى أكبر الرابحين يمرون بانخفاضات مخيفة، ومن باعوا عند أول هبوط كبير فاتهم معظم الصعود. لكن NVIDIA حالة نادرة: كثير من الأسهم الرائجة لا تتعافى أبدًا." },
+        tsmc: { title: "هبوط TSMC وعودتها", period: "2022–2024", asset: "TSMC (2330)",
+          intro: "أكبر شركة في تايوان على وشك عام صعب. هل ستتحلى بالصبر لما سيأتي بعده؟",
+          news: ["الحرب في أوكرانيا وارتفاع أسعار الفائدة يهزان الأسواق العالمية",
+                 "مخاوف تباطؤ الرقائق وقيود أمريكية جديدة على بيع الرقائق للصين تدفع TSMC إلى أدنى مستوى منذ أكثر من عامين",
+                 "شركة بيركشاير هاثاواي التابعة لوارن بافيت تكشف أنها اشترت أسهم TSMC",
+                 "الطلب على رقائق الذكاء الاصطناعي يدفع TSMC فوق 1,000 دولار تايواني لأول مرة"],
+          real: "في 2022، أدى ارتفاع أسعار الفائدة والخوف من ضعف الطلب على الرقائق إلى خفض سعر TSMC إلى النصف تقريبًا. ثم غيّر الذكاء الاصطناعي القصة: تصنع TSMC أكثر رقائق الذكاء الاصطناعي تقدمًا لـ NVIDIA وغيرها، وبحلول نهاية 2024 كان سهمها قد تضاعف نحو ثلاث مرات من قاع 2022.",
+          lesson: "حتى سهم شركة ممتازة قد ينخفض كثيرًا في عام سيئ. إذا بقي النشاط قويًا فقد يؤتي الصبر ثماره، لكن لم يكن أحد يعرف مسبقًا متى سيأتي التحول." },
+      },
+    },
+    bn: {
+      ui: {
+        "tab.challenges": "চ্যালেঞ্জ", "plus.tag": "PLUS", "plus.preview": "Plus ফিচার · প্রিভিউ চলাকালীন বিনামূল্যে",
+        "plus.lockedTitle": "এটি একটি StockPilot Plus ফিচার", "plus.lockedBody": v => `মাসে ${v.price}-এ Plus নিন এবং খুলুন:`,
+        "plus.f1": "ঐতিহাসিক চ্যালেঞ্জ: বাজারের বিখ্যাত ঘটনা আবার খেলুন", "plus.f2": "নতুন Plus ফিচার যেমন যেমন আসবে", "plus.f3": "আপনার সমর্থন নতুন পাঠ ও বাজার বানাতে সাহায্য করে",
+        "plus.upgrade": "Plus-এ আপগ্রেড করুন", "plus.soon": "পেমেন্ট এখনো চালু হয়নি।",
+        "ch.title": "ঐতিহাসিক চ্যালেঞ্জ", "ch.sub": "$10,000 ভার্চুয়াল টাকা নিয়ে বাজারের বিখ্যাত মুহূর্তগুলোতে ফিরে যান। আপনি কি বাজারের চেয়ে ভালো করতে পারবেন?",
+        "ch.note": "দাম প্রতিটি আসল ঘটনার আকার অনুসরণ করে, সংখ্যাগুলো সরল ও আনুমানিক। শিরোনামগুলো আসল ঘটনা।",
+        "ch.play": "খেলুন", "ch.replay": "আবার খেলুন", "ch.back": "সব চ্যালেঞ্জ", "ch.quit": "বেরিয়ে যান",
+        "ch.best": v => `সেরা ফল: ${v.p}`, "ch.notPlayed": "এখনো খেলা হয়নি",
+        "ch.level.1": "সহজ", "ch.level.2": "মাঝারি", "ch.level.3": "কঠিন",
+        "ch.pause": "থামান", "ch.resume": "চালান", "ch.speed": "গতি", "ch.autoPause": "খবর এলে থামুন",
+        "ch.value": "আপনার টাকা", "ch.cash": "নগদ", "ch.invested": "বিনিয়োগ করা", "ch.hold": "শুরুতে কিনে ধরে রাখলে",
+        "ch.buyPct": v => `${v.p}% কিনুন`, "ch.buyAll": "সব নগদ দিয়ে কিনুন", "ch.sellPct": v => `${v.p}% বেচুন`, "ch.sellAll": "সব বেচুন",
+        "ch.trades": v => `${v.n}টি ট্রেড`, "ch.news": "শিরোনাম", "ch.newsEmpty": "গল্প এগোলে শিরোনাম এখানে দেখা যাবে।",
+        "ch.startHint": "শুরু করতে চালান চাপুন। যেকোনো সময় কেনাবেচা করুন, ভাবতে চাইলে যেকোনো সময় থামান।",
+        "ch.newsPaused": "⏸ খবরের জন্য থামানো হয়েছে। কী করবেন ঠিক করুন, তারপর চালান চাপুন।",
+        "ch.done": "চ্যালেঞ্জ শেষ", "ch.you": "আপনি", "ch.holdShort": "কিনে ধরে রাখা", "ch.cashShort": "নগদে থাকা",
+        "ch.dd": v => `আপনার সবচেয়ে বড় পতন: ${v.a} · বাজারের সবচেয়ে বড় পতন: ${v.b}`,
+        "ch.star1": "চ্যালেঞ্জ শেষ করেছেন", "ch.star2": "শুরুর চেয়ে বেশি টাকা নিয়ে শেষ করেছেন",
+        "ch.star3": "বিনিয়োগ করেছেন, আর আপনার সবচেয়ে বড় পতন বাজারের চেয়ে খারাপ ছিল না",
+        "ch.real": "আসলে কী ঘটেছিল", "ch.takeaway": "শিক্ষা:", "ch.xp": v => `চ্যালেঞ্জ: ${v.t}`,
+      },
+      chs: {
+        dotcom: { title: "ডট-কম বুদবুদ", period: "1999–2002", asset: "Nasdaq Composite সূচক",
+          intro: "ইন্টারনেট শেয়ার এখন পৃথিবীর সবচেয়ে আলোচিত জিনিস। আপনি কি বুদবুদের সঙ্গে উঠবেন, আর সময়মতো বের হতে পারবেন?",
+          news: ["ইন্টারনেট শেয়ারের দাম আকাশছোঁয়া, নামে “.com” থাকলেই বিনিয়োগকারীরা কিনছেন",
+                 "Nasdaq 5,000-এর উপরে রেকর্ড উচ্চতায়",
+                 "প্রযুক্তি শেয়ারে ধস: Nasdaq এক দিনে প্রায় 10% পড়েছে",
+                 "11 সেপ্টেম্বরের হামলার পর মার্কিন বাজার আবার খুলে তীব্রভাবে পড়েছে",
+                 "চূড়া থেকে প্রায় 80% পড়ার পর Nasdaq অবশেষে তলানিতে"],
+          real: "Nasdaq 1999-এ প্রায় 85% বেড়ে 2000 সালের মার্চে চূড়ায় পৌঁছায়। অনেক ইন্টারনেট কোম্পানির কোনো মুনাফা ছিল না, আর বিনিয়োগকারীরা আস্থা হারালে দাম ধসে পড়ে। 2002 সালের অক্টোবরের মধ্যে Nasdaq প্রায় 80% হারায়, আর 2000-এর চূড়ায় ফিরতে প্রায় 15 বছর, 2015 পর্যন্ত, লাগে।",
+          lesson: "উত্তেজনাপূর্ণ গল্প আর মুনাফা এক জিনিস নয়। সবাই যখন বলে “এবার আলাদা”, তখন প্রতিটি পজিশন ছোট রাখুন আর টাকা ছড়িয়ে দিন।" },
+        gfc: { title: "2008-এর আর্থিক সংকট", period: "অক্টোবর 2007–2009", asset: "S&P 500 সূচক",
+          intro: "মার্কিন আবাসন বাজারে ফাটল দেখা দিচ্ছে। কয়েক দশকের সবচেয়ে খারাপ সংকটে আপনি কি টাকা রক্ষা করতে পারবেন?",
+          news: ["বড় মার্কিন ইনভেস্টমেন্ট ব্যাংক Bear Stearns-কে উদ্ধার করে JPMorgan-এর কাছে বিক্রি করা হয়েছে",
+                 "Lehman Brothers দেউলিয়া, মার্কিন ইতিহাসের সবচেয়ে বড় দেউলিয়াত্ব",
+                 "ব্যাংকগুলোকে বাঁচাতে মার্কিন কংগ্রেস 700 বিলিয়ন ডলারের পরিকল্পনা পাস করেছে",
+                 "শেয়ার সর্বনিম্ন বিন্দুতে, 2007-এর চূড়া থেকে প্রায় 57% নিচে"],
+          real: "অনেক আমেরিকান এমন বাড়ি কিনতে ধার নিয়েছিলেন যার খরচ তাঁরা বহন করতে পারতেন না। বাড়ির দাম পড়লে এসব ঋণে বাজি ধরা ব্যাংকগুলো বিপুল ক্ষতিতে পড়ে, কয়েকটি ডুবে যায়। S&P 500 অক্টোবর 2007 থেকে মার্চ 2009 পর্যন্ত প্রায় 57% পড়ে। তারপর এর সবচেয়ে দীর্ঘ উত্থানগুলোর একটি শুরু হয়, আর 2013-এর মধ্যে এটি পুরোনো চূড়ার উপরে ফেরে।",
+          lesson: "সবচেয়ে ভয়ের মুহূর্ত, যখন সবাই বেচছে, প্রায়ই তলানির কাছাকাছি থাকে। 2009-এর শুরুতে আতঙ্কে বেচা মানুষেরা পুনরুদ্ধার হারিয়েছেন।" },
+        covid: { title: "কোভিড ধস", period: "2020", asset: "S&P 500 সূচক",
+          intro: "একটি নতুন ভাইরাস ছড়াচ্ছে। বাজার ইতিহাসের দ্রুততম ধসগুলোর একটির মুখে। আপনি কী করবেন?",
+          news: ["করোনাভাইরাস চীনের বাইরে দ্রুত ছড়াচ্ছে, শেয়ার পড়তে শুরু করেছে",
+                 "বিশ্ব স্বাস্থ্য সংস্থা বৈশ্বিক মহামারি ঘোষণা করেছে",
+                 "মার্কিন কেন্দ্রীয় ব্যাংক বাজারকে সীমাহীন সহায়তার প্রতিশ্রুতি দিয়েছে",
+                 "Pfizer ও BioNTech বলছে তাদের টিকা 90%-এর বেশি কার্যকর"],
+          real: "S&P 500 মাত্র এক মাসের কিছু বেশি সময়ে প্রায় 34% পড়ে, যা ইতিহাসের দ্রুততম ধসগুলোর একটি। তারপর সরকার ও কেন্দ্রীয় ব্যাংকগুলো বিশাল সহায়তা দেয়। বাজার 2020 সালের আগস্টের মধ্যে ক্ষতি পুষিয়ে নেয় এবং বছর শেষ করে প্রায় 16% বেড়ে।",
+          lesson: "ধসের পর দ্রুত পুনরুদ্ধারও হতে পারে। আতঙ্কে বেচে “নিরাপদ লাগা” পর্যন্ত অপেক্ষা করা মানে প্রায়ই বেশি দামে আবার কেনা।" },
+        rates: { title: "2022-এর সুদের ধাক্কা", period: "2022–2023-এর মাঝামাঝি", asset: "Nasdaq Composite সূচক",
+          intro: "মূল্যস্ফীতি দ্রুত বাড়ছে আর সুদের হার লাফ দিতে চলেছে। প্রযুক্তি শেয়ার কীভাবে সামলাবে?",
+          news: ["মার্কিন ফেডারেল রিজার্ভ 2018-এর পর প্রথমবার সুদের হার বাড়িয়েছে",
+                 "মার্কিন মূল্যস্ফীতি 40 বছরের সর্বোচ্চে, ফেড 1994-এর পর সবচেয়ে বড় হারে সুদ বাড়িয়েছে",
+                 "আবারও উচ্চ মূল্যস্ফীতির খবর, কিন্তু সেদিনই শেয়ার জোরালোভাবে ঘুরে দাঁড়িয়েছে",
+                 "OpenAI ChatGPT চালু করেছে, AI নিয়ে উৎসাহের ঢেউ শুরু"],
+          real: "40 বছরের সর্বোচ্চ মূল্যস্ফীতি ঠেকাতে ফেড 2022-এ খুব দ্রুত সুদ বাড়ায়। বেশি সুদ দ্রুত বাড়তে থাকা প্রযুক্তি কোম্পানিগুলোর সবচেয়ে বেশি ক্ষতি করে, আর সে বছর Nasdaq প্রায় এক-তৃতীয়াংশ পড়ে। 2023-এ AI নিয়ে উৎসাহ প্রযুক্তি শেয়ারকে ঘুরে দাঁড়াতে সাহায্য করে।",
+          lesson: "সুদের হার গুরুত্বপূর্ণ। এটি দ্রুত বাড়লে দামি গ্রোথ শেয়ার প্রায়ই সবচেয়ে বেশি পড়ে। বাজার কী দিয়ে চলে তা জানলে শান্ত থাকা সহজ হয়।" },
+        ai: { title: "AI চিপের জোয়ার", period: "2023–2024", asset: "NVIDIA-র শেয়ার",
+          intro: "ChatGPT সবে চালু হয়েছে, আর সবাই AI চিপ চায়। ওঠানামার মধ্যেও কি আপনি টিকে থাকবেন?",
+          news: ["ChatGPT চালুর দুই মাস পর কোম্পানিগুলো AI চিপ কেনার দৌড়ে",
+                 "NVIDIA প্রত্যাশার চেয়ে অনেক বেশি বিক্রির পূর্বাভাস দিয়েছে, শেয়ার এক দিনে প্রায় 24% লাফিয়েছে",
+                 "NVIDIA জানিয়েছে AI চিপ থেকে বিক্রি আবারও বিপুল বেড়েছে",
+                 "NVIDIA কিছু সময়ের জন্য বিশ্বের সবচেয়ে মূল্যবান কোম্পানি হয়েছে",
+                 "মার্কিন অর্থনীতি নিয়ে দুশ্চিন্তায় বিশ্বজুড়ে বাজার পড়েছে, চিপ শেয়ার নিচে"],
+          real: "ChatGPT-এর পর AI চিপের চাহিদা বিস্ফোরিত হয়। NVIDIA-র বিক্রি ও মুনাফা কয়েক গুণ বাড়ে, আর এর শেয়ার দুই বছরে প্রায় নয় গুণ হয়। তবু পথে কয়েকবার 20% বা তার বেশি পতন ঘটে।",
+          lesson: "বড় বিজয়ীরও ভয়ের পতন হয়, আর প্রথম বড় পতনে বেচে দেওয়া মানুষেরা বেশিরভাগ লাভ হারিয়েছেন। তবে NVIDIA একটি বিরল উদাহরণ: অনেক আলোচিত শেয়ার আর কখনো ফেরে না।" },
+        tsmc: { title: "TSMC-র পতন ও প্রত্যাবর্তন", period: "2022–2024", asset: "TSMC (2330)",
+          intro: "তাইওয়ানের সবচেয়ে বড় কোম্পানির সামনে একটি কঠিন বছর। এরপর যা আসবে তার জন্য কি ধৈর্য রাখতে পারবেন?",
+          news: ["ইউক্রেনে যুদ্ধ আর বাড়তে থাকা সুদের হার বিশ্ববাজার কাঁপিয়েছে",
+                 "চিপের মন্দার ভয় আর চীনে চিপ বিক্রিতে নতুন মার্কিন নিষেধাজ্ঞায় TSMC দুই বছরেরও বেশি সময়ের সর্বনিম্নে",
+                 "ওয়ারেন বাফেটের কোম্পানি Berkshire Hathaway জানিয়েছে তারা TSMC-র শেয়ার কিনেছে",
+                 "AI চিপের চাহিদায় TSMC প্রথমবার NT$1,000-এর উপরে"],
+          real: "2022-এ বেশি সুদ আর চিপের চাহিদা কমার ভয়ে TSMC-র দাম প্রায় অর্ধেক হয়ে যায়। তারপর AI গল্পটা বদলে দেয়: TSMC NVIDIA ও অন্যদের জন্য সবচেয়ে উন্নত AI চিপ বানায়, আর 2024-এর শেষে এর শেয়ার 2022-এর সর্বনিম্ন থেকে প্রায় তিন গুণ হয়।",
+          lesson: "দারুণ কোম্পানির শেয়ারও খারাপ বছরে অনেক পড়তে পারে। ব্যবসা শক্তিশালী থাকলে ধৈর্যের ফল মিলতে পারে, কিন্তু মোড় কখন ঘুরবে তা আগে থেকে কেউ জানত না।" },
+      },
+    },
+  };
+  for (const [lg, { ui, chs }] of Object.entries(TX)) {
+    if (!I18N[lg]) continue;
+    Object.assign(I18N[lg], ui);
+    I18N[lg].chs = chs;
+  }
+})();
+
+/* ================================================================
+   StockPilot Plus
+   ----------------------------------------------------------------
+   Plus features are FREE during the preview.
+   To start charging later:
+     1. set PLUS.requirePayment to true, and
+     2. replace the check in plusUnlocked() with a real payment check
+        (an account + payment service such as Stripe, verified on a server).
+   Nothing else needs to change: every Plus feature asks plusUnlocked().
+   ================================================================ */
+const PLUS = { requirePayment: false, price: "$4.99" };
+function plusUnlocked() {
+  if (!PLUS.requirePayment) return true;
+  return !!(learn.plus && learn.plus.active);   // placeholder until real payments exist
+}
+
+/* ============ History challenges (Plus) ============ */
+// Each challenge follows the shape of a real market event. Anchor points are rough,
+// rounded historical levels; the path between them is filled in with seeded noise,
+// so everyone sees the same chart. fx converts the asset's price into US dollars.
+const CH_START_CASH = 10000;
+const CHALLENGES = [
+  { id: "dotcom", emoji: "💻", level: 2, unit: "week", cur: "", fx: 1, vol: 0.045, seed: 1999,
+    start: "1999-01-04", end: "2002-12-30",
+    pts: [["1999-01-04", 2200], ["1999-04-12", 2500], ["1999-07-19", 2700], ["1999-10-25", 2800], ["1999-12-27", 4069],
+          ["2000-03-10", 5048], ["2000-04-14", 3321], ["2000-07-17", 4200], ["2000-09-29", 3670], ["2000-12-29", 2470],
+          ["2001-04-04", 1640], ["2001-07-16", 2030], ["2001-09-21", 1423], ["2001-12-31", 1950], ["2002-03-18", 1850],
+          ["2002-07-23", 1330], ["2002-10-09", 1114], ["2002-12-30", 1335]],
+    news: ["1999-12-27", "2000-03-10", "2000-04-14", "2001-09-17", "2002-10-09"] },
+  { id: "gfc", emoji: "🏦", level: 3, unit: "week", cur: "", fx: 1, vol: 0.035, seed: 2008,
+    start: "2007-10-08", end: "2009-12-28",
+    pts: [["2007-10-09", 1565], ["2007-11-26", 1407], ["2007-12-10", 1515], ["2008-01-22", 1310], ["2008-03-10", 1273],
+          ["2008-05-19", 1426], ["2008-07-15", 1214], ["2008-08-11", 1305], ["2008-09-15", 1192], ["2008-10-10", 899],
+          ["2008-11-04", 1005], ["2008-11-20", 752], ["2009-01-06", 935], ["2009-03-09", 676], ["2009-06-12", 946],
+          ["2009-08-25", 1028], ["2009-12-28", 1115]],
+    news: ["2008-03-17", "2008-09-15", "2008-10-03", "2009-03-09"] },
+  { id: "covid", emoji: "🦠", level: 1, unit: "day", cur: "", fx: 1, vol: 0.018, seed: 2020,
+    start: "2020-02-03", end: "2020-12-31",
+    pts: [["2020-02-03", 3248], ["2020-02-19", 3386], ["2020-02-28", 2954], ["2020-03-09", 2746], ["2020-03-16", 2386],
+          ["2020-03-23", 2237], ["2020-03-26", 2630], ["2020-04-17", 2875], ["2020-05-13", 2820], ["2020-06-08", 3232],
+          ["2020-06-26", 3009], ["2020-07-31", 3271], ["2020-09-02", 3580], ["2020-09-23", 3237], ["2020-10-12", 3534],
+          ["2020-10-30", 3270], ["2020-11-09", 3550], ["2020-12-31", 3756]],
+    news: ["2020-02-24", "2020-03-11", "2020-03-23", "2020-11-09"] },
+  { id: "rates", emoji: "📈", level: 2, unit: "week", cur: "", fx: 1, vol: 0.035, seed: 2022,
+    start: "2022-01-03", end: "2023-06-26",
+    pts: [["2022-01-03", 15833], ["2022-01-27", 13353], ["2022-02-02", 14417], ["2022-03-14", 12581], ["2022-03-29", 14620],
+          ["2022-05-11", 11364], ["2022-06-16", 10646], ["2022-08-15", 13128], ["2022-09-30", 10576], ["2022-10-13", 10500],
+          ["2022-11-30", 11468], ["2022-12-28", 10214], ["2023-02-02", 12200], ["2023-03-13", 11188], ["2023-06-26", 13500]],
+    news: ["2022-03-16", "2022-06-13", "2022-10-13", "2022-11-30"] },
+  { id: "ai", emoji: "🤖", level: 2, unit: "week", cur: "$", fx: 1, vol: 0.06, seed: 2023,
+    start: "2023-01-02", end: "2024-12-30",
+    pts: [["2023-01-03", 14.3], ["2023-02-02", 21.7], ["2023-03-31", 27.8], ["2023-05-22", 31], ["2023-05-29", 39],
+          ["2023-07-18", 47.5], ["2023-10-26", 40.3], ["2023-12-29", 49.5], ["2024-02-22", 78.5], ["2024-03-08", 87.5],
+          ["2024-04-19", 76.2], ["2024-06-18", 135.6], ["2024-07-30", 103.7], ["2024-08-19", 130], ["2024-09-06", 102.8],
+          ["2024-11-07", 148.9], ["2024-12-30", 134.3]],
+    news: ["2023-01-03", "2023-05-25", "2024-02-22", "2024-06-18", "2024-08-05"] },
+  { id: "tsmc", emoji: "🔬", level: 1, unit: "week", cur: "NT$", fx: 32, vol: 0.035, seed: 2330,
+    start: "2022-01-03", end: "2024-12-30",
+    pts: [["2022-01-03", 615], ["2022-01-17", 688], ["2022-03-08", 545], ["2022-04-05", 600], ["2022-07-01", 433],
+          ["2022-08-01", 509], ["2022-10-25", 371], ["2022-11-15", 450], ["2023-01-30", 542], ["2023-04-25", 491],
+          ["2023-06-14", 593], ["2023-10-04", 517], ["2023-12-29", 593], ["2024-03-08", 784], ["2024-04-19", 750],
+          ["2024-07-11", 1080], ["2024-08-05", 815], ["2024-10-17", 1085], ["2024-12-30", 1075]],
+    news: ["2022-02-24", "2022-10-25", "2022-11-15", "2024-07-11"] },
+];
+// challenge texts live in I18N[lang].chs; missing ones fall back to English
+const chText = (id, k) => {
+  const d = (I18N[dictLang()] || {}).chs, o = d && d[id] && d[id][k] !== undefined ? d[id][k] : I18N.en.chs[id][k];
+  return lang === "zhs" ? toS(o) : o;
+};
+
+const ymd = d => d.toISOString().slice(0, 10);
+const dayAfter = (ds, k) => { const d = new Date(ds + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return ymd(d); };
+function chDates(sc) {
+  const out = [];
+  if (sc.unit === "week") { for (let d = sc.start; d <= sc.end; d = dayAfter(d, 7)) out.push(d); }
+  else { for (let d = sc.start; d <= sc.end; d = dayAfter(d, 1)) { const w = new Date(d + "T00:00:00Z").getUTCDay(); if (w > 0 && w < 6) out.push(d); } }
+  return out;
+}
+const nearestStep = (dates, ds) => { let best = 0; for (let i = 0; i < dates.length; i++) if (Math.abs(Date.parse(dates[i]) - Date.parse(ds)) < Math.abs(Date.parse(dates[best]) - Date.parse(ds))) best = i; return best; };
+// Log-linear path through the anchors, with a Brownian bridge between each pair so every anchor is hit exactly.
+function chSeries(sc) {
+  const dates = chDates(sc), rng = mulberry32(sc.seed), rnd = () => gaussWith(rng);
+  const anchors = sc.pts.map(([d, v]) => [nearestStep(dates, d), v]).filter((a, i, arr) => i === 0 || a[0] > arr[i - 1][0]);
+  if (anchors[0][0] !== 0) anchors.unshift([0, anchors[0][1]]);
+  const last = dates.length - 1;
+  if (anchors[anchors.length - 1][0] !== last) anchors.push([last, anchors[anchors.length - 1][1]]);
+  const s = new Array(dates.length);
+  for (let a = 0; a < anchors.length - 1; a++) {
+    const [i0, v0] = anchors[a], [i1, v1] = anchors[a + 1], n = i1 - i0;
+    const w = [0]; for (let k = 1; k <= n; k++) w.push(w[k - 1] + sc.vol * rnd());
+    for (let k = 0; k <= n; k++) s[i0 + k] = Math.exp(Math.log(v0) + (Math.log(v1) - Math.log(v0)) * k / n + (w[k] - w[n] * k / n));
+  }
+  return { dates, s, newsAt: sc.news.map(d => nearestStep(dates, d)) };
+}
+
+let game = null;          // the challenge being played (not saved: a challenge takes about a minute)
+let chTimer = null;
+const chSpeedMs = sp => 1000 / (4 * sp);
+const chFmtPx = (sc, v) => ltr(sc.cur + v.toLocaleString("en-US", { minimumFractionDigits: v < 100 ? 2 : 0, maximumFractionDigits: v < 100 ? 2 : 0 }));
+const chFmtDate = ds => new Date(ds + "T12:00:00Z").toLocaleDateString(LOCALE(), { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+const chValue = (g, i = g.i) => g.cash + g.units * g.d.s[i] / g.sc.fx;
+
+function chStart(id) {
+  const sc = CHALLENGES.find(c => c.id === id);
+  if (!sc) return;
+  chStop();
+  game = { sc, d: chSeries(sc), i: 0, cash: CH_START_CASH, units: 0, trades: [], news: [], speed: game ? game.speed : 1,
+           autoPause: game ? game.autoPause : true, peak: CH_START_CASH, dd: 0, mPeak: 0, mDD: 0, over: false, paused: false };
+  game.mPeak = game.d.s[0];
+  chCheckNews();
+  renderChallenges();
+}
+function chStop() { if (chTimer) { clearInterval(chTimer); chTimer = null; } }
+function chPlay() {
+  if (!game || game.over) return;
+  chStop(); game.paused = false;
+  chTimer = setInterval(chStep, chSpeedMs(game.speed));
+  renderChallengeGame();
+}
+function chPause(byNews) { chStop(); if (game) game.paused = !!byNews; renderChallengeGame(); }
+function chCheckNews() {
+  const g = game;
+  g.d.newsAt.forEach((at, k) => { if (at === g.i && !g.news.includes(k)) g.news.unshift(k); });
+}
+function chStep() {
+  const g = game;
+  if (!g || g.over) { chStop(); return; }
+  g.i++;
+  const v = chValue(g), p = g.d.s[g.i];
+  g.peak = Math.max(g.peak, v); g.dd = Math.max(g.dd, 1 - v / g.peak);
+  g.mPeak = Math.max(g.mPeak, p); g.mDD = Math.max(g.mDD, 1 - p / g.mPeak);
+  const before = g.news.length;
+  chCheckNews();
+  if (g.i >= g.d.s.length - 1) { chFinish(); return; }
+  if (g.news.length > before && g.autoPause) { chPause(true); return; }
+  renderChallengeGame();
+}
+function chTrade(side, frac) {
+  const g = game;
+  if (!g || g.over) return;
+  const px = g.d.s[g.i] / g.sc.fx;
+  if (side === "buy") {
+    const amt = g.cash * frac;
+    if (amt < 1) return;
+    g.cash -= amt; g.units += amt / px;
+    g.trades.push({ i: g.i, side, amt });
+  } else {
+    const u = g.units * frac;
+    if (u * px < 1) return;
+    g.units -= u; g.cash += u * px;
+    if (frac === 1) g.units = 0;
+    g.trades.push({ i: g.i, side, amt: u * px });
+  }
+  renderChallengeGame();
+}
+function chFinish() {
+  const g = game;
+  chStop();
+  g.over = true;
+  const end = chValue(g), ret = end / CH_START_CASH - 1;
+  const hold = g.d.s[g.d.s.length - 1] / g.d.s[0] - 1;
+  g.stars = [true, end > CH_START_CASH, g.dd <= g.mDD + 1e-9 && g.trades.length > 0];
+  const n = g.stars.filter(Boolean).length;
+  learn.ch = learn.ch || {};
+  const prev = learn.ch[g.sc.id] || { stars: 0, best: null, plays: 0 };
+  const xp = (prev.plays ? 0 : 30) + 10 * Math.max(0, n - prev.stars);
+  learn.ch[g.sc.id] = { stars: Math.max(prev.stars, n), best: prev.best == null ? ret : Math.max(prev.best, ret), plays: prev.plays + 1 };
+  g.result = { end, ret, hold, n };
+  saveLearn();
+  if (xp) addXP(xp, t("ch.xp", { t: chText(g.sc.id, "title") }));
+  if (n === 3) confetti();
+  renderChallenges();
+}
+
+/* ---- Rendering ---- */
+const pctTxt = x => fmtPct(x);
+function chStarsHtml(n) { return `<span class="ch-stars" aria-label="${n}/3">${"★".repeat(n)}<span class="off">${"★".repeat(3 - n)}</span></span>`; }
+function renderChallenges() {
+  const v = $("challengeView");
+  if (!v) return;
+  const head = `<div class="ch-head"><div><h2>⭐ ${t("ch.title")} <span class="plus-tag">${t("plus.tag")}</span></h2>
+      <p class="ch-sub">${t("ch.sub")}</p></div>
+      ${PLUS.requirePayment ? "" : `<span class="plus-ribbon">🎁 ${t("plus.preview")}</span>`}</div>`;
+  if (!plusUnlocked()) {
+    v.innerHTML = `<div class="ch-wrap">${head}<div class="card plus-lock">
+      <div class="plus-lock-icon" aria-hidden="true">🔒</div><h3>${t("plus.lockedTitle")}</h3><p>${t("plus.lockedBody", { price: PLUS.price })}</p>
+      <ul class="plus-list">${["plus.f1", "plus.f2", "plus.f3"].map(k => `<li>${t(k)}</li>`).join("")}</ul>
+      <button type="button" class="btn btn-primary" disabled>${t("plus.upgrade")}</button><p class="muted">${t("plus.soon")}</p></div></div>`;
+    return;
+  }
+  if (game && game.over) { v.innerHTML = `<div class="ch-wrap">${head}${chResultHtml()}</div>`; return; }
+  if (game) { v.innerHTML = `<div class="ch-wrap">${head}<div id="chGame"></div></div>`; renderChallengeGame(); return; }
+  const cards = CHALLENGES.map(sc => {
+    const p = (learn.ch || {})[sc.id];
+    return `<div class="card ch-card">
+      <div class="ch-emoji" aria-hidden="true">${sc.emoji}</div>
+      <div class="ch-card-body"><h3>${chText(sc.id, "title")}</h3>
+        <div class="ch-meta">${chText(sc.id, "period")} · ${chText(sc.id, "asset")} · ${t("ch.level." + sc.level)}</div>
+        <p>${chText(sc.id, "intro")}</p>
+        <div class="ch-card-foot">${p ? `${chStarsHtml(p.stars)} <span class="muted">${t("ch.best", { p: pctTxt(p.best) })}</span>` : `<span class="muted">${t("ch.notPlayed")}</span>`}
+          <button type="button" class="btn btn-primary" data-ch="${sc.id}">${t(p ? "ch.replay" : "ch.play")}</button></div></div></div>`;
+  }).join("");
+  v.innerHTML = `<div class="ch-wrap">${head}<p class="ch-note">${t("ch.note")}</p><div class="ch-grid">${cards}</div></div>`;
+}
+function chChart(g) {
+  const W = Math.max(300, Math.min(760, ($("chGame") || {}).clientWidth || 640) - 24), H = 260;
+  const padL = 56, padR = 12, padT = 12, padB = 26, n = g.d.s.length;
+  const seen = g.d.s.slice(0, g.i + 1);
+  let lo = Math.min(...seen), hi = Math.max(...seen);
+  if (hi - lo < hi * 0.04) { lo *= 0.97; hi *= 1.03; }
+  const pad = (hi - lo) * 0.1; lo -= pad; hi += pad;
+  const x = i => padL + (W - padL - padR) * i / (n - 1), y = v => padT + (H - padT - padB) * (1 - (v - lo) / (hi - lo));
+  let grid = "";
+  for (let k = 0; k <= 3; k++) { const v = lo + (hi - lo) * k / 3, yy = y(v);
+    grid += `<line x1="${padL}" x2="${W - padR}" y1="${yy}" y2="${yy}" stroke="var(--grid)"/><text x="${padL - 6}" y="${yy + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${chFmtPx(g.sc, v)}</text>`; }
+  const yearTicks = [];
+  g.d.dates.forEach((d, i) => { if (i > 0 && d.slice(0, 4) !== g.d.dates[i - 1].slice(0, 4)) yearTicks.push([i, d.slice(0, 4)]); });
+  const years = yearTicks.map(([i, yr]) => `<line x1="${x(i)}" x2="${x(i)}" y1="${padT}" y2="${H - padB}" stroke="var(--grid)" stroke-dasharray="2 3"/><text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${yr}</text>`).join("");
+  const line = seen.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const area = `${x(0)},${H - padB} ${line} ${x(g.i)},${H - padB}`;
+  const news = g.d.newsAt.filter(at => at <= g.i).map(at => `<circle cx="${x(at)}" cy="${y(g.d.s[at])}" r="4" fill="var(--warn-ink)"/>`).join("");
+  const marks = g.trades.map(tr => { const xx = x(tr.i), yy = y(g.d.s[tr.i]);
+    return tr.side === "buy" ? `<path d="M${xx} ${yy + 6} l-6 10 h12 z" fill="var(--up)"/>` : `<path d="M${xx} ${yy - 6} l-6 -10 h12 z" fill="var(--down)"/>`; }).join("");
+  return `<svg class="ch-chart" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${chText(g.sc.id, "asset")}">
+    ${grid}${years}<polygon points="${area}" fill="var(--series-soft)"/><polyline points="${line}" fill="none" stroke="var(--series)" stroke-width="2" stroke-linejoin="round"/>
+    ${news}${marks}<circle cx="${x(g.i)}" cy="${y(g.d.s[g.i])}" r="4.5" fill="var(--series)"/></svg>`;
+}
+function renderChallengeGame() {
+  const box = $("chGame"), g = game;
+  if (!box || !g || g.over) return;
+  const v = chValue(g), ret = v / CH_START_CASH - 1, hold = CH_START_CASH * g.d.s[g.i] / g.d.s[0];
+  const playing = !!chTimer, prog = g.i / (g.d.s.length - 1);
+  const newsList = g.news.map(k => `<li><span class="time">${chFmtDate(g.d.dates[g.d.newsAt[k]])}</span>${chText(g.sc.id, "news")[k]}</li>`).join("");
+  const hint = g.paused ? `<p class="ch-hint warn">${t("ch.newsPaused")}</p>` : g.i === 0 && !playing ? `<p class="ch-hint">${t("ch.startHint")}</p>` : "";
+  const inv = g.units * g.d.s[g.i] / g.sc.fx;
+  box.innerHTML = `<div class="ch-game">
+    <div class="card ch-main">
+      <div class="ch-top"><div><div class="ch-meta">${g.sc.emoji} ${chText(g.sc.id, "title")} · ${chText(g.sc.id, "asset")}</div>
+        <div class="ch-date">${chFmtDate(g.d.dates[g.i])}</div></div>
+        <div class="ch-px">${chFmtPx(g.sc, g.d.s[g.i])} <span class="${g.d.s[g.i] >= g.d.s[0] ? "pos" : "neg"}">${pctTxt(g.d.s[g.i] / g.d.s[0] - 1)}</span></div></div>
+      ${chChart(g)}
+      <div class="ch-prog" aria-hidden="true"><span style="width:${(prog * 100).toFixed(1)}%"></span></div>
+      <div class="ch-controls">
+        <button type="button" class="btn btn-primary" data-chact="${playing ? "pause" : "play"}">${playing ? "⏸ " + t("ch.pause") : "▶ " + t("ch.resume")}</button>
+        <div class="seg" role="group" aria-label="${t("ch.speed")}">${[1, 2, 4].map(s => `<button type="button" data-chspeed="${s}" aria-pressed="${g.speed === s}">${s}×</button>`).join("")}</div>
+        <label class="ch-check"><input type="checkbox" id="chAuto" ${g.autoPause ? "checked" : ""}> ${t("ch.autoPause")}</label>
+        <button type="button" class="btn btn-ghost ch-quit" data-chact="quit">${t("ch.quit")}</button>
+      </div>${hint}
+    </div>
+    <div class="ch-side">
+      <div class="card">
+        <div class="label">${t("ch.value")}</div>
+        <div class="ch-big">${fmt$(v)} <span class="${ret >= 0 ? "pos" : "neg"}">${pctTxt(ret)}</span></div>
+        <div class="ch-rows"><div><span>${t("ch.cash")}</span><b>${fmt$(g.cash)}</b></div><div><span>${t("ch.invested")}</span><b>${fmt$(inv)}</b></div>
+          <div><span>${t("ch.hold")}</span><b>${fmt$(hold)}</b></div></div>
+        <div class="ch-trade">
+          ${[0.25, 0.5].map(f => `<button type="button" class="btn btn-buy" data-chbuy="${f}" ${g.cash < 1 ? "disabled" : ""}>${t("ch.buyPct", { p: f * 100 })}</button>`).join("")}
+          <button type="button" class="btn btn-buy" data-chbuy="1" ${g.cash < 1 ? "disabled" : ""}>${t("ch.buyAll")}</button>
+          ${[0.25, 0.5].map(f => `<button type="button" class="btn btn-sell" data-chsell="${f}" ${inv < 1 ? "disabled" : ""}>${t("ch.sellPct", { p: f * 100 })}</button>`).join("")}
+          <button type="button" class="btn btn-sell" data-chsell="1" ${inv < 1 ? "disabled" : ""}>${t("ch.sellAll")}</button>
+        </div>
+        <p class="muted ch-small">${t("ch.trades", { n: g.trades.length })}</p>
+      </div>
+      <div class="card"><h3 class="ch-h3">📰 ${t("ch.news")}</h3><ul class="feed ch-news">${newsList || `<li class="empty">${t("ch.newsEmpty")}</li>`}</ul></div>
+    </div></div>`;
+}
+function chResultHtml() {
+  const g = game, r = g.result, id = g.sc.id;
+  const holdEnd = CH_START_CASH * (1 + r.hold);
+  const starRows = ["ch.star1", "ch.star2", "ch.star3"].map((k, i) => `<li class="${g.stars[i] ? "ok" : "no"}">${g.stars[i] ? "★" : "☆"} ${t(k)}</li>`).join("");
+  return `<div class="card ch-result">
+    <div class="ch-result-top"><div class="ch-emoji" aria-hidden="true">${g.sc.emoji}</div><div>
+      <h3>${t("ch.done")} · ${chText(id, "title")}</h3>${chStarsHtml(r.n)}</div></div>
+    <div class="ch-compare">
+      <div><div class="label">${t("ch.you")}</div><div class="ch-big">${fmt$(r.end)}</div><div class="${r.ret >= 0 ? "pos" : "neg"}">${pctTxt(r.ret)}</div></div>
+      <div><div class="label">${t("ch.holdShort")}</div><div class="ch-big">${fmt$(holdEnd)}</div><div class="${r.hold >= 0 ? "pos" : "neg"}">${pctTxt(r.hold)}</div></div>
+      <div><div class="label">${t("ch.cashShort")}</div><div class="ch-big">${fmt$(CH_START_CASH)}</div><div class="muted">${pctTxt(0)}</div></div>
+    </div>
+    <p class="muted">${t("ch.dd", { a: pct0(g.dd), b: pct0(g.mDD) })} · ${t("ch.trades", { n: g.trades.length })}</p>
+    <ul class="ch-starlist">${starRows}</ul>
+    <h4>📜 ${t("ch.real")}</h4><p>${chText(id, "real")}</p>
+    <div class="key-idea"><b>${t("ch.takeaway")}</b> ${chText(id, "lesson")}</div>
+    <div class="ch-result-btns"><button type="button" class="btn btn-primary" data-ch="${id}">${t("ch.replay")}</button>
+      <button type="button" class="btn btn-ghost" data-chact="back">${t("ch.back")}</button></div>
+  </div>`;
+}
+
+/* ---- Events (wired once from app.js after everything has loaded) ---- */
+function initPlus() {
+  $("challengeView").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.ch) { chStart(b.dataset.ch); return; }
+    if (b.dataset.chbuy) { chTrade("buy", +b.dataset.chbuy); return; }
+    if (b.dataset.chsell) { chTrade("sell", +b.dataset.chsell); return; }
+    if (b.dataset.chspeed) { game.speed = +b.dataset.chspeed; if (chTimer) chPlay(); else renderChallengeGame(); return; }
+    const act = b.dataset.chact;
+    if (act === "play") chPlay();
+    else if (act === "pause") chPause(false);
+    else if (act === "quit" || act === "back") { chStop(); game = null; renderChallenges(); }
+  });
+  $("challengeView").addEventListener("change", e => { if (e.target.id === "chAuto" && game) game.autoPause = e.target.checked; });
+}
+
 /* ============ Language ============ */
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
 function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
@@ -8515,7 +9430,7 @@ function renderLearn() {
 }
 
 /* ============ Views (Trade / Journal / Learn) ============ */
-const VIEWS = ["trade", "journal", "learn"];
+const VIEWS = ["trade", "journal", "learn", "challenges"];
 let currentView = "trade";
 function showView(v) {
   if (v === "vocabulary") { learn.pane = "vocab"; v = "learn"; }
@@ -8524,6 +9439,9 @@ function showView(v) {
   $("tradeView").hidden = v !== "trade";
   $("journalView").hidden = v !== "journal";
   $("learnView").hidden = v !== "learn";
+  $("challengeView").hidden = v !== "challenges";
+  if (v !== "challenges" && chTimer) chPause(false);   // don't let a challenge run in the background
+  if (v === "challenges") renderChallenges();
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v === "learn") renderLearn();
   if (v === "journal") { renderJournal(); setFlag("journalOpen"); }
@@ -8617,6 +9535,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeZoom();
 window.addEventListener("resize", () => { if (zoomOpen()) renderZoom(); });
 
 loadZone(zone);
+initPlus();
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
 renderMktOptions();

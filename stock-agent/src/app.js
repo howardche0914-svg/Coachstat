@@ -1899,7 +1899,7 @@ function renderLearn() {
 }
 
 /* ============ Views (Trade / Journal / Learn) ============ */
-const VIEWS = ["trade", "journal", "learn"];
+const VIEWS = ["trade", "journal", "learn", "challenges"];
 let currentView = "trade";
 function showView(v) {
   if (v === "vocabulary") { learn.pane = "vocab"; v = "learn"; }
@@ -1908,6 +1908,9 @@ function showView(v) {
   $("tradeView").hidden = v !== "trade";
   $("journalView").hidden = v !== "journal";
   $("learnView").hidden = v !== "learn";
+  $("challengeView").hidden = v !== "challenges";
+  if (v !== "challenges" && chTimer) chPause(false);   // don't let a challenge run in the background
+  if (v === "challenges") renderChallenges();
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v === "learn") renderLearn();
   if (v === "journal") { renderJournal(); setFlag("journalOpen"); }
@@ -2001,6 +2004,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeZoom();
 window.addEventListener("resize", () => { if (zoomOpen()) renderZoom(); });
 
 loadZone(zone);
+initPlus();
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
 renderMktOptions();

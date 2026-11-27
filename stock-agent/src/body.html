@@ -7,6 +7,7 @@
     <button type="button" data-view="trade" aria-pressed="true"><span data-i18n="tab.trade">Trade</span></button>
     <button type="button" data-view="journal" aria-pressed="false"><span data-i18n="tab.journal">Journal</span><span class="count" id="journalCount"></span></button>
     <button type="button" data-view="learn" aria-pressed="false"><span data-i18n="tab.learn">Learn</span><span class="count" id="learnCount"></span></button>
+    <button type="button" data-view="challenges" aria-pressed="false"><span data-i18n="tab.challenges">Challenges</span> <span class="plus-tag" data-i18n="plus.tag">PLUS</span></button>
   </nav>
   <div class="seg zone-seg" role="group" aria-label="Practice area" data-i18n-aria="zone.aria">
     <button type="button" data-zone="practice" aria-pressed="true"><span aria-hidden="true">🎮</span> <span data-i18n="zone.practice">Practice zone</span></button>
@@ -203,6 +204,8 @@
 </div>
 
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<section id="challengeView" hidden></section>
 
 <footer>
   <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·

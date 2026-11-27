@@ -36,3 +36,18 @@ Simplified Chinese (简体中文), Spanish (Español), French (Français), Hindi
 (हिन्दी), Arabic (العربية, right-to-left) and Bengali (বাংলা). All prices and news are simulated
 and no real money or brokerage account is involved. Open the file in any
 browser — no build step or server needed.
+
+### StockPilot Plus (paid features, free during the preview)
+Plus features are marked with a **PLUS** tag. They are free for now: in
+`stock-agent/src/plus.js`, `PLUS.requirePayment` is `false`. Setting it to
+`true` shows a locked "Upgrade to Plus" screen instead; before charging for
+real, `plusUnlocked()` must be connected to an account system and a payment
+service (for example Stripe) that is checked on a server.
+
+- **History challenges:** replay 6 famous market events (the dot-com bubble,
+  the 2008 financial crisis, the COVID crash, the 2022 rate shock, the AI chip
+  boom and TSMC's 2022–2024 fall and comeback) with $10,000 of virtual money.
+  Prices follow the shape of each real event with approximate numbers, real
+  headlines pause the game, and the results compare you with buying and
+  holding or staying in cash, award up to 3 stars and XP, and explain what
+  really happened.
