@@ -23,9 +23,10 @@ Nasdaq-100 ETFs), 20 Taiwan, 7 Japan, 6 India, 6 Hong Kong, 7 Europe and
 search box, trends, news headlines, whole-market moves, daily recaps and the
 10% daily price limits of Taiwan and Saudi Arabia. It also has a virtual
 $100,000 paper-trading account, a Coach that summarizes each stock and
-suggests what a careful trader might do, an optional auto-pilot, a trade
+suggests what a careful trader might do, market, limit and stop-loss
+orders, favorites, an optional auto-pilot, a trade
 Journal that records every buy and sell and reviews each step against the
-lessons' rules, and a Learn tab with 20 lessons in 5 units (each with an
+lessons' rules, and a Learn tab with 21 lessons in 5 units (each with an
 animated, narrated video, a 3-question quiz and a hands-on mission), XP,
 levels, badges, daily streaks, a 45-word stock and economics vocabulary
 and a flashcard game. The price chart has 1M / 3M / 6M /
@@ -35,7 +36,13 @@ word, is available in 8 languages: English, Traditional Chinese (繁體中文),
 Simplified Chinese (简体中文), Spanish (Español), French (Français), Hindi
 (हिन्दी), Arabic (العربية, right-to-left) and Bengali (বাংলা). All prices and news are simulated
 and no real money or brokerage account is involved. Open the file in any
-browser — no build step or server needed.
+browser — no build step or server needed. Starting prices are based on real
+late-November 2026 prices (some estimated), and the Real-hours zone skips
+major US, European and Japanese holidays. Glossary words in lessons can be
+tapped for their meaning, and a short guide introduces the app on the first
+visit. When opened as a claude.ai artifact by a signed-in viewer, progress is
+also saved privately to that viewer's Claude account, so it follows them
+across devices; otherwise it is saved in the browser.
 
 ### StockPilot Plus (paid features, free during the preview)
 Plus features are marked with a **PLUS** tag. They are free for now: in

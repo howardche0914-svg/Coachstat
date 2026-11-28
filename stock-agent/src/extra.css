@@ -276,3 +276,23 @@
   .fav-star { margin-inline-end: 3px; }
   .cloud-status { margin-top: 6px; font-size: 12px; color: var(--muted); }
   .cloud-status:empty { display: none; }
+
+  /* ============ Vocabulary words in lessons + first-time guide ============ */
+  .gloss-word { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: help;
+    border-bottom: 2px dotted var(--accent); }
+  .gloss-word:hover, .gloss-word:focus-visible { color: var(--accent); }
+  .gloss-pop { position: fixed; z-index: 60; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); font-size: 14px; }
+  .gloss-pop .gp-term { font-size: 15px; }
+  .gloss-pop p { margin: 6px 0; color: var(--ink-2); }
+  .gloss-pop .gp-ex { font-size: 13px; }
+  .tour-hi { position: fixed; z-index: 70; border-radius: 12px; pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(10, 14, 22, .55); outline: 3px solid var(--accent); transition: all .25s ease; }
+  .tour-card { position: fixed; z-index: 71; background: var(--surface); color: var(--ink); border-radius: 14px;
+    padding: 14px 16px; box-shadow: 0 14px 40px rgba(0,0,0,.25); }
+  .tour-card h3 { margin: 2px 0 6px; font-size: 16px; }
+  .tour-card p { margin: 0 0 12px; font-size: 14px; color: var(--ink-2); }
+  .tour-step { font-size: 12px; color: var(--muted); }
+  .tour-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .link-btn { font: inherit; background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; }
+  @media (prefers-reduced-motion: reduce) { .tour-hi { transition: none; } }

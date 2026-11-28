@@ -1847,6 +1847,7 @@ function renderLesson() {
   $("tryIt").addEventListener("click", () => tryIt(l));
   panel.addEventListener("click", e => { if (e.target.closest("[data-mission-go]")) tryIt(l); });
   initVideo(l);
+  linkGlossary($("lessonPanel").querySelector(".lesson-body"));
 }
 
 function answerQuiz(l, qi, k) {
@@ -2123,4 +2124,5 @@ syncOrderForm(false);
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);
+initGuide();
 initCloud();

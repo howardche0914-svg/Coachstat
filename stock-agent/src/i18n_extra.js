@@ -2,6 +2,7 @@
 (() => {
   const TX = {
     en: {
+      "b.all.d": "Finish every lesson",
       "cloud.on": "☁️ Progress is saved to your Claude account, so it follows you to your other devices.", "cloud.local": "💾 Progress is saved in this browser only.",
       "cloud.error": "⚠️ Could not save to your account just now. Progress is still saved in this browser, and the app will try again.", "cloud.restored": "☁️ Loaded your saved progress from your account.",
       "ord.type": "Order type", "ord.market": "Market (now)", "ord.limit": "Limit", "ord.stop": "Stop-loss", "ord.px": "Price",
@@ -24,6 +25,7 @@
       "fav.none": "No favorites yet. Open a stock and tap ☆ next to its name.",
     },
     zh: {
+      "b.all.d": "完成所有課程",
       "cloud.on": "☁️ 進度已存到你的 Claude 帳號，換裝置也能接著玩。", "cloud.local": "💾 進度只存在這個瀏覽器裡。",
       "cloud.error": "⚠️ 暫時無法存到你的帳號。進度仍存在這個瀏覽器裡，稍後會再試一次。", "cloud.restored": "☁️ 已從你的帳號載入儲存的進度。",
       "ord.type": "委託方式", "ord.market": "市價（立即）", "ord.limit": "限價", "ord.stop": "停損", "ord.px": "價格",
@@ -46,6 +48,7 @@
       "fav.none": "還沒有最愛的股票。打開一檔股票，點名稱旁邊的 ☆。",
     },
     es: {
+      "b.all.d": "Termina todas las lecciones",
       "cloud.on": "☁️ Tu progreso se guarda en tu cuenta de Claude y te sigue a tus otros dispositivos.", "cloud.local": "💾 Tu progreso solo se guarda en este navegador.",
       "cloud.error": "⚠️ Ahora no se pudo guardar en tu cuenta. El progreso sigue guardado en este navegador y se volverá a intentar.", "cloud.restored": "☁️ Se cargó el progreso guardado en tu cuenta.",
       "ord.type": "Tipo de orden", "ord.market": "Mercado (ahora)", "ord.limit": "Limitada", "ord.stop": "Stop-loss", "ord.px": "Precio",
@@ -68,6 +71,7 @@
       "fav.none": "Aún no tienes favoritas. Abre una acción y toca ☆ junto a su nombre.",
     },
     fr: {
+      "b.all.d": "Terminer toutes les leçons",
       "cloud.on": "☁️ Votre progression est enregistrée dans votre compte Claude et vous suit sur vos autres appareils.", "cloud.local": "💾 La progression est enregistrée uniquement dans ce navigateur.",
       "cloud.error": "⚠️ Impossible d’enregistrer dans votre compte pour le moment. La progression reste enregistrée dans ce navigateur et l’app réessaiera.", "cloud.restored": "☁️ Progression enregistrée chargée depuis votre compte.",
       "ord.type": "Type d’ordre", "ord.market": "Au marché (maintenant)", "ord.limit": "À cours limité", "ord.stop": "Stop-loss", "ord.px": "Prix",
@@ -90,6 +94,7 @@
       "fav.none": "Pas encore de favoris. Ouvrez une action et touchez ☆ à côté de son nom.",
     },
     hi: {
+      "b.all.d": "सभी पाठ पूरे करें",
       "cloud.on": "☁️ प्रगति आपके Claude खाते में सहेजी जाती है, इसलिए दूसरे डिवाइस पर भी मिलती है।", "cloud.local": "💾 प्रगति सिर्फ़ इस ब्राउज़र में सहेजी गई है।",
       "cloud.error": "⚠️ अभी आपके खाते में सहेज नहीं पाए। प्रगति इस ब्राउज़र में सुरक्षित है, ऐप फिर कोशिश करेगा।", "cloud.restored": "☁️ आपके खाते से सहेजी गई प्रगति लोड हुई।",
       "ord.type": "ऑर्डर का प्रकार", "ord.market": "मार्केट (अभी)", "ord.limit": "लिमिट", "ord.stop": "स्टॉप-लॉस", "ord.px": "कीमत",
@@ -112,6 +117,7 @@
       "fav.none": "अभी कोई पसंदीदा नहीं। कोई शेयर खोलें और उसके नाम के पास ☆ दबाएँ।",
     },
     ar: {
+      "b.all.d": "أنهِ جميع الدروس",
       "cloud.on": "☁️ يُحفظ تقدمك في حسابك على Claude، لذا يرافقك على أجهزتك الأخرى.", "cloud.local": "💾 يُحفظ التقدم في هذا المتصفح فقط.",
       "cloud.error": "⚠️ تعذّر الحفظ في حسابك الآن. ما زال التقدم محفوظًا في هذا المتصفح، وسيحاول التطبيق مجددًا.", "cloud.restored": "☁️ تم تحميل تقدمك المحفوظ من حسابك.",
       "ord.type": "نوع الأمر", "ord.market": "السوق (الآن)", "ord.limit": "محدد السعر", "ord.stop": "وقف الخسارة", "ord.px": "السعر",
@@ -134,6 +140,7 @@
       "fav.none": "لا توجد أسهم مفضلة بعد. افتح سهمًا واضغط ☆ بجانب اسمه.",
     },
     bn: {
+      "b.all.d": "সব পাঠ শেষ করুন",
       "cloud.on": "☁️ অগ্রগতি আপনার Claude অ্যাকাউন্টে সংরক্ষিত হয়, তাই অন্য ডিভাইসেও পাবেন।", "cloud.local": "💾 অগ্রগতি শুধু এই ব্রাউজারে সংরক্ষিত।",
       "cloud.error": "⚠️ এখন আপনার অ্যাকাউন্টে সংরক্ষণ করা গেল না। অগ্রগতি এই ব্রাউজারে আছে, অ্যাপ আবার চেষ্টা করবে।", "cloud.restored": "☁️ আপনার অ্যাকাউন্ট থেকে সংরক্ষিত অগ্রগতি লোড হয়েছে।",
       "ord.type": "অর্ডারের ধরন", "ord.market": "মার্কেট (এখনই)", "ord.limit": "লিমিট", "ord.stop": "স্টপ-লস", "ord.px": "দাম",
@@ -157,4 +164,65 @@
     },
   };
   for (const [lg, tx] of Object.entries(TX)) if (I18N[lg]) Object.assign(I18N[lg], tx);
+})();
+
+/* ---- First-time guide ---- */
+(() => {
+  const T = {
+    en: ["🧭 Take the tour", "Next", "Back", "Skip", "Let's go!", v => `Step ${v.i} of ${v.n}`, [
+      ["Market watchlist", "77 stocks from 7 markets. Pick a market, search by name, and tap a stock to open it. Your ★ favorites stay on top."],
+      ["Price chart and coach", "See how the price has moved, then read the coach: what's happening and what a careful trader might do. Tap any ? to open the matching lesson."],
+      ["Buy and sell", "Choose how many shares and an order type: Market buys now, Limit waits for your price, and Stop-loss sells automatically to limit a loss."],
+      ["Journal, lessons and challenges", "The Journal reviews every trade you make. Learn has 21 lessons with videos and quizzes. Challenges lets you replay famous market events."],
+      ["Two practice areas", "The Practice zone moves all the time. The Real-hours zone follows each market's real trading hours. Each has its own $100,000 of virtual money."],
+      ["Your language", "Switch between 8 languages here at any time. Have fun, and remember: it's all virtual money!"]]],
+    zh: ["🧭 導覽", "下一步", "上一步", "略過", "開始吧！", v => `第 ${v.i} 步，共 ${v.n} 步`, [
+      ["市場觀察清單", "7 個市場、77 檔股票。選擇市場、用名稱搜尋，點一檔股票就能打開。你的 ★ 最愛會排在最上面。"],
+      ["價格走勢圖和教練", "看看價格怎麼變動，再讀教練的說明：發生了什麼事、謹慎的投資人可能會怎麼做。點任何一個「?」就能打開相關課程。"],
+      ["買進和賣出", "選擇股數和委託方式：市價立刻買，限價等你的價格，停損會自動賣出來限制虧損。"],
+      ["日誌、課程和挑戰", "交易日誌會檢討你的每一筆交易。學習區有 21 堂附影片和測驗的課程。挑戰區可以重溫著名的市場事件。"],
+      ["兩個練習區", "練習區的價格隨時在動。真實練習區依照每個市場真實的交易時間。兩區各有 10 萬美元的虛擬資金。"],
+      ["你的語言", "隨時可以在這裡切換 8 種語言。玩得開心，記得：這裡全都是虛擬的錢！"]]],
+    es: ["🧭 Ver la guía", "Siguiente", "Atrás", "Omitir", "¡Vamos!", v => `Paso ${v.i} de ${v.n}`, [
+      ["Lista de mercados", "77 acciones de 7 mercados. Elige un mercado, busca por nombre y toca una acción para abrirla. Tus ★ favoritas quedan arriba."],
+      ["Gráfico y coach", "Mira cómo se ha movido el precio y lee al coach: qué está pasando y qué haría un inversor prudente. Toca cualquier ? para abrir la lección."],
+      ["Comprar y vender", "Elige cuántas acciones y el tipo de orden: Mercado compra ya, Limitada espera tu precio y Stop-loss vende sola para limitar una pérdida."],
+      ["Diario, lecciones y retos", "El Diario revisa cada operación. Aprender tiene 21 lecciones con vídeos y preguntas. Retos te deja revivir momentos famosos del mercado."],
+      ["Dos zonas de práctica", "La zona de práctica se mueve todo el tiempo. La de horario real sigue el horario real de cada mercado. Cada una tiene 100.000 $ virtuales."],
+      ["Tu idioma", "Cambia entre 8 idiomas aquí cuando quieras. ¡Diviértete, y recuerda que todo es dinero virtual!"]]],
+    fr: ["🧭 Visite guidée", "Suivant", "Retour", "Passer", "C’est parti !", v => `Étape ${v.i} sur ${v.n}`, [
+      ["Liste des marchés", "77 actions de 7 marchés. Choisissez un marché, cherchez par nom et touchez une action pour l’ouvrir. Vos ★ favoris restent en haut."],
+      ["Graphique et coach", "Regardez l’évolution du prix, puis lisez le coach : ce qui se passe et ce que ferait un investisseur prudent. Touchez un ? pour ouvrir la leçon."],
+      ["Acheter et vendre", "Choisissez le nombre d’actions et le type d’ordre : Au marché achète tout de suite, À cours limité attend votre prix, Stop-loss vend tout seul pour limiter une perte."],
+      ["Journal, leçons et défis", "Le Journal analyse chacune de vos transactions. Apprendre propose 21 leçons avec vidéos et quiz. Défis vous fait revivre des moments célèbres de la Bourse."],
+      ["Deux zones d’entraînement", "La zone d’entraînement bouge tout le temps. La zone heures réelles suit les vrais horaires de chaque marché. Chacune a 100 000 $ fictifs."],
+      ["Votre langue", "Changez de langue ici à tout moment, parmi 8. Amusez-vous, et n’oubliez pas : tout est en argent fictif !"]]],
+    hi: ["🧭 टूर देखें", "आगे", "पीछे", "छोड़ें", "चलिए शुरू करें!", v => `चरण ${v.i} / ${v.n}`, [
+      ["बाज़ार वॉचलिस्ट", "7 बाज़ारों के 77 शेयर। बाज़ार चुनें, नाम से खोजें, और किसी शेयर को खोलने के लिए उस पर टैप करें। आपके ★ पसंदीदा सबसे ऊपर रहते हैं।"],
+      ["प्राइस चार्ट और कोच", "देखें कीमत कैसे बदली, फिर कोच पढ़ें: क्या हो रहा है और एक सावधान ट्रेडर क्या कर सकता है। संबंधित पाठ खोलने के लिए कोई भी ? दबाएँ।"],
+      ["ख़रीदें और बेचें", "शेयरों की संख्या और ऑर्डर का प्रकार चुनें: मार्केट अभी ख़रीदता है, लिमिट आपकी कीमत का इंतज़ार करता है, और स्टॉप-लॉस नुकसान सीमित करने के लिए अपने-आप बेचता है।"],
+      ["जर्नल, पाठ और चुनौतियाँ", "जर्नल आपके हर ट्रेड की समीक्षा करता है। सीखें में वीडियो और क्विज़ वाले 21 पाठ हैं। चुनौतियों में आप बाज़ार की मशहूर घटनाएँ दोबारा खेल सकते हैं।"],
+      ["दो अभ्यास क्षेत्र", "अभ्यास क्षेत्र हर समय चलता है। असली समय क्षेत्र हर बाज़ार के असली ट्रेडिंग समय पर चलता है। दोनों में $100,000 का अलग नकली पैसा है।"],
+      ["आपकी भाषा", "यहाँ कभी भी 8 भाषाओं में बदलें। मज़े करें, और याद रखें: यह सब नकली पैसा है!"]]],
+    ar: ["🧭 جولة تعريفية", "التالي", "السابق", "تخطٍّ", "لنبدأ!", v => `الخطوة ${v.i} من ${v.n}`, [
+      ["قائمة مراقبة السوق", "77 سهمًا من 7 أسواق. اختر سوقًا، وابحث بالاسم، واضغط على سهم لفتحه. تبقى أسهمك ★ المفضلة في الأعلى."],
+      ["رسم السعر والمدرب", "شاهد كيف تحرك السعر، ثم اقرأ المدرب: ماذا يحدث وما قد يفعله متداول حذر. اضغط أي ? لفتح الدرس المناسب."],
+      ["الشراء والبيع", "اختر عدد الأسهم ونوع الأمر: السوق يشتري الآن، ومحدد السعر ينتظر سعرك، ووقف الخسارة يبيع تلقائيًا للحد من الخسارة."],
+      ["السجل والدروس والتحديات", "يراجع السجل كل صفقة تقوم بها. في قسم التعلّم 21 درسًا بفيديوهات واختبارات. وفي التحديات يمكنك إعادة عيش أحداث شهيرة في السوق."],
+      ["منطقتا تدريب", "منطقة التدريب تتحرك طوال الوقت. منطقة الساعات الحقيقية تتبع ساعات التداول الحقيقية لكل سوق. لكل منهما 100,000 دولار افتراضية."],
+      ["لغتك", "بدّل بين 8 لغات من هنا في أي وقت. استمتع، وتذكّر: كل الأموال هنا افتراضية!"]]],
+    bn: ["🧭 পরিচিতি দেখুন", "পরের", "আগের", "বাদ দিন", "শুরু করি!", v => `ধাপ ${v.i} / ${v.n}`, [
+      ["বাজার ওয়াচলিস্ট", "7টি বাজারের 77টি শেয়ার। বাজার বেছে নিন, নাম দিয়ে খুঁজুন, আর খুলতে একটি শেয়ারে ট্যাপ করুন। আপনার ★ প্রিয় শেয়ার উপরে থাকে।"],
+      ["দামের চার্ট ও কোচ", "দাম কীভাবে নড়েছে দেখুন, তারপর কোচ পড়ুন: কী ঘটছে আর একজন সতর্ক ট্রেডার কী করতে পারেন। সংশ্লিষ্ট পাঠ খুলতে যেকোনো ? চাপুন।"],
+      ["কেনা ও বেচা", "শেয়ারের সংখ্যা ও অর্ডারের ধরন বেছে নিন: মার্কেট এখনই কেনে, লিমিট আপনার দামের অপেক্ষা করে, আর স্টপ-লস ক্ষতি সীমিত করতে নিজে থেকে বেচে।"],
+      ["জার্নাল, পাঠ ও চ্যালেঞ্জ", "জার্নাল আপনার প্রতিটি ট্রেড পর্যালোচনা করে। শিখুন অংশে ভিডিও ও কুইজসহ 21টি পাঠ আছে। চ্যালেঞ্জে বাজারের বিখ্যাত ঘটনা আবার খেলতে পারবেন।"],
+      ["দুটি অনুশীলন এলাকা", "অনুশীলন এলাকা সবসময় চলে। আসল সময়ের এলাকা প্রতিটি বাজারের আসল ট্রেডিং সময় মেনে চলে। দুটিতেই আলাদা $100,000 ভার্চুয়াল টাকা।"],
+      ["আপনার ভাষা", "এখানে যেকোনো সময় 8টি ভাষার মধ্যে বদলান। মজা করুন, আর মনে রাখুন: সবই ভার্চুয়াল টাকা!"]]],
+  };
+  for (const [lg, [start, next, back, skip, done, step, steps]] of Object.entries(T)) {
+    if (!I18N[lg]) continue;
+    const o = { "tour.start": start, "tour.next": next, "tour.back": back, "tour.skip": skip, "tour.done": done, "tour.step": step };
+    steps.forEach(([ti, bo], i) => { o[`tour.${i + 1}.t`] = ti; o[`tour.${i + 1}.b`] = bo; });
+    Object.assign(I18N[lg], o);
+  }
 })();

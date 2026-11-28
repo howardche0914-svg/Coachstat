@@ -649,6 +649,26 @@
   .fav-star { margin-inline-end: 3px; }
   .cloud-status { margin-top: 6px; font-size: 12px; color: var(--muted); }
   .cloud-status:empty { display: none; }
+
+  /* ============ Vocabulary words in lessons + first-time guide ============ */
+  .gloss-word { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: help;
+    border-bottom: 2px dotted var(--accent); }
+  .gloss-word:hover, .gloss-word:focus-visible { color: var(--accent); }
+  .gloss-pop { position: fixed; z-index: 60; background: var(--surface); color: var(--ink); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); font-size: 14px; }
+  .gloss-pop .gp-term { font-size: 15px; }
+  .gloss-pop p { margin: 6px 0; color: var(--ink-2); }
+  .gloss-pop .gp-ex { font-size: 13px; }
+  .tour-hi { position: fixed; z-index: 70; border-radius: 12px; pointer-events: none;
+    box-shadow: 0 0 0 9999px rgba(10, 14, 22, .55); outline: 3px solid var(--accent); transition: all .25s ease; }
+  .tour-card { position: fixed; z-index: 71; background: var(--surface); color: var(--ink); border-radius: 14px;
+    padding: 14px 16px; box-shadow: 0 14px 40px rgba(0,0,0,.25); }
+  .tour-card h3 { margin: 2px 0 6px; font-size: 16px; }
+  .tour-card p { margin: 0 0 12px; font-size: 14px; color: var(--ink-2); }
+  .tour-step { font-size: 12px; color: var(--muted); }
+  .tour-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .link-btn { font: inherit; background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; }
+  @media (prefers-reduced-motion: reduce) { .tour-hi { transition: none; } }
 </style>
 </head>
 <body>
@@ -740,6 +760,7 @@
         <p class="coach-note" data-i18n="coach.note"></p>
       </div>
 
+      <div id="tradeBox">
       <div class="ord-row">
         <label for="ordType" data-i18n="ord.type">Order type</label>
         <select id="ordType" class="mkt-select">
@@ -761,6 +782,7 @@
       <div class="ord-box" id="ordBox" hidden>
         <h3 data-i18n="ord.open">Open orders</h3>
         <ul class="ord-list" id="ordList"></ul>
+      </div>
       </div>
     </div>
 
@@ -879,6 +901,7 @@
 <footer>
   <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
   <a href="../index.html" data-i18n="footer.back">back to CoachStat</a>
+  · <button type="button" class="link-btn" data-tour="start" data-i18n="tour.start">🧭 Take the tour</button>
   <div class="cloud-status" id="cloudStatus" role="status"></div>
 </footer>
 
@@ -2528,12 +2551,66 @@ const EXTRAS = {
 };
 
 /* Course order and units */
+// ---- Lesson: stock markets around the world ----
+const openNow = () => MKS.filter(mk => { const st = mktStatus(mk); return st.open && !st.lunch; });
+NEW_LESSONS.push({
+  id: "world", a: 0, tryIt: { sym: "7203" },
+  data: () => ({ n: MKS.length, open: openNow().map(mk => MARKETS[mk].flag + " " + t("mkt." + mk)).join(", "), held: new Set(Object.keys(state.holdings).map(s => market[s].mkt)).size }),
+  en: {
+    title: "Stock markets around the world", try: "Look at Toyota (7203)",
+    body: d => `
+      <p>Every country has its own stock exchange, and each one runs a little differently. StockPilot has ${d.n} markets: the US, Taiwan, Japan, India, Hong Kong, Europe and Saudi Arabia.</p>
+      <ul>
+        <li><b>Different clocks.</b> Each market opens in its own time zone, so when New York opens, Tokyo has already closed for the night. Tokyo and Hong Kong even stop for a <b>lunch break</b>, and Saudi Arabia trades from <b>Sunday to Thursday</b>.</li>
+        <li><b>Different rules.</b> Taiwan and Saudi Arabia limit how far a price can move in one day (±10%). The US, Europe and Hong Kong have no daily limit, so prices can jump much further.</li>
+        <li><b>Different money.</b> Each market uses its own currency: yen, rupees, euros, riyals and more. Your cash here stays in US dollars, so a foreign stock's value also moves with the exchange rate. This is <b>currency risk</b>.</li>
+      </ul>
+      <p>Owning stocks from several countries spreads your risk, because economies don't all rise and fall together. But it adds currency risk, so many investors keep most of their money in their home market and a smaller part abroad.</p>
+      ${key("each market has its own clock, currency and rules. Spreading across countries spreads risk, but adds currency risk.")}
+      ${live(d.open ? `Open right now in real time: <b>${d.open}</b>. You own stocks from <b>${d.held}</b> market${d.held === 1 ? "" : "s"}.` : `In real time, all ${d.n} markets are closed right now. You own stocks from <b>${d.held}</b> market${d.held === 1 ? "" : "s"}.`)}`,
+    q: "Which market trades from Sunday to Thursday?",
+    opts: ["Saudi Arabia", "Japan", "The United States"],
+    why: "The Saudi Exchange's week runs Sunday to Thursday, matching the working week there.",
+  },
+  zh: {
+    title: "全球股市", try: "看看豐田（7203）",
+    body: d => `
+      <p>每個國家都有自己的證券交易所，而且運作方式都有點不同。StockPilot 有 ${d.n} 個市場：美國、台灣、日本、印度、香港、歐洲和沙烏地阿拉伯。</p>
+      <ul>
+        <li><b>時鐘不同。</b>每個市場依自己的時區開盤，所以紐約開盤時，東京早就收盤了。東京和香港中午還會<b>午休</b>，沙烏地阿拉伯則是<b>週日到週四</b>交易。</li>
+        <li><b>規則不同。</b>台灣和沙烏地阿拉伯限制價格一天最多漲跌 ±10%。美國、歐洲和香港沒有每日漲跌幅限制，價格可以跳得更遠。</li>
+        <li><b>貨幣不同。</b>每個市場用自己的貨幣：日圓、盧比、歐元、里亞爾等等。你在這裡的現金是美元，所以外國股票的價值也會跟著匯率變動。這就是<b>匯率風險</b>。</li>
+      </ul>
+      <p>持有好幾個國家的股票可以分散風險，因為各國經濟不會同時漲跌。但這也會帶來匯率風險，所以很多投資人把大部分資金放在本國市場，小部分放在海外。</p>
+      ${key("每個市場都有自己的時鐘、貨幣和規則。分散到不同國家可以分散風險，但會增加匯率風險。")}
+      ${live(d.open ? `以真實時間來看，現在開盤的有：<b>${d.open}</b>。你持有 <b>${d.held}</b> 個市場的股票。` : `以真實時間來看，現在 ${d.n} 個市場都休市。你持有 <b>${d.held}</b> 個市場的股票。`)}`,
+    q: "哪個市場是週日到週四交易？",
+    opts: ["沙烏地阿拉伯", "日本", "美國"],
+    why: "沙烏地證券交易所的交易週是週日到週四，和當地的工作週一樣。",
+  },
+});
+EXTRAS.world = {
+  more: [
+    Q(0, ["You buy a Japanese stock. It rises 10% in yen, but the yen falls 10% against the dollar. Roughly how did you do in dollars?", ["About −1%: almost no gain", "+10%", "+20%"], "1.10 × 0.90 = 0.99, so the currency drop wiped out the gain. That's currency risk."],
+         ["你買了一檔日股。它以日圓計漲了 10%，但日圓對美元貶值 10%。換算成美元大約是多少？", ["約 −1%：幾乎沒賺", "+10%", "+20%"], "1.10 × 0.90 = 0.99，匯率下跌把漲幅吃掉了。這就是匯率風險。"]),
+    Q(0, ["Which two markets in StockPilot have a ±10% daily price limit?", ["Taiwan and Saudi Arabia", "The US and Europe", "Japan and Hong Kong"], "Taiwan and Saudi Arabia limit daily moves to 10% from the previous close."],
+         ["StockPilot 裡哪兩個市場有 ±10% 的每日漲跌幅限制？", ["台灣和沙烏地阿拉伯", "美國和歐洲", "日本和香港"], "台灣和沙烏地阿拉伯限制每天漲跌不超過昨收的 10%。"]),
+  ],
+  mission: M("Own stocks from 3 or more different markets at the same time", "同時持有 3 個以上不同市場的股票", () => new Set(Object.keys(state.holdings).map(s => market[s] && market[s].mkt)).size >= 3),
+  video: [
+    S("flags", { l: "🌏", r: "🌍" }, "Every country has its own stock exchange, currency and rules.", "每個國家都有自己的證券交易所、貨幣和規則。", { en: { mid: "7 markets", l: "Asia", r: "Europe & Americas" }, zh: { mid: "7 個市場", l: "亞洲", r: "歐洲與美洲" } }),
+    S("math", {}, "When New York opens, Tokyo is already closed for the night, and some markets even stop for lunch.", "紐約開盤時，東京早就收盤了，有些市場中午還會休息。", { en: { lines: ["Tokyo: lunch 11:30–12:30", "Hong Kong: lunch 12:00–13:00", "Saudi Arabia: Sunday–Thursday"] }, zh: { lines: ["東京：午休 11:30–12:30", "香港：午休 12:00–13:00", "沙烏地：週日到週四"] } }),
+    S("math", {}, "Some markets limit how far a price can move in a day. Others don't.", "有些市場限制價格一天的漲跌幅，有些則沒有。", { en: { lines: ["Taiwan, Saudi Arabia: ±10% a day", "US, Europe, Hong Kong: no limit"] }, zh: { lines: ["台灣、沙烏地：每天 ±10%", "美國、歐洲、香港：沒有限制"] } }),
+    S("math", {}, "Foreign stocks add currency risk: a falling currency can eat your gain.", "外國股票會帶來匯率風險：貨幣下跌可能吃掉你的獲利。", { en: { lines: ["Stock +10% in yen", "Yen −10% against the dollar", "≈ −1% in dollars"] }, zh: { lines: ["股價以日圓計 +10%", "日圓對美元 −10%", "換算美元 ≈ −1%"] } }),
+  ],
+};
+
 const UNITS = [
   { id: "u1", ids: ["basics", "buysell", "pnl", "orders"] },
   { id: "u2", ids: ["chart", "news", "ma", "rsi"] },
   { id: "u3", ids: ["risk", "diversify", "psychology", "whenact"] },
   { id: "u4", ids: ["compound", "dividends", "valuation", "cycles"] },
-  { id: "u5", ids: ["taiwan", "economy", "plan", "predict"] },
+  { id: "u5", ids: ["taiwan", "world", "economy", "plan", "predict"] },
 ];
 (() => {
   const all = [...LESSONS, ...NEW_LESSONS];
@@ -6476,6 +6553,137 @@ addLanguage("bn", {
   ],
 });
 
+/* ============ Lesson "Stock markets around the world" in es, fr, hi, ar, bn ============ */
+addLanguage("es", { lessons: { world: {
+  title: "Las bolsas del mundo", try: "Ver Toyota (7203)",
+  body: d => `
+    <p>Cada país tiene su propia bolsa, y cada una funciona un poco distinto. StockPilot tiene ${d.n} mercados: EE. UU., Taiwán, Japón, India, Hong Kong, Europa y Arabia Saudí.</p>
+    <ul>
+      <li><b>Relojes distintos.</b> Cada mercado abre en su propia zona horaria, así que cuando abre Nueva York, Tokio ya cerró por la noche. Tokio y Hong Kong incluso paran para <b>comer</b>, y Arabia Saudí opera de <b>domingo a jueves</b>.</li>
+      <li><b>Reglas distintas.</b> Taiwán y Arabia Saudí limitan cuánto puede moverse un precio en un día (±10 %). EE. UU., Europa y Hong Kong no tienen límite diario, así que los precios pueden saltar mucho más.</li>
+      <li><b>Dinero distinto.</b> Cada mercado usa su moneda: yenes, rupias, euros, riales y más. Aquí tu efectivo está en dólares, así que el valor de una acción extranjera también se mueve con el tipo de cambio. Es el <b>riesgo de divisa</b>.</li>
+    </ul>
+    <p>Tener acciones de varios países reparte el riesgo, porque las economías no suben y bajan a la vez. Pero añade riesgo de divisa, por eso muchos inversores tienen casi todo en su mercado local y una parte menor fuera.</p>
+    ${key("cada mercado tiene su reloj, su moneda y sus reglas. Repartir entre países reparte el riesgo, pero añade riesgo de divisa.")}
+    ${live(d.open ? `Abiertos ahora en tiempo real: <b>${d.open}</b>. Tienes acciones de <b>${d.held}</b> mercado${d.held === 1 ? "" : "s"}.` : `En tiempo real, los ${d.n} mercados están cerrados ahora. Tienes acciones de <b>${d.held}</b> mercado${d.held === 1 ? "" : "s"}.`)}`,
+  quiz: [
+    ["¿Qué mercado opera de domingo a jueves?", ["Arabia Saudí", "Japón", "Estados Unidos"], "La semana de la bolsa saudí va de domingo a jueves, como la semana laboral allí."],
+    ["Compras una acción japonesa. Sube un 10 % en yenes, pero el yen cae un 10 % frente al dólar. ¿Cómo te fue en dólares, más o menos?", ["Cerca de −1 %: casi sin ganancia", "+10 %", "+20 %"], "1,10 × 0,90 = 0,99: la caída de la moneda se comió la ganancia. Eso es riesgo de divisa."],
+    ["¿Qué dos mercados de StockPilot tienen un límite diario de ±10 %?", ["Taiwán y Arabia Saudí", "EE. UU. y Europa", "Japón y Hong Kong"], "Taiwán y Arabia Saudí limitan el movimiento diario al 10 % desde el cierre anterior."],
+  ],
+  mission: "Ten acciones de 3 o más mercados distintos a la vez",
+  video: [
+    ["Cada país tiene su propia bolsa, su moneda y sus reglas.", { mid: "7 mercados", l: "Asia", r: "Europa y América" }],
+    ["Cuando abre Nueva York, Tokio ya cerró, y algunos mercados incluso paran para comer.", { lines: ["Tokio: comida 11:30–12:30", "Hong Kong: comida 12:00–13:00", "Arabia Saudí: domingo a jueves"] }],
+    ["Algunos mercados limitan cuánto puede moverse un precio en un día. Otros no.", { lines: ["Taiwán, Arabia Saudí: ±10 % al día", "EE. UU., Europa, Hong Kong: sin límite"] }],
+    ["Las acciones extranjeras añaden riesgo de divisa: una moneda que cae puede comerse tu ganancia.", { lines: ["Acción +10 % en yenes", "Yen −10 % frente al dólar", "≈ −1 % en dólares"] }],
+  ],
+} } });
+
+addLanguage("fr", { lessons: { world: {
+  title: "Les Bourses du monde", try: "Voir Toyota (7203)",
+  body: d => `
+    <p>Chaque pays a sa propre Bourse, et chacune fonctionne un peu différemment. StockPilot compte ${d.n} marchés : les États-Unis, Taïwan, le Japon, l’Inde, Hong Kong, l’Europe et l’Arabie saoudite.</p>
+    <ul>
+      <li><b>Des horloges différentes.</b> Chaque marché ouvre dans son fuseau horaire : quand New York ouvre, Tokyo est déjà fermé pour la nuit. Tokyo et Hong Kong font même une <b>pause déjeuner</b>, et l’Arabie saoudite échange du <b>dimanche au jeudi</b>.</li>
+      <li><b>Des règles différentes.</b> Taïwan et l’Arabie saoudite limitent la variation d’un prix sur une journée (±10 %). Les États-Unis, l’Europe et Hong Kong n’ont pas de limite quotidienne : les prix peuvent bondir bien plus.</li>
+      <li><b>Des monnaies différentes.</b> Chaque marché a sa monnaie : yen, roupie, euro, riyal… Ici, vos liquidités restent en dollars : la valeur d’une action étrangère suit donc aussi le taux de change. C’est le <b>risque de change</b>.</li>
+    </ul>
+    <p>Détenir des actions de plusieurs pays répartit le risque, car les économies ne montent et ne baissent pas toutes en même temps. Mais cela ajoute un risque de change : beaucoup d’investisseurs gardent l’essentiel dans leur marché national et une plus petite part à l’étranger.</p>
+    ${key("chaque marché a son horloge, sa monnaie et ses règles. Se répartir entre pays répartit le risque, mais ajoute un risque de change.")}
+    ${live(d.open ? `Ouverts en ce moment, en temps réel : <b>${d.open}</b>. Vous détenez des actions de <b>${d.held}</b> marché${d.held === 1 ? "" : "s"}.` : `En temps réel, les ${d.n} marchés sont fermés en ce moment. Vous détenez des actions de <b>${d.held}</b> marché${d.held === 1 ? "" : "s"}.`)}`,
+  quiz: [
+    ["Quel marché échange du dimanche au jeudi ?", ["L’Arabie saoudite", "Le Japon", "Les États-Unis"], "La semaine de la Bourse saoudienne va du dimanche au jeudi, comme la semaine de travail là-bas."],
+    ["Vous achetez une action japonaise. Elle gagne 10 % en yens, mais le yen perd 10 % face au dollar. Environ combien gagnez-vous en dollars ?", ["Environ −1 % : presque rien", "+10 %", "+20 %"], "1,10 × 0,90 = 0,99 : la baisse de la monnaie a effacé le gain. C’est le risque de change."],
+    ["Quels deux marchés de StockPilot ont une limite quotidienne de ±10 % ?", ["Taïwan et l’Arabie saoudite", "Les États-Unis et l’Europe", "Le Japon et Hong Kong"], "Taïwan et l’Arabie saoudite limitent la variation quotidienne à 10 % par rapport à la clôture précédente."],
+  ],
+  mission: "Détenez des actions de 3 marchés différents ou plus en même temps",
+  video: [
+    ["Chaque pays a sa propre Bourse, sa monnaie et ses règles.", { mid: "7 marchés", l: "Asie", r: "Europe et Amériques" }],
+    ["Quand New York ouvre, Tokyo est déjà fermé, et certains marchés font même une pause déjeuner.", { lines: ["Tokyo : déjeuner 11h30–12h30", "Hong Kong : déjeuner 12h00–13h00", "Arabie saoudite : dimanche–jeudi"] }],
+    ["Certains marchés limitent la variation d’un prix sur une journée. D’autres non.", { lines: ["Taïwan, Arabie saoudite : ±10 % par jour", "États-Unis, Europe, Hong Kong : aucune limite"] }],
+    ["Les actions étrangères ajoutent un risque de change : une monnaie qui baisse peut effacer votre gain.", { lines: ["Action +10 % en yens", "Yen −10 % face au dollar", "≈ −1 % en dollars"] }],
+  ],
+} } });
+
+addLanguage("hi", { lessons: { world: {
+  title: "दुनिया भर के शेयर बाज़ार", try: "Toyota (7203) देखें",
+  body: d => `
+    <p>हर देश का अपना स्टॉक एक्सचेंज है, और हर एक थोड़ा अलग तरीके से चलता है। StockPilot में ${d.n} बाज़ार हैं: अमेरिका, ताइवान, जापान, भारत, हांगकांग, यूरोप और सऊदी अरब।</p>
+    <ul>
+      <li><b>अलग घड़ियाँ।</b> हर बाज़ार अपने टाइम ज़ोन में खुलता है, इसलिए जब न्यूयॉर्क खुलता है, टोक्यो रात के लिए बंद हो चुका होता है। टोक्यो और हांगकांग में <b>लंच ब्रेक</b> भी होता है, और सऊदी अरब <b>रविवार से गुरुवार</b> ट्रेड करता है।</li>
+      <li><b>अलग नियम।</b> ताइवान और सऊदी अरब एक दिन में कीमत की चाल सीमित करते हैं (±10%)। अमेरिका, यूरोप और हांगकांग में कोई दैनिक सीमा नहीं, इसलिए कीमतें कहीं ज़्यादा उछल सकती हैं।</li>
+      <li><b>अलग पैसा।</b> हर बाज़ार की अपनी मुद्रा है: येन, रुपया, यूरो, रियाल वगैरह। यहाँ आपका नकद अमेरिकी डॉलर में है, इसलिए विदेशी शेयर का मूल्य विनिमय दर के साथ भी बदलता है। इसे <b>मुद्रा जोखिम</b> कहते हैं।</li>
+    </ul>
+    <p>कई देशों के शेयर रखने से जोखिम बँटता है, क्योंकि सभी अर्थव्यवस्थाएँ एक साथ ऊपर-नीचे नहीं होतीं। लेकिन इससे मुद्रा जोखिम जुड़ता है, इसलिए कई निवेशक ज़्यादातर पैसा अपने देश के बाज़ार में और छोटा हिस्सा विदेश में रखते हैं।</p>
+    ${key("हर बाज़ार की अपनी घड़ी, मुद्रा और नियम हैं। देशों में बाँटने से जोखिम बँटता है, पर मुद्रा जोखिम जुड़ता है।")}
+    ${live(d.open ? `असली समय में अभी खुले हैं: <b>${d.open}</b>। आपके पास <b>${d.held}</b> बाज़ारों के शेयर हैं।` : `असली समय में अभी सभी ${d.n} बाज़ार बंद हैं। आपके पास <b>${d.held}</b> बाज़ारों के शेयर हैं।`)}`,
+  quiz: [
+    ["कौन-सा बाज़ार रविवार से गुरुवार ट्रेड करता है?", ["सऊदी अरब", "जापान", "अमेरिका"], "सऊदी एक्सचेंज का हफ़्ता रविवार से गुरुवार चलता है, वहाँ के कामकाजी हफ़्ते की तरह।"],
+    ["आप एक जापानी शेयर ख़रीदते हैं। वह येन में 10% बढ़ता है, लेकिन येन डॉलर के मुक़ाबले 10% गिरता है। डॉलर में मोटे तौर पर क्या हुआ?", ["लगभग −1%: लगभग कोई फ़ायदा नहीं", "+10%", "+20%"], "1.10 × 0.90 = 0.99, यानी मुद्रा की गिरावट ने मुनाफ़ा मिटा दिया। यही मुद्रा जोखिम है।"],
+    ["StockPilot के किन दो बाज़ारों में ±10% की दैनिक सीमा है?", ["ताइवान और सऊदी अरब", "अमेरिका और यूरोप", "जापान और हांगकांग"], "ताइवान और सऊदी अरब दैनिक चाल को पिछले बंद भाव से 10% तक सीमित रखते हैं।"],
+  ],
+  mission: "एक साथ 3 या ज़्यादा अलग-अलग बाज़ारों के शेयर रखें",
+  video: [
+    ["हर देश का अपना स्टॉक एक्सचेंज, मुद्रा और नियम होते हैं।", { mid: "7 बाज़ार", l: "एशिया", r: "यूरोप और अमेरिका" }],
+    ["जब न्यूयॉर्क खुलता है, टोक्यो बंद हो चुका होता है, और कुछ बाज़ार लंच के लिए रुकते भी हैं।", { lines: ["टोक्यो: लंच 11:30–12:30", "हांगकांग: लंच 12:00–13:00", "सऊदी अरब: रविवार–गुरुवार"] }],
+    ["कुछ बाज़ार एक दिन में कीमत की चाल सीमित करते हैं। कुछ नहीं करते।", { lines: ["ताइवान, सऊदी अरब: रोज़ ±10%", "अमेरिका, यूरोप, हांगकांग: कोई सीमा नहीं"] }],
+    ["विदेशी शेयर मुद्रा जोखिम जोड़ते हैं: गिरती मुद्रा आपका मुनाफ़ा खा सकती है।", { lines: ["शेयर येन में +10%", "येन डॉलर के मुक़ाबले −10%", "डॉलर में ≈ −1%"] }],
+  ],
+} } });
+
+addLanguage("ar", { lessons: { world: {
+  title: "أسواق الأسهم حول العالم", try: "شاهد تويوتا (7203)",
+  body: d => `
+    <p>لكل دولة بورصتها الخاصة، وكل واحدة تعمل بطريقة مختلفة قليلًا. في StockPilot يوجد ${d.n} أسواق: أمريكا وتايوان واليابان والهند وهونغ كونغ وأوروبا والسعودية.</p>
+    <ul>
+      <li><b>ساعات مختلفة.</b> كل سوق يفتح في منطقته الزمنية، لذا عندما تفتح نيويورك تكون طوكيو قد أغلقت ليلًا. وتتوقف طوكيو وهونغ كونغ أيضًا من أجل <b>استراحة الغداء</b>، وتتداول السعودية من <b>الأحد إلى الخميس</b>.</li>
+      <li><b>قواعد مختلفة.</b> تحدّ تايوان والسعودية من تحرك السعر في يوم واحد (±10%). أما أمريكا وأوروبا وهونغ كونغ فلا حد يوميًا فيها، لذا قد تقفز الأسعار أكثر بكثير.</li>
+      <li><b>عملات مختلفة.</b> لكل سوق عملته: الين والروبية واليورو والريال وغيرها. نقدك هنا بالدولار الأمريكي، لذا تتحرك قيمة السهم الأجنبي أيضًا مع سعر الصرف. هذا هو <b>خطر العملة</b>.</li>
+    </ul>
+    <p>امتلاك أسهم من عدة دول يوزع المخاطر، لأن الاقتصادات لا ترتفع وتنخفض معًا. لكنه يضيف خطر العملة، لذا يحتفظ كثير من المستثمرين بمعظم أموالهم في سوقهم المحلية وبجزء أصغر في الخارج.</p>
+    ${key("لكل سوق ساعته وعملته وقواعده. التوزيع بين الدول يوزع المخاطر، لكنه يضيف خطر العملة.")}
+    ${live(d.open ? `المفتوحة الآن بالوقت الحقيقي: <b>${d.open}</b>. تملك أسهمًا من <b>${d.held}</b> سوق.` : `بالوقت الحقيقي، كل الأسواق الـ ${d.n} مغلقة الآن. تملك أسهمًا من <b>${d.held}</b> سوق.`)}`,
+  quiz: [
+    ["أي سوق يتداول من الأحد إلى الخميس؟", ["السعودية", "اليابان", "الولايات المتحدة"], "أسبوع السوق المالية السعودية من الأحد إلى الخميس، مثل أسبوع العمل هناك."],
+    ["تشتري سهمًا يابانيًا. يرتفع 10% بالين، لكن الين يهبط 10% أمام الدولار. كيف كانت نتيجتك بالدولار تقريبًا؟", ["نحو −1%: لا ربح تقريبًا", "+10%", "+20%"], "1.10 × 0.90 = 0.99، أي أن هبوط العملة محا الربح. هذا هو خطر العملة."],
+    ["أي سوقين في StockPilot لديهما حد يومي ±10%؟", ["تايوان والسعودية", "أمريكا وأوروبا", "اليابان وهونغ كونغ"], "تحد تايوان والسعودية التحرك اليومي بـ 10% من سعر الإغلاق السابق."],
+  ],
+  mission: "امتلك أسهمًا من 3 أسواق مختلفة أو أكثر في الوقت نفسه",
+  video: [
+    ["لكل دولة بورصتها وعملتها وقواعدها.", { mid: "7 أسواق", l: "آسيا", r: "أوروبا والأمريكتان" }],
+    ["عندما تفتح نيويورك تكون طوكيو قد أغلقت، وبعض الأسواق تتوقف حتى للغداء.", { lines: ["طوكيو: غداء 11:30–12:30", "هونغ كونغ: غداء 12:00–13:00", "السعودية: الأحد–الخميس"] }],
+    ["بعض الأسواق تحد من تحرك السعر في اليوم، وبعضها لا.", { lines: ["تايوان، السعودية: ±10% يوميًا", "أمريكا، أوروبا، هونغ كونغ: بلا حد"] }],
+    ["الأسهم الأجنبية تضيف خطر العملة: العملة الهابطة قد تأكل ربحك.", { lines: ["السهم +10% بالين", "الين −10% أمام الدولار", "≈ −1% بالدولار"] }],
+  ],
+} } });
+
+addLanguage("bn", { lessons: { world: {
+  title: "বিশ্বের শেয়ারবাজার", try: "Toyota (7203) দেখুন",
+  body: d => `
+    <p>প্রতিটি দেশের নিজস্ব স্টক এক্সচেঞ্জ আছে, আর প্রতিটি একটু আলাদাভাবে চলে। StockPilot-এ ${d.n}টি বাজার আছে: যুক্তরাষ্ট্র, তাইওয়ান, জাপান, ভারত, হংকং, ইউরোপ ও সৌদি আরব।</p>
+    <ul>
+      <li><b>আলাদা ঘড়ি।</b> প্রতিটি বাজার নিজের টাইম জোনে খোলে, তাই নিউ ইয়র্ক খুললে টোকিও রাতের জন্য বন্ধ হয়ে গেছে। টোকিও ও হংকং-এ <b>দুপুরের বিরতিও</b> হয়, আর সৌদি আরব <b>রবিবার থেকে বৃহস্পতিবার</b> ট্রেড করে।</li>
+      <li><b>আলাদা নিয়ম।</b> তাইওয়ান ও সৌদি আরব এক দিনে দামের নড়াচড়া সীমিত রাখে (±10%)। যুক্তরাষ্ট্র, ইউরোপ ও হংকং-এ কোনো দৈনিক সীমা নেই, তাই দাম অনেক বেশি লাফাতে পারে।</li>
+      <li><b>আলাদা টাকা।</b> প্রতিটি বাজারের নিজস্ব মুদ্রা: ইয়েন, রুপি, ইউরো, রিয়াল ইত্যাদি। এখানে আপনার নগদ মার্কিন ডলারে, তাই বিদেশি শেয়ারের মূল্য বিনিময় হারের সঙ্গেও বদলায়। একে <b>মুদ্রা ঝুঁকি</b> বলে।</li>
+    </ul>
+    <p>কয়েকটি দেশের শেয়ার রাখলে ঝুঁকি ছড়িয়ে যায়, কারণ সব অর্থনীতি একসঙ্গে ওঠানামা করে না। তবে এতে মুদ্রা ঝুঁকি যোগ হয়, তাই অনেক বিনিয়োগকারী বেশিরভাগ টাকা নিজের দেশের বাজারে আর ছোট অংশ বিদেশে রাখেন।</p>
+    ${key("প্রতিটি বাজারের নিজস্ব ঘড়ি, মুদ্রা ও নিয়ম আছে। দেশে দেশে ছড়ালে ঝুঁকি ছড়ায়, তবে মুদ্রা ঝুঁকি যোগ হয়।")}
+    ${live(d.open ? `আসল সময়ে এখন খোলা: <b>${d.open}</b>। আপনার কাছে <b>${d.held}</b>টি বাজারের শেয়ার আছে।` : `আসল সময়ে এখন ${d.n}টি বাজারই বন্ধ। আপনার কাছে <b>${d.held}</b>টি বাজারের শেয়ার আছে।`)}`,
+  quiz: [
+    ["কোন বাজার রবিবার থেকে বৃহস্পতিবার ট্রেড করে?", ["সৌদি আরব", "জাপান", "যুক্তরাষ্ট্র"], "সৌদি এক্সচেঞ্জের সপ্তাহ রবিবার থেকে বৃহস্পতিবার, সেখানকার কাজের সপ্তাহের মতো।"],
+    ["আপনি একটি জাপানি শেয়ার কিনলেন। ইয়েনে এটি 10% বাড়ল, কিন্তু ডলারের বিপরীতে ইয়েন 10% কমল। ডলারে মোটামুটি কী হলো?", ["প্রায় −1%: প্রায় কোনো লাভ নেই", "+10%", "+20%"], "1.10 × 0.90 = 0.99, অর্থাৎ মুদ্রার পতন লাভ মুছে দিয়েছে। এটাই মুদ্রা ঝুঁকি।"],
+    ["StockPilot-এর কোন দুটি বাজারে ±10% দৈনিক সীমা আছে?", ["তাইওয়ান ও সৌদি আরব", "যুক্তরাষ্ট্র ও ইউরোপ", "জাপান ও হংকং"], "তাইওয়ান ও সৌদি আরব দৈনিক নড়াচড়া আগের বন্ধ দামের 10%-এ সীমিত রাখে।"],
+  ],
+  mission: "একসঙ্গে 3টি বা তার বেশি আলাদা বাজারের শেয়ার রাখুন",
+  video: [
+    ["প্রতিটি দেশের নিজস্ব স্টক এক্সচেঞ্জ, মুদ্রা ও নিয়ম আছে।", { mid: "7টি বাজার", l: "এশিয়া", r: "ইউরোপ ও আমেরিকা" }],
+    ["নিউ ইয়র্ক খুললে টোকিও বন্ধ হয়ে গেছে, আর কিছু বাজার দুপুরে বিরতিও নেয়।", { lines: ["টোকিও: বিরতি 11:30–12:30", "হংকং: বিরতি 12:00–13:00", "সৌদি আরব: রবিবার–বৃহস্পতিবার"] }],
+    ["কিছু বাজার এক দিনে দামের নড়াচড়া সীমিত রাখে। কিছু রাখে না।", { lines: ["তাইওয়ান, সৌদি আরব: দিনে ±10%", "যুক্তরাষ্ট্র, ইউরোপ, হংকং: কোনো সীমা নেই"] }],
+    ["বিদেশি শেয়ারে মুদ্রা ঝুঁকি যোগ হয়: পড়ন্ত মুদ্রা আপনার লাভ খেয়ে ফেলতে পারে।", { lines: ["শেয়ার ইয়েনে +10%", "ডলারের বিপরীতে ইয়েন −10%", "ডলারে ≈ −1%"] }],
+  ],
+} } });
+
 /* ============ Markets around the world: Japan, India, Hong Kong, Europe, Saudi Arabia ============ */
 // Adds the new markets, industries and headlines to every language, and makes a few
 // coach messages work for any number of markets instead of just the US and Taiwan.
@@ -6732,6 +6940,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
 (() => {
   const TX = {
     en: {
+      "b.all.d": "Finish every lesson",
       "cloud.on": "☁️ Progress is saved to your Claude account, so it follows you to your other devices.", "cloud.local": "💾 Progress is saved in this browser only.",
       "cloud.error": "⚠️ Could not save to your account just now. Progress is still saved in this browser, and the app will try again.", "cloud.restored": "☁️ Loaded your saved progress from your account.",
       "ord.type": "Order type", "ord.market": "Market (now)", "ord.limit": "Limit", "ord.stop": "Stop-loss", "ord.px": "Price",
@@ -6754,6 +6963,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
       "fav.none": "No favorites yet. Open a stock and tap ☆ next to its name.",
     },
     zh: {
+      "b.all.d": "完成所有課程",
       "cloud.on": "☁️ 進度已存到你的 Claude 帳號，換裝置也能接著玩。", "cloud.local": "💾 進度只存在這個瀏覽器裡。",
       "cloud.error": "⚠️ 暫時無法存到你的帳號。進度仍存在這個瀏覽器裡，稍後會再試一次。", "cloud.restored": "☁️ 已從你的帳號載入儲存的進度。",
       "ord.type": "委託方式", "ord.market": "市價（立即）", "ord.limit": "限價", "ord.stop": "停損", "ord.px": "價格",
@@ -6776,6 +6986,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
       "fav.none": "還沒有最愛的股票。打開一檔股票，點名稱旁邊的 ☆。",
     },
     es: {
+      "b.all.d": "Termina todas las lecciones",
       "cloud.on": "☁️ Tu progreso se guarda en tu cuenta de Claude y te sigue a tus otros dispositivos.", "cloud.local": "💾 Tu progreso solo se guarda en este navegador.",
       "cloud.error": "⚠️ Ahora no se pudo guardar en tu cuenta. El progreso sigue guardado en este navegador y se volverá a intentar.", "cloud.restored": "☁️ Se cargó el progreso guardado en tu cuenta.",
       "ord.type": "Tipo de orden", "ord.market": "Mercado (ahora)", "ord.limit": "Limitada", "ord.stop": "Stop-loss", "ord.px": "Precio",
@@ -6798,6 +7009,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
       "fav.none": "Aún no tienes favoritas. Abre una acción y toca ☆ junto a su nombre.",
     },
     fr: {
+      "b.all.d": "Terminer toutes les leçons",
       "cloud.on": "☁️ Votre progression est enregistrée dans votre compte Claude et vous suit sur vos autres appareils.", "cloud.local": "💾 La progression est enregistrée uniquement dans ce navigateur.",
       "cloud.error": "⚠️ Impossible d’enregistrer dans votre compte pour le moment. La progression reste enregistrée dans ce navigateur et l’app réessaiera.", "cloud.restored": "☁️ Progression enregistrée chargée depuis votre compte.",
       "ord.type": "Type d’ordre", "ord.market": "Au marché (maintenant)", "ord.limit": "À cours limité", "ord.stop": "Stop-loss", "ord.px": "Prix",
@@ -6820,6 +7032,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
       "fav.none": "Pas encore de favoris. Ouvrez une action et touchez ☆ à côté de son nom.",
     },
     hi: {
+      "b.all.d": "सभी पाठ पूरे करें",
       "cloud.on": "☁️ प्रगति आपके Claude खाते में सहेजी जाती है, इसलिए दूसरे डिवाइस पर भी मिलती है।", "cloud.local": "💾 प्रगति सिर्फ़ इस ब्राउज़र में सहेजी गई है।",
       "cloud.error": "⚠️ अभी आपके खाते में सहेज नहीं पाए। प्रगति इस ब्राउज़र में सुरक्षित है, ऐप फिर कोशिश करेगा।", "cloud.restored": "☁️ आपके खाते से सहेजी गई प्रगति लोड हुई।",
       "ord.type": "ऑर्डर का प्रकार", "ord.market": "मार्केट (अभी)", "ord.limit": "लिमिट", "ord.stop": "स्टॉप-लॉस", "ord.px": "कीमत",
@@ -6842,6 +7055,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
       "fav.none": "अभी कोई पसंदीदा नहीं। कोई शेयर खोलें और उसके नाम के पास ☆ दबाएँ।",
     },
     ar: {
+      "b.all.d": "أنهِ جميع الدروس",
       "cloud.on": "☁️ يُحفظ تقدمك في حسابك على Claude، لذا يرافقك على أجهزتك الأخرى.", "cloud.local": "💾 يُحفظ التقدم في هذا المتصفح فقط.",
       "cloud.error": "⚠️ تعذّر الحفظ في حسابك الآن. ما زال التقدم محفوظًا في هذا المتصفح، وسيحاول التطبيق مجددًا.", "cloud.restored": "☁️ تم تحميل تقدمك المحفوظ من حسابك.",
       "ord.type": "نوع الأمر", "ord.market": "السوق (الآن)", "ord.limit": "محدد السعر", "ord.stop": "وقف الخسارة", "ord.px": "السعر",
@@ -6864,6 +7078,7 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
       "fav.none": "لا توجد أسهم مفضلة بعد. افتح سهمًا واضغط ☆ بجانب اسمه.",
     },
     bn: {
+      "b.all.d": "সব পাঠ শেষ করুন",
       "cloud.on": "☁️ অগ্রগতি আপনার Claude অ্যাকাউন্টে সংরক্ষিত হয়, তাই অন্য ডিভাইসেও পাবেন।", "cloud.local": "💾 অগ্রগতি শুধু এই ব্রাউজারে সংরক্ষিত।",
       "cloud.error": "⚠️ এখন আপনার অ্যাকাউন্টে সংরক্ষণ করা গেল না। অগ্রগতি এই ব্রাউজারে আছে, অ্যাপ আবার চেষ্টা করবে।", "cloud.restored": "☁️ আপনার অ্যাকাউন্ট থেকে সংরক্ষিত অগ্রগতি লোড হয়েছে।",
       "ord.type": "অর্ডারের ধরন", "ord.market": "মার্কেট (এখনই)", "ord.limit": "লিমিট", "ord.stop": "স্টপ-লস", "ord.px": "দাম",
@@ -6887,6 +7102,67 @@ TS_WORDS.push(["看著", "看着"], ["接著", "接着"], ["跟著", "跟着"], 
     },
   };
   for (const [lg, tx] of Object.entries(TX)) if (I18N[lg]) Object.assign(I18N[lg], tx);
+})();
+
+/* ---- First-time guide ---- */
+(() => {
+  const T = {
+    en: ["🧭 Take the tour", "Next", "Back", "Skip", "Let's go!", v => `Step ${v.i} of ${v.n}`, [
+      ["Market watchlist", "77 stocks from 7 markets. Pick a market, search by name, and tap a stock to open it. Your ★ favorites stay on top."],
+      ["Price chart and coach", "See how the price has moved, then read the coach: what's happening and what a careful trader might do. Tap any ? to open the matching lesson."],
+      ["Buy and sell", "Choose how many shares and an order type: Market buys now, Limit waits for your price, and Stop-loss sells automatically to limit a loss."],
+      ["Journal, lessons and challenges", "The Journal reviews every trade you make. Learn has 21 lessons with videos and quizzes. Challenges lets you replay famous market events."],
+      ["Two practice areas", "The Practice zone moves all the time. The Real-hours zone follows each market's real trading hours. Each has its own $100,000 of virtual money."],
+      ["Your language", "Switch between 8 languages here at any time. Have fun, and remember: it's all virtual money!"]]],
+    zh: ["🧭 導覽", "下一步", "上一步", "略過", "開始吧！", v => `第 ${v.i} 步，共 ${v.n} 步`, [
+      ["市場觀察清單", "7 個市場、77 檔股票。選擇市場、用名稱搜尋，點一檔股票就能打開。你的 ★ 最愛會排在最上面。"],
+      ["價格走勢圖和教練", "看看價格怎麼變動，再讀教練的說明：發生了什麼事、謹慎的投資人可能會怎麼做。點任何一個「?」就能打開相關課程。"],
+      ["買進和賣出", "選擇股數和委託方式：市價立刻買，限價等你的價格，停損會自動賣出來限制虧損。"],
+      ["日誌、課程和挑戰", "交易日誌會檢討你的每一筆交易。學習區有 21 堂附影片和測驗的課程。挑戰區可以重溫著名的市場事件。"],
+      ["兩個練習區", "練習區的價格隨時在動。真實練習區依照每個市場真實的交易時間。兩區各有 10 萬美元的虛擬資金。"],
+      ["你的語言", "隨時可以在這裡切換 8 種語言。玩得開心，記得：這裡全都是虛擬的錢！"]]],
+    es: ["🧭 Ver la guía", "Siguiente", "Atrás", "Omitir", "¡Vamos!", v => `Paso ${v.i} de ${v.n}`, [
+      ["Lista de mercados", "77 acciones de 7 mercados. Elige un mercado, busca por nombre y toca una acción para abrirla. Tus ★ favoritas quedan arriba."],
+      ["Gráfico y coach", "Mira cómo se ha movido el precio y lee al coach: qué está pasando y qué haría un inversor prudente. Toca cualquier ? para abrir la lección."],
+      ["Comprar y vender", "Elige cuántas acciones y el tipo de orden: Mercado compra ya, Limitada espera tu precio y Stop-loss vende sola para limitar una pérdida."],
+      ["Diario, lecciones y retos", "El Diario revisa cada operación. Aprender tiene 21 lecciones con vídeos y preguntas. Retos te deja revivir momentos famosos del mercado."],
+      ["Dos zonas de práctica", "La zona de práctica se mueve todo el tiempo. La de horario real sigue el horario real de cada mercado. Cada una tiene 100.000 $ virtuales."],
+      ["Tu idioma", "Cambia entre 8 idiomas aquí cuando quieras. ¡Diviértete, y recuerda que todo es dinero virtual!"]]],
+    fr: ["🧭 Visite guidée", "Suivant", "Retour", "Passer", "C’est parti !", v => `Étape ${v.i} sur ${v.n}`, [
+      ["Liste des marchés", "77 actions de 7 marchés. Choisissez un marché, cherchez par nom et touchez une action pour l’ouvrir. Vos ★ favoris restent en haut."],
+      ["Graphique et coach", "Regardez l’évolution du prix, puis lisez le coach : ce qui se passe et ce que ferait un investisseur prudent. Touchez un ? pour ouvrir la leçon."],
+      ["Acheter et vendre", "Choisissez le nombre d’actions et le type d’ordre : Au marché achète tout de suite, À cours limité attend votre prix, Stop-loss vend tout seul pour limiter une perte."],
+      ["Journal, leçons et défis", "Le Journal analyse chacune de vos transactions. Apprendre propose 21 leçons avec vidéos et quiz. Défis vous fait revivre des moments célèbres de la Bourse."],
+      ["Deux zones d’entraînement", "La zone d’entraînement bouge tout le temps. La zone heures réelles suit les vrais horaires de chaque marché. Chacune a 100 000 $ fictifs."],
+      ["Votre langue", "Changez de langue ici à tout moment, parmi 8. Amusez-vous, et n’oubliez pas : tout est en argent fictif !"]]],
+    hi: ["🧭 टूर देखें", "आगे", "पीछे", "छोड़ें", "चलिए शुरू करें!", v => `चरण ${v.i} / ${v.n}`, [
+      ["बाज़ार वॉचलिस्ट", "7 बाज़ारों के 77 शेयर। बाज़ार चुनें, नाम से खोजें, और किसी शेयर को खोलने के लिए उस पर टैप करें। आपके ★ पसंदीदा सबसे ऊपर रहते हैं।"],
+      ["प्राइस चार्ट और कोच", "देखें कीमत कैसे बदली, फिर कोच पढ़ें: क्या हो रहा है और एक सावधान ट्रेडर क्या कर सकता है। संबंधित पाठ खोलने के लिए कोई भी ? दबाएँ।"],
+      ["ख़रीदें और बेचें", "शेयरों की संख्या और ऑर्डर का प्रकार चुनें: मार्केट अभी ख़रीदता है, लिमिट आपकी कीमत का इंतज़ार करता है, और स्टॉप-लॉस नुकसान सीमित करने के लिए अपने-आप बेचता है।"],
+      ["जर्नल, पाठ और चुनौतियाँ", "जर्नल आपके हर ट्रेड की समीक्षा करता है। सीखें में वीडियो और क्विज़ वाले 21 पाठ हैं। चुनौतियों में आप बाज़ार की मशहूर घटनाएँ दोबारा खेल सकते हैं।"],
+      ["दो अभ्यास क्षेत्र", "अभ्यास क्षेत्र हर समय चलता है। असली समय क्षेत्र हर बाज़ार के असली ट्रेडिंग समय पर चलता है। दोनों में $100,000 का अलग नकली पैसा है।"],
+      ["आपकी भाषा", "यहाँ कभी भी 8 भाषाओं में बदलें। मज़े करें, और याद रखें: यह सब नकली पैसा है!"]]],
+    ar: ["🧭 جولة تعريفية", "التالي", "السابق", "تخطٍّ", "لنبدأ!", v => `الخطوة ${v.i} من ${v.n}`, [
+      ["قائمة مراقبة السوق", "77 سهمًا من 7 أسواق. اختر سوقًا، وابحث بالاسم، واضغط على سهم لفتحه. تبقى أسهمك ★ المفضلة في الأعلى."],
+      ["رسم السعر والمدرب", "شاهد كيف تحرك السعر، ثم اقرأ المدرب: ماذا يحدث وما قد يفعله متداول حذر. اضغط أي ? لفتح الدرس المناسب."],
+      ["الشراء والبيع", "اختر عدد الأسهم ونوع الأمر: السوق يشتري الآن، ومحدد السعر ينتظر سعرك، ووقف الخسارة يبيع تلقائيًا للحد من الخسارة."],
+      ["السجل والدروس والتحديات", "يراجع السجل كل صفقة تقوم بها. في قسم التعلّم 21 درسًا بفيديوهات واختبارات. وفي التحديات يمكنك إعادة عيش أحداث شهيرة في السوق."],
+      ["منطقتا تدريب", "منطقة التدريب تتحرك طوال الوقت. منطقة الساعات الحقيقية تتبع ساعات التداول الحقيقية لكل سوق. لكل منهما 100,000 دولار افتراضية."],
+      ["لغتك", "بدّل بين 8 لغات من هنا في أي وقت. استمتع، وتذكّر: كل الأموال هنا افتراضية!"]]],
+    bn: ["🧭 পরিচিতি দেখুন", "পরের", "আগের", "বাদ দিন", "শুরু করি!", v => `ধাপ ${v.i} / ${v.n}`, [
+      ["বাজার ওয়াচলিস্ট", "7টি বাজারের 77টি শেয়ার। বাজার বেছে নিন, নাম দিয়ে খুঁজুন, আর খুলতে একটি শেয়ারে ট্যাপ করুন। আপনার ★ প্রিয় শেয়ার উপরে থাকে।"],
+      ["দামের চার্ট ও কোচ", "দাম কীভাবে নড়েছে দেখুন, তারপর কোচ পড়ুন: কী ঘটছে আর একজন সতর্ক ট্রেডার কী করতে পারেন। সংশ্লিষ্ট পাঠ খুলতে যেকোনো ? চাপুন।"],
+      ["কেনা ও বেচা", "শেয়ারের সংখ্যা ও অর্ডারের ধরন বেছে নিন: মার্কেট এখনই কেনে, লিমিট আপনার দামের অপেক্ষা করে, আর স্টপ-লস ক্ষতি সীমিত করতে নিজে থেকে বেচে।"],
+      ["জার্নাল, পাঠ ও চ্যালেঞ্জ", "জার্নাল আপনার প্রতিটি ট্রেড পর্যালোচনা করে। শিখুন অংশে ভিডিও ও কুইজসহ 21টি পাঠ আছে। চ্যালেঞ্জে বাজারের বিখ্যাত ঘটনা আবার খেলতে পারবেন।"],
+      ["দুটি অনুশীলন এলাকা", "অনুশীলন এলাকা সবসময় চলে। আসল সময়ের এলাকা প্রতিটি বাজারের আসল ট্রেডিং সময় মেনে চলে। দুটিতেই আলাদা $100,000 ভার্চুয়াল টাকা।"],
+      ["আপনার ভাষা", "এখানে যেকোনো সময় 8টি ভাষার মধ্যে বদলান। মজা করুন, আর মনে রাখুন: সবই ভার্চুয়াল টাকা!"]]],
+  };
+  for (const [lg, [start, next, back, skip, done, step, steps]] of Object.entries(T)) {
+    if (!I18N[lg]) continue;
+    const o = { "tour.start": start, "tour.next": next, "tour.back": back, "tour.skip": skip, "tour.done": done, "tour.step": step };
+    steps.forEach(([ti, bo], i) => { o[`tour.${i + 1}.t`] = ti; o[`tour.${i + 1}.b`] = bo; });
+    Object.assign(I18N[lg], o);
+  }
 })();
 
 /* ============ StockPilot Plus + History challenges: texts in every language ============ */
@@ -7832,6 +8108,136 @@ function applyCloudSave() {
   applyStatic(); renderMktOptions(); syncOrderForm(false);
   renderAll(); renderXP(); showView(currentView);
   toast(t("cloud.restored"));
+}
+
+/* ============ Clickable vocabulary words in lessons + first-time guide ============ */
+
+/* ---- Vocabulary words: the first mention of each glossary word in a lesson becomes a button ---- */
+let glossCache = { lang: null, re: null, map: null };
+const NO_WORD_GAPS = ["zh", "zhs", "hi", "ar", "bn"];   // scripts where \b word boundaries don't work
+function glossMatcher() {
+  if (glossCache.lang === lang) return glossCache;
+  const map = new Map();
+  GLOSSARY.forEach((g, i) => {
+    const term = String(glossRow(g)[0]);
+    // "ETF (exchange-traded fund)" -> "ETF", "exchange-traded fund"; "Overbought / oversold" -> both
+    for (let v of term.split(/\s*[\/／(（)）]\s*/)) {
+      v = v.trim();
+      const minLen = NO_WORD_GAPS.includes(lang) ? 2 : 3;
+      if (v.length >= minLen && !map.has(v.toLowerCase())) map.set(v.toLowerCase(), i);
+    }
+  });
+  const alts = [...map.keys()].sort((a, b) => b.length - a.length).map(v => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const re = NO_WORD_GAPS.includes(lang) ? new RegExp(`(${alts})`, "giu") : new RegExp(`(?<![\\p{L}\\p{N}])(${alts})(?:s|es)?(?![\\p{L}\\p{N}])`, "giu");
+  glossCache = { lang, re, map };
+  return glossCache;
+}
+function linkGlossary(root) {
+  if (!root) return;
+  const { re, map } = glossMatcher(), used = new Set();
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: n => n.parentElement.closest("button, a, .gloss-word, .key-idea > b, h4") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+  });
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (let cur of nodes) {
+    while (cur) {
+      re.lastIndex = 0;
+      let m, hit = null;
+      while ((m = re.exec(cur.data))) { const i = map.get(m[1].toLowerCase()); if (i != null && !used.has(i)) { hit = { m, i }; break; } }
+      if (!hit) break;
+      used.add(hit.i);
+      const mid = cur.splitText(hit.m.index), rest = mid.splitText(hit.m[0].length);
+      const btn = document.createElement("button");
+      btn.type = "button"; btn.className = "gloss-word"; btn.dataset.gloss = String(hit.i); btn.textContent = mid.data;
+      mid.replaceWith(btn);
+      cur = rest;
+    }
+  }
+}
+function showGloss(btn) {
+  const g = GLOSSARY[+btn.dataset.gloss];
+  if (!g) return;
+  const [term, def, ex] = glossRow(g);
+  let pop = $("glossPop");
+  if (!pop) { pop = document.createElement("div"); pop.id = "glossPop"; pop.className = "gloss-pop"; pop.setAttribute("role", "dialog"); document.body.appendChild(pop); }
+  pop.innerHTML = `<b class="gp-term"></b><p class="gp-def"></p><p class="gp-ex"><b>${t("v.ex")}</b> <span></span></p>
+    <button type="button" class="btn btn-ghost btn-sm" data-goto-vocab>${t("l.vocab")} →</button>`;
+  pop.querySelector(".gp-term").textContent = term;
+  pop.querySelector(".gp-def").textContent = def;
+  pop.querySelector(".gp-ex span").textContent = ex;
+  pop.hidden = false;
+  const r = btn.getBoundingClientRect(), w = Math.min(320, innerWidth - 32);
+  pop.style.width = w + "px";
+  pop.style.left = Math.max(16, Math.min(innerWidth - w - 16, r.left)) + "px";
+  pop.style.top = (r.bottom + 8 + pop.offsetHeight > innerHeight ? Math.max(8, r.top - pop.offsetHeight - 8) : r.bottom + 8) + "px";
+  setFlag("glossWord");
+}
+const hideGloss = () => { const p = $("glossPop"); if (p) p.hidden = true; };
+
+/* ---- First-time guide: six short steps on the Trade screen ---- */
+const TOUR = [
+  () => document.querySelector(".col-left .card"),
+  () => $("chartWrap"),
+  () => $("tradeBox"),
+  () => document.querySelector(".tabs"),
+  () => document.querySelector(".zone-seg"),
+  () => $("langSel"),
+];
+let tourStep = -1;
+function startTour() {
+  hideGloss();
+  if (currentView !== "trade") showView("trade");
+  tourStep = 0;
+  renderTour();
+}
+function endTour() {
+  tourStep = -1;
+  ["tourHi", "tourCard"].forEach(id => { const el = $(id); if (el) el.remove(); });
+  learn.toured = true; saveLearn();
+}
+function renderTour() {
+  const target = TOUR[tourStep] && TOUR[tourStep]();
+  if (!target) { endTour(); return; }
+  target.scrollIntoView({ block: "center", behavior: "instant" in document.documentElement.style ? "instant" : "auto" });
+  let hi = $("tourHi"), card = $("tourCard");
+  if (!hi) { hi = document.createElement("div"); hi.id = "tourHi"; hi.className = "tour-hi"; document.body.appendChild(hi); }
+  if (!card) { card = document.createElement("div"); card.id = "tourCard"; card.className = "tour-card"; card.setAttribute("role", "dialog"); card.setAttribute("aria-modal", "true"); document.body.appendChild(card); }
+  const r = target.getBoundingClientRect(), pad = 6;
+  Object.assign(hi.style, { left: (r.left - pad) + "px", top: (r.top - pad) + "px", width: (r.width + pad * 2) + "px", height: (r.height + pad * 2) + "px" });
+  const n = TOUR.length, last = tourStep === n - 1;
+  card.innerHTML = `<div class="tour-step">${t("tour.step", { i: tourStep + 1, n })}</div>
+    <h3>${t(`tour.${tourStep + 1}.t`)}</h3><p>${t(`tour.${tourStep + 1}.b`)}</p>
+    <div class="tour-btns"><button type="button" class="btn btn-ghost btn-sm" data-tour="skip">${t("tour.skip")}</button>
+      ${tourStep > 0 ? `<button type="button" class="btn btn-ghost btn-sm" data-tour="back">${t("tour.back")}</button>` : ""}
+      <button type="button" class="btn btn-primary btn-sm" data-tour="next">${t(last ? "tour.done" : "tour.next")}</button></div>`;
+  const w = Math.min(340, innerWidth - 32);
+  card.style.width = w + "px";
+  const below = r.bottom + 14, ch = card.offsetHeight;
+  card.style.top = (below + ch < innerHeight ? below : Math.max(12, r.top - ch - 14)) + "px";
+  card.style.left = Math.max(16, Math.min(innerWidth - w - 16, r.left)) + "px";
+  card.querySelector('[data-tour="next"]').focus();
+}
+
+function initGuide() {
+  document.addEventListener("click", e => {
+    const w = e.target.closest(".gloss-word");
+    if (w) { showGloss(w); return; }
+    if (e.target.closest("[data-goto-vocab]")) { hideGloss(); learn.pane = "vocab"; saveLearn(); showView("learn"); return; }
+    if (!e.target.closest("#glossPop")) hideGloss();
+    const tb = e.target.closest("[data-tour]");
+    if (tb) {
+      const a = tb.dataset.tour;
+      if (a === "start") startTour();
+      else if (a === "skip") endTour();
+      else if (a === "back") { tourStep--; renderTour(); }
+      else if (a === "next") { if (tourStep >= TOUR.length - 1) endTour(); else { tourStep++; renderTour(); } }
+    }
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") { hideGloss(); if (tourStep >= 0) endTour(); } });
+  window.addEventListener("resize", () => { hideGloss(); if (tourStep >= 0) renderTour(); });
+  window.addEventListener("scroll", () => { hideGloss(); if (tourStep >= 0) { const tg = TOUR[tourStep](); const hi = $("tourHi"); if (tg && hi) { const r = tg.getBoundingClientRect(); hi.style.top = (r.top - 6) + "px"; hi.style.left = (r.left - 6) + "px"; } } }, { passive: true });
+  // first visit: show the guide once, on the Trade screen
+  if (!learn.toured && currentView === "trade") setTimeout(() => { if (!learn.toured && currentView === "trade" && tourStep < 0) startTour(); }, 900);
 }
 
 /* ============ Language ============ */
@@ -9683,6 +10089,7 @@ function renderLesson() {
   $("tryIt").addEventListener("click", () => tryIt(l));
   panel.addEventListener("click", e => { if (e.target.closest("[data-mission-go]")) tryIt(l); });
   initVideo(l);
+  linkGlossary($("lessonPanel").querySelector(".lesson-body"));
 }
 
 function answerQuiz(l, qi, k) {
@@ -9959,6 +10366,7 @@ syncOrderForm(false);
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);
+initGuide();
 initCloud();
 </script>
 </body>

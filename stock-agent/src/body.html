@@ -87,6 +87,7 @@
         <p class="coach-note" data-i18n="coach.note"></p>
       </div>
 
+      <div id="tradeBox">
       <div class="ord-row">
         <label for="ordType" data-i18n="ord.type">Order type</label>
         <select id="ordType" class="mkt-select">
@@ -108,6 +109,7 @@
       <div class="ord-box" id="ordBox" hidden>
         <h3 data-i18n="ord.open">Open orders</h3>
         <ul class="ord-list" id="ordList"></ul>
+      </div>
       </div>
     </div>
 
@@ -226,5 +228,6 @@
 <footer>
   <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
   <a href="../index.html" data-i18n="footer.back">back to CoachStat</a>
+  · <button type="button" class="link-btn" data-tour="start" data-i18n="tour.start">🧭 Take the tour</button>
   <div class="cloud-status" id="cloudStatus" role="status"></div>
 </footer>

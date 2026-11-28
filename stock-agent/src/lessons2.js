@@ -607,12 +607,66 @@ const EXTRAS = {
 };
 
 /* Course order and units */
+// ---- Lesson: stock markets around the world ----
+const openNow = () => MKS.filter(mk => { const st = mktStatus(mk); return st.open && !st.lunch; });
+NEW_LESSONS.push({
+  id: "world", a: 0, tryIt: { sym: "7203" },
+  data: () => ({ n: MKS.length, open: openNow().map(mk => MARKETS[mk].flag + " " + t("mkt." + mk)).join(", "), held: new Set(Object.keys(state.holdings).map(s => market[s].mkt)).size }),
+  en: {
+    title: "Stock markets around the world", try: "Look at Toyota (7203)",
+    body: d => `
+      <p>Every country has its own stock exchange, and each one runs a little differently. StockPilot has ${d.n} markets: the US, Taiwan, Japan, India, Hong Kong, Europe and Saudi Arabia.</p>
+      <ul>
+        <li><b>Different clocks.</b> Each market opens in its own time zone, so when New York opens, Tokyo has already closed for the night. Tokyo and Hong Kong even stop for a <b>lunch break</b>, and Saudi Arabia trades from <b>Sunday to Thursday</b>.</li>
+        <li><b>Different rules.</b> Taiwan and Saudi Arabia limit how far a price can move in one day (±10%). The US, Europe and Hong Kong have no daily limit, so prices can jump much further.</li>
+        <li><b>Different money.</b> Each market uses its own currency: yen, rupees, euros, riyals and more. Your cash here stays in US dollars, so a foreign stock's value also moves with the exchange rate. This is <b>currency risk</b>.</li>
+      </ul>
+      <p>Owning stocks from several countries spreads your risk, because economies don't all rise and fall together. But it adds currency risk, so many investors keep most of their money in their home market and a smaller part abroad.</p>
+      ${key("each market has its own clock, currency and rules. Spreading across countries spreads risk, but adds currency risk.")}
+      ${live(d.open ? `Open right now in real time: <b>${d.open}</b>. You own stocks from <b>${d.held}</b> market${d.held === 1 ? "" : "s"}.` : `In real time, all ${d.n} markets are closed right now. You own stocks from <b>${d.held}</b> market${d.held === 1 ? "" : "s"}.`)}`,
+    q: "Which market trades from Sunday to Thursday?",
+    opts: ["Saudi Arabia", "Japan", "The United States"],
+    why: "The Saudi Exchange's week runs Sunday to Thursday, matching the working week there.",
+  },
+  zh: {
+    title: "全球股市", try: "看看豐田（7203）",
+    body: d => `
+      <p>每個國家都有自己的證券交易所，而且運作方式都有點不同。StockPilot 有 ${d.n} 個市場：美國、台灣、日本、印度、香港、歐洲和沙烏地阿拉伯。</p>
+      <ul>
+        <li><b>時鐘不同。</b>每個市場依自己的時區開盤，所以紐約開盤時，東京早就收盤了。東京和香港中午還會<b>午休</b>，沙烏地阿拉伯則是<b>週日到週四</b>交易。</li>
+        <li><b>規則不同。</b>台灣和沙烏地阿拉伯限制價格一天最多漲跌 ±10%。美國、歐洲和香港沒有每日漲跌幅限制，價格可以跳得更遠。</li>
+        <li><b>貨幣不同。</b>每個市場用自己的貨幣：日圓、盧比、歐元、里亞爾等等。你在這裡的現金是美元，所以外國股票的價值也會跟著匯率變動。這就是<b>匯率風險</b>。</li>
+      </ul>
+      <p>持有好幾個國家的股票可以分散風險，因為各國經濟不會同時漲跌。但這也會帶來匯率風險，所以很多投資人把大部分資金放在本國市場，小部分放在海外。</p>
+      ${key("每個市場都有自己的時鐘、貨幣和規則。分散到不同國家可以分散風險，但會增加匯率風險。")}
+      ${live(d.open ? `以真實時間來看，現在開盤的有：<b>${d.open}</b>。你持有 <b>${d.held}</b> 個市場的股票。` : `以真實時間來看，現在 ${d.n} 個市場都休市。你持有 <b>${d.held}</b> 個市場的股票。`)}`,
+    q: "哪個市場是週日到週四交易？",
+    opts: ["沙烏地阿拉伯", "日本", "美國"],
+    why: "沙烏地證券交易所的交易週是週日到週四，和當地的工作週一樣。",
+  },
+});
+EXTRAS.world = {
+  more: [
+    Q(0, ["You buy a Japanese stock. It rises 10% in yen, but the yen falls 10% against the dollar. Roughly how did you do in dollars?", ["About −1%: almost no gain", "+10%", "+20%"], "1.10 × 0.90 = 0.99, so the currency drop wiped out the gain. That's currency risk."],
+         ["你買了一檔日股。它以日圓計漲了 10%，但日圓對美元貶值 10%。換算成美元大約是多少？", ["約 −1%：幾乎沒賺", "+10%", "+20%"], "1.10 × 0.90 = 0.99，匯率下跌把漲幅吃掉了。這就是匯率風險。"]),
+    Q(0, ["Which two markets in StockPilot have a ±10% daily price limit?", ["Taiwan and Saudi Arabia", "The US and Europe", "Japan and Hong Kong"], "Taiwan and Saudi Arabia limit daily moves to 10% from the previous close."],
+         ["StockPilot 裡哪兩個市場有 ±10% 的每日漲跌幅限制？", ["台灣和沙烏地阿拉伯", "美國和歐洲", "日本和香港"], "台灣和沙烏地阿拉伯限制每天漲跌不超過昨收的 10%。"]),
+  ],
+  mission: M("Own stocks from 3 or more different markets at the same time", "同時持有 3 個以上不同市場的股票", () => new Set(Object.keys(state.holdings).map(s => market[s] && market[s].mkt)).size >= 3),
+  video: [
+    S("flags", { l: "🌏", r: "🌍" }, "Every country has its own stock exchange, currency and rules.", "每個國家都有自己的證券交易所、貨幣和規則。", { en: { mid: "7 markets", l: "Asia", r: "Europe & Americas" }, zh: { mid: "7 個市場", l: "亞洲", r: "歐洲與美洲" } }),
+    S("math", {}, "When New York opens, Tokyo is already closed for the night, and some markets even stop for lunch.", "紐約開盤時，東京早就收盤了，有些市場中午還會休息。", { en: { lines: ["Tokyo: lunch 11:30–12:30", "Hong Kong: lunch 12:00–13:00", "Saudi Arabia: Sunday–Thursday"] }, zh: { lines: ["東京：午休 11:30–12:30", "香港：午休 12:00–13:00", "沙烏地：週日到週四"] } }),
+    S("math", {}, "Some markets limit how far a price can move in a day. Others don't.", "有些市場限制價格一天的漲跌幅，有些則沒有。", { en: { lines: ["Taiwan, Saudi Arabia: ±10% a day", "US, Europe, Hong Kong: no limit"] }, zh: { lines: ["台灣、沙烏地：每天 ±10%", "美國、歐洲、香港：沒有限制"] } }),
+    S("math", {}, "Foreign stocks add currency risk: a falling currency can eat your gain.", "外國股票會帶來匯率風險：貨幣下跌可能吃掉你的獲利。", { en: { lines: ["Stock +10% in yen", "Yen −10% against the dollar", "≈ −1% in dollars"] }, zh: { lines: ["股價以日圓計 +10%", "日圓對美元 −10%", "換算美元 ≈ −1%"] } }),
+  ],
+};
+
 const UNITS = [
   { id: "u1", ids: ["basics", "buysell", "pnl", "orders"] },
   { id: "u2", ids: ["chart", "news", "ma", "rsi"] },
   { id: "u3", ids: ["risk", "diversify", "psychology", "whenact"] },
   { id: "u4", ids: ["compound", "dividends", "valuation", "cycles"] },
-  { id: "u5", ids: ["taiwan", "economy", "plan", "predict"] },
+  { id: "u5", ids: ["taiwan", "world", "economy", "plan", "predict"] },
 ];
 (() => {
   const all = [...LESSONS, ...NEW_LESSONS];
