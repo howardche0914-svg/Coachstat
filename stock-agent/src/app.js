@@ -44,104 +44,117 @@ function jpTick(p) { return p < 10000 ? 1 : p < 30000 ? 5 : 10; }
 const MON_FRI = [1, 2, 3, 4, 5];
 const MARKETS = {
   US: { cur: "$",    perUSD: 1,    vol: 0.009, dp: 2, limit: 0,    tick: () => 0.01, tz: "America/New_York", open: 570, close: 960,  days: MON_FRI, flag: "🇺🇸" },
-  TW: { cur: "NT$",  perUSD: 32,   vol: 0.010, dp: 2, limit: 0.10, tick: twTick,     tz: "Asia/Taipei",      open: 540, close: 810,  days: MON_FRI, flag: "🇹🇼" },
-  JP: { cur: "¥",    perUSD: 150,  vol: 0.011, dp: 0, limit: 0,    tick: jpTick,     tz: "Asia/Tokyo",       open: 540, close: 930,  days: MON_FRI, flag: "🇯🇵", lunch: [690, 750] },
-  IN: { cur: "₹",    perUSD: 85,   vol: 0.010, dp: 2, limit: 0,    tick: () => 0.05, tz: "Asia/Kolkata",     open: 555, close: 930,  days: MON_FRI, flag: "🇮🇳" },
-  HK: { cur: "HK$",  perUSD: 7.8,  vol: 0.013, dp: 2, limit: 0,    tick: hkTick,     tz: "Asia/Hong_Kong",   open: 570, close: 960,  days: MON_FRI, flag: "🇭🇰", lunch: [720, 780] },
-  EU: { cur: "€",    perUSD: 0.9,  vol: 0.009, dp: 2, limit: 0,    tick: () => 0.01, tz: "Europe/Paris",     open: 540, close: 1050, days: MON_FRI, flag: "🇪🇺" },
+  TW: { cur: "NT$",  perUSD: 32.9,   vol: 0.010, dp: 2, limit: 0.10, tick: twTick,     tz: "Asia/Taipei",      open: 540, close: 810,  days: MON_FRI, flag: "🇹🇼" },
+  JP: { cur: "¥",    perUSD: 159.4,  vol: 0.011, dp: 0, limit: 0,    tick: jpTick,     tz: "Asia/Tokyo",       open: 540, close: 930,  days: MON_FRI, flag: "🇯🇵", lunch: [690, 750] },
+  IN: { cur: "₹",    perUSD: 93.5,   vol: 0.010, dp: 2, limit: 0,    tick: () => 0.05, tz: "Asia/Kolkata",     open: 555, close: 930,  days: MON_FRI, flag: "🇮🇳" },
+  HK: { cur: "HK$",  perUSD: 7.85,  vol: 0.013, dp: 2, limit: 0,    tick: hkTick,     tz: "Asia/Hong_Kong",   open: 570, close: 960,  days: MON_FRI, flag: "🇭🇰", lunch: [720, 780] },
+  EU: { cur: "€",    perUSD: 0.91,  vol: 0.009, dp: 2, limit: 0,    tick: () => 0.01, tz: "Europe/Paris",     open: 540, close: 1050, days: MON_FRI, flag: "🇪🇺" },
   SA: { cur: "SAR ", perUSD: 3.75, vol: 0.009, dp: 2, limit: 0.10, tick: saTick,     tz: "Asia/Riyadh",      open: 600, close: 900,  days: [0, 1, 2, 3, 4], flag: "🇸🇦" },
 };
 const MKS = Object.keys(MARKETS);
+// Market holidays (Dec 2026 to Dec 2027). The US, European and Japanese calendars follow fixed rules,
+// so they are complete. Elsewhere only fixed-date holidays are listed: lunar and religious holidays
+// (Lunar New Year, Diwali, Eid, ...) move every year and are left out rather than guessed.
+const HOLIDAYS = {
+  US: ["2026-12-25", "2027-01-01", "2027-01-18", "2027-02-15", "2027-03-26", "2027-05-31", "2027-06-18", "2027-07-05", "2027-09-06", "2027-11-25", "2027-12-24"],
+  EU: ["2026-12-25", "2027-01-01", "2027-03-26", "2027-03-29"],
+  JP: ["2026-12-31", "2027-01-01", "2027-01-11", "2027-02-11", "2027-02-23", "2027-03-22", "2027-04-29", "2027-05-03", "2027-05-04", "2027-05-05",
+       "2027-07-19", "2027-08-11", "2027-09-20", "2027-09-23", "2027-10-11", "2027-11-03", "2027-11-23", "2027-12-31"],
+  TW: ["2027-01-01"], HK: ["2026-12-25", "2027-01-01"], IN: ["2026-12-25", "2027-01-26"], SA: [],
+};
+for (const mk of MKS) MARKETS[mk].holidays = new Set(HOLIDAYS[mk] || []);
 // Daily volatility of each industry's shared moves
 const SECTORS = { chips: 0.014, tech: 0.008, finance: 0.007, consumer: 0.008, shipping: 0.016, telecom: 0.003,
                   health: 0.006, energy: 0.012, industrial: 0.008, staples: 0.004, fund: 0 };
 
-/* ============ Universe (starting prices are rough, simulated levels) ============ */
+/* ============ Universe ============ */
+// Starting prices: real prices from late November 2026 where available; VOO, QQQ, 0050 and the
+// European stocks are estimates from the latest dated quotes found. Exchange rates: Nov 19, 2026.
 const STOCKS = [
-  { sym: "AAPL",  name: "Apple",           zh: "蘋果 Apple",      short: "Apple",      zhShort: "蘋果",   base: 232,  drift: 0.0003, vol: 0.015, beta: 1.0, sector: "tech",     mkt: "US" },
-  { sym: "MSFT",  name: "Microsoft",       zh: "微軟 Microsoft",  short: "Microsoft",  zhShort: "微軟",   base: 448,  drift: 0.0004, vol: 0.014, beta: 0.9, sector: "tech",     mkt: "US" },
-  { sym: "NVDA",  name: "NVIDIA",          zh: "輝達 NVIDIA",     short: "NVIDIA",     zhShort: "輝達",   base: 138,  drift: 0.0007, vol: 0.028, beta: 1.6, sector: "chips",    mkt: "US" },
-  { sym: "GOOGL", name: "Alphabet",        zh: "Alphabet（谷歌）", short: "Alphabet",   zhShort: "Alphabet", base: 182, drift: 0.0003, vol: 0.017, beta: 1.1, sector: "tech",   mkt: "US" },
-  { sym: "AMZN",  name: "Amazon",          zh: "亞馬遜 Amazon",   short: "Amazon",     zhShort: "亞馬遜", base: 205,  drift: 0.0004, vol: 0.019, beta: 1.2, sector: "tech",     mkt: "US" },
-  { sym: "META",  name: "Meta Platforms",  zh: "Meta",            short: "Meta",       zhShort: "Meta",   base: 585,  drift: 0.0005, vol: 0.021, beta: 1.3, sector: "tech",     mkt: "US" },
-  { sym: "TSLA",  name: "Tesla",           zh: "特斯拉 Tesla",    short: "Tesla",      zhShort: "特斯拉", base: 248,  drift: 0.0002, vol: 0.034, beta: 1.8, sector: "consumer", mkt: "US" },
-  { sym: "BRK.B", name: "Berkshire Hath.", zh: "波克夏 Berkshire", short: "Berkshire", zhShort: "波克夏", base: 462,  drift: 0.0003, vol: 0.010, beta: 0.6, sector: "finance",  mkt: "US" },
-  { sym: "JPM",   name: "JPMorgan Chase",  zh: "摩根大通 JPMorgan", short: "JPMorgan", zhShort: "摩根大通", base: 244, drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance", mkt: "US" },
-  { sym: "V",     name: "Visa",            zh: "Visa",            short: "Visa",       zhShort: "Visa",   base: 312,  drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",  mkt: "US" },
-  { sym: "NFLX",  name: "Netflix",         zh: "網飛 Netflix",    short: "Netflix",    zhShort: "網飛",   base: 892,  drift: 0.0004, vol: 0.023, beta: 1.2, sector: "consumer", mkt: "US" },
-  { sym: "DIS",   name: "Walt Disney",     zh: "迪士尼 Disney",   short: "Disney",     zhShort: "迪士尼", base: 112,  drift: 0.0001, vol: 0.016, beta: 1.0, sector: "consumer", mkt: "US" },
-  { sym: "2330",  name: "TSMC 台積電",       zh: "台積電",           short: "TSMC",       zhShort: "台積電", base: 1085, drift: 0.0005, vol: 0.020, beta: 1.1, sector: "chips",    mkt: "TW" },
-  { sym: "2317",  name: "Hon Hai 鴻海",      zh: "鴻海",             short: "Hon Hai",    zhShort: "鴻海",   base: 212,  drift: 0.0003, vol: 0.022, beta: 1.0, sector: "tech",     mkt: "TW" },
-  { sym: "2454",  name: "MediaTek 聯發科",   zh: "聯發科",           short: "MediaTek",   zhShort: "聯發科", base: 1340, drift: 0.0004, vol: 0.024, beta: 1.2, sector: "chips",    mkt: "TW" },
-  { sym: "2308",  name: "Delta 台達電",      zh: "台達電",           short: "Delta",      zhShort: "台達電", base: 405,  drift: 0.0004, vol: 0.019, beta: 1.0, sector: "tech",     mkt: "TW" },
-  { sym: "2412",  name: "Chunghwa Tel 中華電", zh: "中華電",          short: "Chunghwa Telecom", zhShort: "中華電", base: 126, drift: 0.0001, vol: 0.006, beta: 0.3, sector: "telecom", mkt: "TW" },
-  { sym: "2881",  name: "Fubon 富邦金",      zh: "富邦金",           short: "Fubon",      zhShort: "富邦金", base: 88,   drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance",  mkt: "TW" },
-  { sym: "2603",  name: "Evergreen 長榮",    zh: "長榮",             short: "Evergreen",  zhShort: "長榮",   base: 198,  drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping", mkt: "TW" },
-  { sym: "0050",  name: "Taiwan 50 ETF 元大台灣50", zh: "元大台灣50", short: "Taiwan 50 ETF", zhShort: "元大台灣50", base: 192, drift: 0.0003, vol: 0.011, beta: 1.0, sector: "fund", mkt: "TW" },
+  { sym: "AAPL",  name: "Apple",           zh: "蘋果 Apple",      short: "Apple",      zhShort: "蘋果",   base: 358.54,  drift: 0.0003, vol: 0.015, beta: 1.0, sector: "tech",     mkt: "US" },
+  { sym: "MSFT",  name: "Microsoft",       zh: "微軟 Microsoft",  short: "Microsoft",  zhShort: "微軟",   base: 492.85,  drift: 0.0004, vol: 0.014, beta: 0.9, sector: "tech",     mkt: "US" },
+  { sym: "NVDA",  name: "NVIDIA",          zh: "輝達 NVIDIA",     short: "NVIDIA",     zhShort: "輝達",   base: 150.49,  drift: 0.0007, vol: 0.028, beta: 1.6, sector: "chips",    mkt: "US" },
+  { sym: "GOOGL", name: "Alphabet",        zh: "Alphabet（谷歌）", short: "Alphabet",   zhShort: "Alphabet", base: 274.96, drift: 0.0003, vol: 0.017, beta: 1.1, sector: "tech",   mkt: "US" },
+  { sym: "AMZN",  name: "Amazon",          zh: "亞馬遜 Amazon",   short: "Amazon",     zhShort: "亞馬遜", base: 254.12,  drift: 0.0004, vol: 0.019, beta: 1.2, sector: "tech",     mkt: "US" },
+  { sym: "META",  name: "Meta Platforms",  zh: "Meta",            short: "Meta",       zhShort: "Meta",   base: 628.96,  drift: 0.0005, vol: 0.021, beta: 1.3, sector: "tech",     mkt: "US" },
+  { sym: "TSLA",  name: "Tesla",           zh: "特斯拉 Tesla",    short: "Tesla",      zhShort: "特斯拉", base: 400,  drift: 0.0002, vol: 0.034, beta: 1.8, sector: "consumer", mkt: "US" },
+  { sym: "BRK.B", name: "Berkshire Hath.", zh: "波克夏 Berkshire", short: "Berkshire", zhShort: "波克夏", base: 580.79,  drift: 0.0003, vol: 0.010, beta: 0.6, sector: "finance",  mkt: "US" },
+  { sym: "JPM",   name: "JPMorgan Chase",  zh: "摩根大通 JPMorgan", short: "JPMorgan", zhShort: "摩根大通", base: 322.96, drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance", mkt: "US" },
+  { sym: "V",     name: "Visa",            zh: "Visa",            short: "Visa",       zhShort: "Visa",   base: 429.56,  drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",  mkt: "US" },
+  { sym: "NFLX",  name: "Netflix",         zh: "網飛 Netflix",    short: "Netflix",    zhShort: "網飛",   base: 60.93,  drift: 0.0004, vol: 0.023, beta: 1.2, sector: "consumer", mkt: "US" },
+  { sym: "DIS",   name: "Walt Disney",     zh: "迪士尼 Disney",   short: "Disney",     zhShort: "迪士尼", base: 127.24,  drift: 0.0001, vol: 0.016, beta: 1.0, sector: "consumer", mkt: "US" },
+  { sym: "2330",  name: "TSMC 台積電",       zh: "台積電",           short: "TSMC",       zhShort: "台積電", base: 2180, drift: 0.0005, vol: 0.020, beta: 1.1, sector: "chips",    mkt: "TW" },
+  { sym: "2317",  name: "Hon Hai 鴻海",      zh: "鴻海",             short: "Hon Hai",    zhShort: "鴻海",   base: 219,  drift: 0.0003, vol: 0.022, beta: 1.0, sector: "tech",     mkt: "TW" },
+  { sym: "2454",  name: "MediaTek 聯發科",   zh: "聯發科",           short: "MediaTek",   zhShort: "聯發科", base: 3680, drift: 0.0004, vol: 0.024, beta: 1.2, sector: "chips",    mkt: "TW" },
+  { sym: "2308",  name: "Delta 台達電",      zh: "台達電",           short: "Delta",      zhShort: "台達電", base: 1125,  drift: 0.0004, vol: 0.019, beta: 1.0, sector: "tech",     mkt: "TW" },
+  { sym: "2412",  name: "Chunghwa Tel 中華電", zh: "中華電",          short: "Chunghwa Telecom", zhShort: "中華電", base: 165.5, drift: 0.0001, vol: 0.006, beta: 0.3, sector: "telecom", mkt: "TW" },
+  { sym: "2881",  name: "Fubon 富邦金",      zh: "富邦金",           short: "Fubon",      zhShort: "富邦金", base: 140,   drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance",  mkt: "TW" },
+  { sym: "2603",  name: "Evergreen 長榮",    zh: "長榮",             short: "Evergreen",  zhShort: "長榮",   base: 249,  drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping", mkt: "TW" },
+  { sym: "0050",  name: "Taiwan 50 ETF 元大台灣50", zh: "元大台灣50", short: "Taiwan 50 ETF", zhShort: "元大台灣50", base: 85, drift: 0.0003, vol: 0.011, beta: 1.0, sector: "fund", mkt: "TW" },
   // --- more US ---
-  { sym: "AMD",   name: "AMD",               zh: "超微 AMD",        short: "AMD",        zhShort: "超微",   base: 165,  drift: 0.0004, vol: 0.030, beta: 1.6, sector: "chips",      mkt: "US" },
-  { sym: "AVGO",  name: "Broadcom",          zh: "博通 Broadcom",   short: "Broadcom",   zhShort: "博通",   base: 340,  drift: 0.0005, vol: 0.026, beta: 1.4, sector: "chips",      mkt: "US" },
-  { sym: "PLTR",  name: "Palantir",          zh: "Palantir",        short: "Palantir",   zhShort: "Palantir", base: 160, drift: 0.0005, vol: 0.038, beta: 1.8, sector: "tech",     mkt: "US" },
-  { sym: "LLY",   name: "Eli Lilly",         zh: "禮來 Eli Lilly",  short: "Eli Lilly",  zhShort: "禮來",   base: 820,  drift: 0.0004, vol: 0.018, beta: 0.6, sector: "health",     mkt: "US" },
-  { sym: "JNJ",   name: "Johnson & Johnson", zh: "嬌生 J&J",        short: "J&J",        zhShort: "嬌生",   base: 165,  drift: 0.0002, vol: 0.010, beta: 0.5, sector: "health",     mkt: "US" },
-  { sym: "XOM",   name: "ExxonMobil",        zh: "埃克森美孚",      short: "ExxonMobil", zhShort: "埃克森美孚", base: 115, drift: 0.0002, vol: 0.015, beta: 0.8, sector: "energy",  mkt: "US" },
-  { sym: "KO",    name: "Coca-Cola",         zh: "可口可樂",        short: "Coca-Cola",  zhShort: "可口可樂", base: 70,  drift: 0.0002, vol: 0.009, beta: 0.5, sector: "staples",  mkt: "US" },
-  { sym: "WMT",   name: "Walmart",           zh: "沃爾瑪 Walmart",  short: "Walmart",    zhShort: "沃爾瑪", base: 98,   drift: 0.0003, vol: 0.012, beta: 0.5, sector: "staples",    mkt: "US" },
-  { sym: "COST",  name: "Costco",            zh: "好市多 Costco",   short: "Costco",     zhShort: "好市多", base: 920,  drift: 0.0003, vol: 0.013, beta: 0.7, sector: "staples",    mkt: "US" },
-  { sym: "MCD",   name: "McDonald's",        zh: "麥當勞",          short: "McDonald's", zhShort: "麥當勞", base: 300,  drift: 0.0002, vol: 0.010, beta: 0.6, sector: "consumer",   mkt: "US" },
-  { sym: "NKE",   name: "Nike",              zh: "耐吉 Nike",       short: "Nike",       zhShort: "耐吉",   base: 72,   drift: 0.0001, vol: 0.020, beta: 1.0, sector: "consumer",   mkt: "US" },
-  { sym: "BA",    name: "Boeing",            zh: "波音 Boeing",     short: "Boeing",     zhShort: "波音",   base: 210,  drift: 0.0002, vol: 0.022, beta: 1.2, sector: "industrial", mkt: "US" },
-  { sym: "VOO",   name: "S&P 500 ETF (Vanguard)", zh: "標普500 ETF (VOO)", short: "S&P 500 ETF", zhShort: "標普500 ETF", base: 560, drift: 0.0003, vol: 0.010, beta: 1.0, sector: "fund", mkt: "US" },
-  { sym: "QQQ",   name: "Nasdaq-100 ETF (Invesco)", zh: "那斯達克100 ETF (QQQ)", short: "Nasdaq-100 ETF", zhShort: "那斯達克100 ETF", base: 560, drift: 0.0004, vol: 0.013, beta: 1.2, sector: "fund", mkt: "US" },
+  { sym: "AMD",   name: "AMD",               zh: "超微 AMD",        short: "AMD",        zhShort: "超微",   base: 424.54,  drift: 0.0004, vol: 0.030, beta: 1.6, sector: "chips",      mkt: "US" },
+  { sym: "AVGO",  name: "Broadcom",          zh: "博通 Broadcom",   short: "Broadcom",   zhShort: "博通",   base: 312.34,  drift: 0.0005, vol: 0.026, beta: 1.4, sector: "chips",      mkt: "US" },
+  { sym: "PLTR",  name: "Palantir",          zh: "Palantir",        short: "Palantir",   zhShort: "Palantir", base: 172.17, drift: 0.0005, vol: 0.038, beta: 1.8, sector: "tech",     mkt: "US" },
+  { sym: "LLY",   name: "Eli Lilly",         zh: "禮來 Eli Lilly",  short: "Eli Lilly",  zhShort: "禮來",   base: 1392.38,  drift: 0.0004, vol: 0.018, beta: 0.6, sector: "health",     mkt: "US" },
+  { sym: "JNJ",   name: "Johnson & Johnson", zh: "嬌生 J&J",        short: "J&J",        zhShort: "嬌生",   base: 275.51,  drift: 0.0002, vol: 0.010, beta: 0.5, sector: "health",     mkt: "US" },
+  { sym: "XOM",   name: "ExxonMobil",        zh: "埃克森美孚",      short: "ExxonMobil", zhShort: "埃克森美孚", base: 160.18, drift: 0.0002, vol: 0.015, beta: 0.8, sector: "energy",  mkt: "US" },
+  { sym: "KO",    name: "Coca-Cola",         zh: "可口可樂",        short: "Coca-Cola",  zhShort: "可口可樂", base: 97.4,  drift: 0.0002, vol: 0.009, beta: 0.5, sector: "staples",  mkt: "US" },
+  { sym: "WMT",   name: "Walmart",           zh: "沃爾瑪 Walmart",  short: "Walmart",    zhShort: "沃爾瑪", base: 133.13,   drift: 0.0003, vol: 0.012, beta: 0.5, sector: "staples",    mkt: "US" },
+  { sym: "COST",  name: "Costco",            zh: "好市多 Costco",   short: "Costco",     zhShort: "好市多", base: 1097.81,  drift: 0.0003, vol: 0.013, beta: 0.7, sector: "staples",    mkt: "US" },
+  { sym: "MCD",   name: "McDonald's",        zh: "麥當勞",          short: "McDonald's", zhShort: "麥當勞", base: 282.62,  drift: 0.0002, vol: 0.010, beta: 0.6, sector: "consumer",   mkt: "US" },
+  { sym: "NKE",   name: "Nike",              zh: "耐吉 Nike",       short: "Nike",       zhShort: "耐吉",   base: 37.32,   drift: 0.0001, vol: 0.020, beta: 1.0, sector: "consumer",   mkt: "US" },
+  { sym: "BA",    name: "Boeing",            zh: "波音 Boeing",     short: "Boeing",     zhShort: "波音",   base: 167.24,  drift: 0.0002, vol: 0.022, beta: 1.2, sector: "industrial", mkt: "US" },
+  { sym: "VOO",   name: "S&P 500 ETF (Vanguard)", zh: "標普500 ETF (VOO)", short: "S&P 500 ETF", zhShort: "標普500 ETF", base: 700, drift: 0.0003, vol: 0.010, beta: 1.0, sector: "fund", mkt: "US" },
+  { sym: "QQQ",   name: "Nasdaq-100 ETF (Invesco)", zh: "那斯達克100 ETF (QQQ)", short: "Nasdaq-100 ETF", zhShort: "那斯達克100 ETF", base: 685, drift: 0.0004, vol: 0.013, beta: 1.2, sector: "fund", mkt: "US" },
   // --- more Taiwan ---
-  { sym: "2382",  name: "Quanta 廣達",       zh: "廣達",   short: "Quanta",           zhShort: "廣達",   base: 290,  drift: 0.0005, vol: 0.026, beta: 1.3, sector: "tech",       mkt: "TW" },
-  { sym: "3231",  name: "Wistron 緯創",      zh: "緯創",   short: "Wistron",          zhShort: "緯創",   base: 115,  drift: 0.0004, vol: 0.030, beta: 1.4, sector: "tech",       mkt: "TW" },
-  { sym: "2357",  name: "ASUS 華碩",         zh: "華碩",   short: "ASUS",             zhShort: "華碩",   base: 600,  drift: 0.0003, vol: 0.018, beta: 1.0, sector: "tech",       mkt: "TW" },
-  { sym: "3008",  name: "Largan 大立光",     zh: "大立光", short: "Largan",           zhShort: "大立光", base: 2400, drift: 0.0002, vol: 0.022, beta: 1.0, sector: "tech",       mkt: "TW" },
-  { sym: "2303",  name: "UMC 聯電",          zh: "聯電",   short: "UMC",              zhShort: "聯電",   base: 45,   drift: 0.0002, vol: 0.018, beta: 1.0, sector: "chips",      mkt: "TW" },
-  { sym: "3711",  name: "ASE 日月光投控",    zh: "日月光投控", short: "ASE",          zhShort: "日月光", base: 150,  drift: 0.0003, vol: 0.020, beta: 1.1, sector: "chips",      mkt: "TW" },
-  { sym: "2891",  name: "CTBC 中信金",       zh: "中信金", short: "CTBC",             zhShort: "中信金", base: 40,   drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",    mkt: "TW" },
-  { sym: "2886",  name: "Mega 兆豐金",       zh: "兆豐金", short: "Mega Financial",   zhShort: "兆豐金", base: 40,   drift: 0.0002, vol: 0.009, beta: 0.6, sector: "finance",    mkt: "TW" },
-  { sym: "1301",  name: "Formosa Plastics 台塑", zh: "台塑", short: "Formosa Plastics", zhShort: "台塑", base: 40,   drift: 0.0000, vol: 0.017, beta: 0.9, sector: "industrial", mkt: "TW" },
-  { sym: "2002",  name: "China Steel 中鋼",  zh: "中鋼",   short: "China Steel",      zhShort: "中鋼",   base: 21,   drift: 0.0000, vol: 0.012, beta: 0.8, sector: "industrial", mkt: "TW" },
-  { sym: "2609",  name: "Yang Ming 陽明",    zh: "陽明",   short: "Yang Ming",        zhShort: "陽明",   base: 65,   drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping",   mkt: "TW" },
-  { sym: "00878", name: "High Dividend ETF 國泰永續高股息", zh: "國泰永續高股息", short: "High Dividend ETF", zhShort: "國泰永續高股息", base: 21, drift: 0.0002, vol: 0.008, beta: 0.8, sector: "fund", mkt: "TW" },
+  { sym: "2382",  name: "Quanta 廣達",       zh: "廣達",   short: "Quanta",           zhShort: "廣達",   base: 278,  drift: 0.0005, vol: 0.026, beta: 1.3, sector: "tech",       mkt: "TW" },
+  { sym: "3231",  name: "Wistron 緯創",      zh: "緯創",   short: "Wistron",          zhShort: "緯創",   base: 162,  drift: 0.0004, vol: 0.030, beta: 1.4, sector: "tech",       mkt: "TW" },
+  { sym: "2357",  name: "ASUS 華碩",         zh: "華碩",   short: "ASUS",             zhShort: "華碩",   base: 799,  drift: 0.0003, vol: 0.018, beta: 1.0, sector: "tech",       mkt: "TW" },
+  { sym: "3008",  name: "Largan 大立光",     zh: "大立光", short: "Largan",           zhShort: "大立光", base: 4235, drift: 0.0002, vol: 0.022, beta: 1.0, sector: "tech",       mkt: "TW" },
+  { sym: "2303",  name: "UMC 聯電",          zh: "聯電",   short: "UMC",              zhShort: "聯電",   base: 87.5,   drift: 0.0002, vol: 0.018, beta: 1.0, sector: "chips",      mkt: "TW" },
+  { sym: "3711",  name: "ASE 日月光投控",    zh: "日月光投控", short: "ASE",          zhShort: "日月光", base: 514,  drift: 0.0003, vol: 0.020, beta: 1.1, sector: "chips",      mkt: "TW" },
+  { sym: "2891",  name: "CTBC 中信金",       zh: "中信金", short: "CTBC",             zhShort: "中信金", base: 68.9,   drift: 0.0003, vol: 0.012, beta: 0.8, sector: "finance",    mkt: "TW" },
+  { sym: "2886",  name: "Mega 兆豐金",       zh: "兆豐金", short: "Mega Financial",   zhShort: "兆豐金", base: 47.05,   drift: 0.0002, vol: 0.009, beta: 0.6, sector: "finance",    mkt: "TW" },
+  { sym: "1301",  name: "Formosa Plastics 台塑", zh: "台塑", short: "Formosa Plastics", zhShort: "台塑", base: 60.1,   drift: 0.0000, vol: 0.017, beta: 0.9, sector: "industrial", mkt: "TW" },
+  { sym: "2002",  name: "China Steel 中鋼",  zh: "中鋼",   short: "China Steel",      zhShort: "中鋼",   base: 17.25,   drift: 0.0000, vol: 0.012, beta: 0.8, sector: "industrial", mkt: "TW" },
+  { sym: "2609",  name: "Yang Ming 陽明",    zh: "陽明",   short: "Yang Ming",        zhShort: "陽明",   base: 55.4,   drift: 0.0001, vol: 0.030, beta: 1.2, sector: "shipping",   mkt: "TW" },
+  { sym: "00878", name: "High Dividend ETF 國泰永續高股息", zh: "國泰永續高股息", short: "High Dividend ETF", zhShort: "國泰永續高股息", base: 32.4, drift: 0.0002, vol: 0.008, beta: 0.8, sector: "fund", mkt: "TW" },
   // --- Japan (Tokyo Stock Exchange, yen) ---
-  { sym: "7203",  name: "Toyota",            zh: "豐田 Toyota",     short: "Toyota",     zhShort: "豐田",   base: 2800,  drift: 0.0002, vol: 0.017, beta: 1.0, sector: "consumer", mkt: "JP" },
-  { sym: "6758",  name: "Sony",              zh: "索尼 Sony",       short: "Sony",       zhShort: "索尼",   base: 3500,  drift: 0.0004, vol: 0.020, beta: 1.1, sector: "tech",     mkt: "JP" },
-  { sym: "7974",  name: "Nintendo",          zh: "任天堂",          short: "Nintendo",   zhShort: "任天堂", base: 11000, drift: 0.0004, vol: 0.021, beta: 0.9, sector: "consumer", mkt: "JP" },
-  { sym: "9984",  name: "SoftBank Group",    zh: "軟銀集團",        short: "SoftBank",   zhShort: "軟銀",   base: 9500,  drift: 0.0004, vol: 0.032, beta: 1.5, sector: "tech",     mkt: "JP" },
-  { sym: "8306",  name: "Mitsubishi UFJ",    zh: "三菱日聯 MUFG",   short: "MUFG",       zhShort: "三菱日聯", base: 2100, drift: 0.0003, vol: 0.018, beta: 1.0, sector: "finance", mkt: "JP" },
-  { sym: "8035",  name: "Tokyo Electron",    zh: "東京威力科創",    short: "Tokyo Electron", zhShort: "東京威力科創", base: 24000, drift: 0.0004, vol: 0.028, beta: 1.4, sector: "chips", mkt: "JP" },
-  { sym: "9983",  name: "Fast Retailing (Uniqlo)", zh: "迅銷 (Uniqlo)", short: "Uniqlo", zhShort: "迅銷", base: 50000, drift: 0.0003, vol: 0.018, beta: 1.0, sector: "consumer", mkt: "JP" },
+  { sym: "7203",  name: "Toyota",            zh: "豐田 Toyota",     short: "Toyota",     zhShort: "豐田",   base: 3384,  drift: 0.0002, vol: 0.017, beta: 1.0, sector: "consumer", mkt: "JP" },
+  { sym: "6758",  name: "Sony",              zh: "索尼 Sony",       short: "Sony",       zhShort: "索尼",   base: 4413,  drift: 0.0004, vol: 0.020, beta: 1.1, sector: "tech",     mkt: "JP" },
+  { sym: "7974",  name: "Nintendo",          zh: "任天堂",          short: "Nintendo",   zhShort: "任天堂", base: 9034, drift: 0.0004, vol: 0.021, beta: 0.9, sector: "consumer", mkt: "JP" },
+  { sym: "9984",  name: "SoftBank Group",    zh: "軟銀集團",        short: "SoftBank",   zhShort: "軟銀",   base: 2984,  drift: 0.0004, vol: 0.032, beta: 1.5, sector: "tech",     mkt: "JP" },
+  { sym: "8306",  name: "Mitsubishi UFJ",    zh: "三菱日聯 MUFG",   short: "MUFG",       zhShort: "三菱日聯", base: 3192, drift: 0.0003, vol: 0.018, beta: 1.0, sector: "finance", mkt: "JP" },
+  { sym: "8035",  name: "Tokyo Electron",    zh: "東京威力科創",    short: "Tokyo Electron", zhShort: "東京威力科創", base: 8220, drift: 0.0004, vol: 0.028, beta: 1.4, sector: "chips", mkt: "JP" },
+  { sym: "9983",  name: "Fast Retailing (Uniqlo)", zh: "迅銷 (Uniqlo)", short: "Uniqlo", zhShort: "迅銷", base: 85330, drift: 0.0003, vol: 0.018, beta: 1.0, sector: "consumer", mkt: "JP" },
   // --- India (National Stock Exchange, rupees) ---
-  { sym: "RELIANCE",   name: "Reliance Industries", zh: "信實工業",        short: "Reliance",  zhShort: "信實",     base: 1400, drift: 0.0003, vol: 0.015, beta: 1.0, sector: "energy",  mkt: "IN" },
-  { sym: "TCS",        name: "Tata Consultancy",    zh: "塔塔諮詢 TCS",    short: "TCS",       zhShort: "塔塔諮詢", base: 3400, drift: 0.0002, vol: 0.014, beta: 0.8, sector: "tech",    mkt: "IN" },
-  { sym: "INFY",       name: "Infosys",             zh: "印孚瑟斯 Infosys", short: "Infosys",  zhShort: "印孚瑟斯", base: 1550, drift: 0.0002, vol: 0.016, beta: 0.9, sector: "tech",    mkt: "IN" },
-  { sym: "HDFCBANK",   name: "HDFC Bank",           zh: "HDFC 銀行",       short: "HDFC Bank", zhShort: "HDFC 銀行", base: 980, drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance", mkt: "IN" },
-  { sym: "BHARTIARTL", name: "Bharti Airtel",       zh: "巴蒂電信 Airtel", short: "Airtel",    zhShort: "巴蒂電信", base: 1900, drift: 0.0004, vol: 0.014, beta: 0.8, sector: "telecom", mkt: "IN" },
-  { sym: "ITC",        name: "ITC",                 zh: "ITC",             short: "ITC",       zhShort: "ITC",      base: 420,  drift: 0.0002, vol: 0.011, beta: 0.6, sector: "staples", mkt: "IN" },
+  { sym: "RELIANCE",   name: "Reliance Industries", zh: "信實工業",        short: "Reliance",  zhShort: "信實",     base: 1351, drift: 0.0003, vol: 0.015, beta: 1.0, sector: "energy",  mkt: "IN" },
+  { sym: "TCS",        name: "Tata Consultancy",    zh: "塔塔諮詢 TCS",    short: "TCS",       zhShort: "塔塔諮詢", base: 2460, drift: 0.0002, vol: 0.014, beta: 0.8, sector: "tech",    mkt: "IN" },
+  { sym: "INFY",       name: "Infosys",             zh: "印孚瑟斯 Infosys", short: "Infosys",  zhShort: "印孚瑟斯", base: 1103.4, drift: 0.0002, vol: 0.016, beta: 0.9, sector: "tech",    mkt: "IN" },
+  { sym: "HDFCBANK",   name: "HDFC Bank",           zh: "HDFC 銀行",       short: "HDFC Bank", zhShort: "HDFC 銀行", base: 817.8, drift: 0.0003, vol: 0.013, beta: 0.9, sector: "finance", mkt: "IN" },
+  { sym: "BHARTIARTL", name: "Bharti Airtel",       zh: "巴蒂電信 Airtel", short: "Airtel",    zhShort: "巴蒂電信", base: 2128.5, drift: 0.0004, vol: 0.014, beta: 0.8, sector: "telecom", mkt: "IN" },
+  { sym: "ITC",        name: "ITC",                 zh: "ITC",             short: "ITC",       zhShort: "ITC",      base: 301,  drift: 0.0002, vol: 0.011, beta: 0.6, sector: "staples", mkt: "IN" },
   // --- Hong Kong (Hong Kong Exchange, HK dollars) ---
-  { sym: "0700",  name: "Tencent",           zh: "騰訊",     short: "Tencent",      zhShort: "騰訊",     base: 600, drift: 0.0004, vol: 0.022, beta: 1.2, sector: "tech",     mkt: "HK" },
-  { sym: "9988",  name: "Alibaba",           zh: "阿里巴巴", short: "Alibaba",      zhShort: "阿里巴巴", base: 150, drift: 0.0003, vol: 0.030, beta: 1.4, sector: "tech",     mkt: "HK" },
-  { sym: "0005",  name: "HSBC",              zh: "匯豐控股", short: "HSBC",         zhShort: "匯豐",     base: 100, drift: 0.0003, vol: 0.013, beta: 0.8, sector: "finance",  mkt: "HK" },
-  { sym: "1810",  name: "Xiaomi",            zh: "小米",     short: "Xiaomi",       zhShort: "小米",     base: 45,  drift: 0.0005, vol: 0.033, beta: 1.4, sector: "tech",     mkt: "HK" },
-  { sym: "1211",  name: "BYD",               zh: "比亞迪",   short: "BYD",          zhShort: "比亞迪",   base: 110, drift: 0.0004, vol: 0.030, beta: 1.3, sector: "consumer", mkt: "HK" },
-  { sym: "0941",  name: "China Mobile",      zh: "中國移動", short: "China Mobile", zhShort: "中國移動", base: 85,  drift: 0.0002, vol: 0.010, beta: 0.5, sector: "telecom",  mkt: "HK" },
+  { sym: "0700",  name: "Tencent",           zh: "騰訊",     short: "Tencent",      zhShort: "騰訊",     base: 352, drift: 0.0004, vol: 0.022, beta: 1.2, sector: "tech",     mkt: "HK" },
+  { sym: "9988",  name: "Alibaba",           zh: "阿里巴巴", short: "Alibaba",      zhShort: "阿里巴巴", base: 88.3, drift: 0.0003, vol: 0.030, beta: 1.4, sector: "tech",     mkt: "HK" },
+  { sym: "0005",  name: "HSBC",              zh: "匯豐控股", short: "HSBC",         zhShort: "匯豐",     base: 129.9, drift: 0.0003, vol: 0.013, beta: 0.8, sector: "finance",  mkt: "HK" },
+  { sym: "1810",  name: "Xiaomi",            zh: "小米",     short: "Xiaomi",       zhShort: "小米",     base: 27.8,  drift: 0.0005, vol: 0.033, beta: 1.4, sector: "tech",     mkt: "HK" },
+  { sym: "1211",  name: "BYD",               zh: "比亞迪",   short: "BYD",          zhShort: "比亞迪",   base: 59, drift: 0.0004, vol: 0.030, beta: 1.3, sector: "consumer", mkt: "HK" },
+  { sym: "0941",  name: "China Mobile",      zh: "中國移動", short: "China Mobile", zhShort: "中國移動", base: 77.75,  drift: 0.0002, vol: 0.010, beta: 0.5, sector: "telecom",  mkt: "HK" },
   // --- Europe (Paris, Amsterdam, Frankfurt, Madrid; euros) ---
-  { sym: "MC",    name: "LVMH",              zh: "LVMH 路威酩軒",   short: "LVMH",       zhShort: "路威酩軒", base: 560, drift: 0.0002, vol: 0.019, beta: 1.1, sector: "consumer",   mkt: "EU" },
-  { sym: "ASML",  name: "ASML",              zh: "艾司摩爾 ASML",   short: "ASML",       zhShort: "艾司摩爾", base: 700, drift: 0.0004, vol: 0.025, beta: 1.4, sector: "chips",      mkt: "EU" },
-  { sym: "SAP",   name: "SAP",               zh: "思愛普 SAP",      short: "SAP",        zhShort: "思愛普",   base: 230, drift: 0.0004, vol: 0.017, beta: 1.0, sector: "tech",       mkt: "EU" },
-  { sym: "AIR",   name: "Airbus",            zh: "空中巴士 Airbus", short: "Airbus",     zhShort: "空中巴士", base: 180, drift: 0.0003, vol: 0.017, beta: 1.0, sector: "industrial", mkt: "EU" },
-  { sym: "TTE",   name: "TotalEnergies",     zh: "道達爾能源",      short: "TotalEnergies", zhShort: "道達爾", base: 55, drift: 0.0001, vol: 0.014, beta: 0.8, sector: "energy",   mkt: "EU" },
-  { sym: "SAN",   name: "Banco Santander",   zh: "桑坦德銀行",      short: "Santander",  zhShort: "桑坦德",   base: 7,   drift: 0.0003, vol: 0.018, beta: 1.2, sector: "finance",    mkt: "EU" },
-  { sym: "ITX",   name: "Inditex (Zara)",    zh: "Inditex (Zara)",  short: "Inditex",    zhShort: "Inditex",  base: 47,  drift: 0.0003, vol: 0.015, beta: 0.9, sector: "consumer",   mkt: "EU" },
+  { sym: "MC",    name: "LVMH",              zh: "LVMH 路威酩軒",   short: "LVMH",       zhShort: "路威酩軒", base: 550, drift: 0.0002, vol: 0.019, beta: 1.1, sector: "consumer",   mkt: "EU" },
+  { sym: "ASML",  name: "ASML",              zh: "艾司摩爾 ASML",   short: "ASML",       zhShort: "艾司摩爾", base: 1300, drift: 0.0004, vol: 0.025, beta: 1.4, sector: "chips",      mkt: "EU" },
+  { sym: "SAP",   name: "SAP",               zh: "思愛普 SAP",      short: "SAP",        zhShort: "思愛普",   base: 200, drift: 0.0004, vol: 0.017, beta: 1.0, sector: "tech",       mkt: "EU" },
+  { sym: "AIR",   name: "Airbus",            zh: "空中巴士 Airbus", short: "Airbus",     zhShort: "空中巴士", base: 190, drift: 0.0003, vol: 0.017, beta: 1.0, sector: "industrial", mkt: "EU" },
+  { sym: "TTE",   name: "TotalEnergies",     zh: "道達爾能源",      short: "TotalEnergies", zhShort: "道達爾", base: 75.8, drift: 0.0001, vol: 0.014, beta: 0.8, sector: "energy",   mkt: "EU" },
+  { sym: "SAN",   name: "Banco Santander",   zh: "桑坦德銀行",      short: "Santander",  zhShort: "桑坦德",   base: 10,   drift: 0.0003, vol: 0.018, beta: 1.2, sector: "finance",    mkt: "EU" },
+  { sym: "ITX",   name: "Inditex (Zara)",    zh: "Inditex (Zara)",  short: "Inditex",    zhShort: "Inditex",  base: 57.6,  drift: 0.0003, vol: 0.015, beta: 0.9, sector: "consumer",   mkt: "EU" },
   // --- Saudi Arabia (Saudi Exchange / Tadawul, riyals; trades Sunday to Thursday) ---
-  { sym: "2222",  name: "Saudi Aramco",        zh: "沙烏地阿美",     short: "Aramco",   zhShort: "沙烏地阿美",     ar: "أرامكو السعودية", arShort: "أرامكو",    base: 25, drift: 0.0001, vol: 0.009, beta: 0.8, sector: "energy",     mkt: "SA" },
-  { sym: "1120",  name: "Al Rajhi Bank",       zh: "拉吉哈銀行",     short: "Al Rajhi", zhShort: "拉吉哈銀行",     ar: "مصرف الراجحي",   arShort: "الراجحي",   base: 95, drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance",    mkt: "SA" },
-  { sym: "2010",  name: "SABIC",               zh: "沙烏地基礎工業", short: "SABIC",    zhShort: "沙烏地基礎工業", ar: "سابك",           arShort: "سابك",      base: 60, drift: 0.0000, vol: 0.015, beta: 1.0, sector: "industrial", mkt: "SA" },
-  { sym: "7010",  name: "stc",                 zh: "沙烏地電信 stc", short: "stc",      zhShort: "沙烏地電信",     ar: "إس تي سي",       arShort: "إس تي سي",  base: 42, drift: 0.0002, vol: 0.011, beta: 0.7, sector: "telecom",    mkt: "SA" },
-  { sym: "1180",  name: "Saudi National Bank", zh: "沙烏地國家銀行", short: "SNB",      zhShort: "沙烏地國家銀行", ar: "البنك الأهلي السعودي", arShort: "البنك الأهلي", base: 35, drift: 0.0002, vol: 0.013, beta: 1.0, sector: "finance", mkt: "SA" },
+  { sym: "2222",  name: "Saudi Aramco",        zh: "沙烏地阿美",     short: "Aramco",   zhShort: "沙烏地阿美",     ar: "أرامكو السعودية", arShort: "أرامكو",    base: 26.38, drift: 0.0001, vol: 0.009, beta: 0.8, sector: "energy",     mkt: "SA" },
+  { sym: "1120",  name: "Al Rajhi Bank",       zh: "拉吉哈銀行",     short: "Al Rajhi", zhShort: "拉吉哈銀行",     ar: "مصرف الراجحي",   arShort: "الراجحي",   base: 60.5, drift: 0.0003, vol: 0.013, beta: 1.0, sector: "finance",    mkt: "SA" },
+  { sym: "2010",  name: "SABIC",               zh: "沙烏地基礎工業", short: "SABIC",    zhShort: "沙烏地基礎工業", ar: "سابك",           arShort: "سابك",      base: 48, drift: 0.0000, vol: 0.015, beta: 1.0, sector: "industrial", mkt: "SA" },
+  { sym: "7010",  name: "stc",                 zh: "沙烏地電信 stc", short: "stc",      zhShort: "沙烏地電信",     ar: "إس تي سي",       arShort: "إس تي سي",  base: 40.58, drift: 0.0002, vol: 0.011, beta: 0.7, sector: "telecom",    mkt: "SA" },
+  { sym: "1180",  name: "Saudi National Bank", zh: "沙烏地國家銀行", short: "SNB",      zhShort: "沙烏地國家銀行", ar: "البنك الأهلي السعودي", arShort: "البنك الأهلي", base: 36.6, drift: 0.0002, vol: 0.013, beta: 1.0, sector: "finance", mkt: "SA" },
 ];
 const HISTORY_DAYS = 180;
 const TICK_MS = 2500;
@@ -1017,12 +1030,12 @@ function mktStatus(mk, now = new Date()) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: H.tz, weekday: "short", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
     .formatToParts(now).map(x => [x.type, x.value]));
   const wd = WD[p.weekday], mins = (+p.hour % 24) * 60 + (+p.minute);
-  const weekday = H.days.includes(wd);
+  const weekday = H.days.includes(wd) && !H.holidays.has(`${p.year}-${p.month}-${p.day}`);
   const open = weekday && mins >= H.open && mins < H.close;
   return { wd, mins, weekday, date: `${p.year}-${p.month}-${p.day}`, open, lunch: open && inLunch(H, mins) };
 }
 const addDays = (ds, k) => { const d = new Date(ds + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + k); return d.toISOString().slice(0, 10); };
-const isTradingDay = (mk, ds) => HOURS[mk].days.includes(new Date(ds + "T00:00:00Z").getUTCDay());
+const isTradingDay = (mk, ds) => HOURS[mk].days.includes(new Date(ds + "T00:00:00Z").getUTCDay()) && !HOURS[mk].holidays.has(ds);
 function lastCompleted(mk, st) {     // date of the most recent session that has already closed
   if (st.weekday && st.mins >= HOURS[mk].close) return st.date;
   let d = addDays(st.date, -1);
@@ -1033,9 +1046,8 @@ const minsFromNow = (st, m) => new Date(Date.now() + (m * 60 - new Date().getSec
 function nextOpen(mk, st) {
   const H = HOURS[mk];
   if (st.lunch) return minsFromNow(st, H.lunch[1] - st.mins);
-  for (let k = 0; k < 8; k++) {
-    const wd = (st.wd + k) % 7;
-    if (H.days.includes(wd) && (k > 0 || st.mins < H.open)) return minsFromNow(st, k * 1440 + H.open - st.mins);
+  for (let k = 0; k < 15; k++) {
+    if (isTradingDay(mk, addDays(st.date, k)) && (k > 0 || st.mins < H.open)) return minsFromNow(st, k * 1440 + H.open - st.mins);
   }
   return new Date();
 }

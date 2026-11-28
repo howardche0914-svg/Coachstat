@@ -192,7 +192,7 @@ I18N.es = {
   "cm.change": "Cambio", "cm.high": "Máximo", "cm.low": "Mínimo", "cm.ma20": "Media 20 días", "cm.ma50": "Media 50 días",
   "cm.hint": "Pasa el cursor por el gráfico para ver el precio de cualquier día. Los triángulos marcan tus operaciones en esta acción.",
   "zone.aria": "Zona de práctica", "zone.practice": "Zona de práctica", "zone.real": "Zona de horario real",
-  "mode.realHint": "Zona de horario real: cada mercado solo se mueve durante su horario real (sin contar festivos). Los precios siguen siendo simulados. Esta zona tiene su propia cuenta de $100.000 y su diario.",
+  "mode.realHint": "Zona de horario real: cada mercado solo se mueve durante su horario real (con los principales festivos de EE. UU., Europa y Japón). Los precios siguen siendo simulados. Esta zona tiene su propia cuenta de $100.000 y su diario.",
   "mode.fastHint": "Zona de práctica: los precios se mueven todo el tiempo y cada sesión dura alrededor de 1 minuto. Esta zona tiene su propia cuenta de $100.000 y su diario.",
   "tz.TW": "hora de Taipéi", "tz.US": "hora de Nueva York",
   "ms.open": v => `${v.flag} ${v.m}: <b class="pos">abierto</b> · cierra a las ${v.close} ${v.tz}${v.local}`,

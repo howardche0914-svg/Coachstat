@@ -192,7 +192,7 @@ I18N.fr = {
   "cm.change": "Variation", "cm.high": "Plus haut", "cm.low": "Plus bas", "cm.ma20": "Moyenne 20 j", "cm.ma50": "Moyenne 50 j",
   "cm.hint": "Survolez le graphique pour voir le prix de n’importe quel jour. Les triangles marquent vos transactions sur cette action.",
   "zone.aria": "Zone d’entraînement", "zone.practice": "Zone d’entraînement", "zone.real": "Zone heures réelles",
-  "mode.realHint": "Zone heures réelles : chaque marché ne bouge que pendant ses vraies heures d’ouverture (jours fériés non comptés). Les prix restent simulés. Cette zone a son propre compte de 100 000 $ et son journal.",
+  "mode.realHint": "Zone heures réelles : chaque marché ne bouge que pendant ses vraies heures d’ouverture (principaux jours fériés des États-Unis, d’Europe et du Japon inclus). Les prix restent simulés. Cette zone a son propre compte de 100 000 $ et son journal.",
   "mode.fastHint": "Zone d’entraînement : les prix bougent tout le temps et chaque séance dure environ 1 minute. Cette zone a son propre compte de 100 000 $ et son journal.",
   "tz.TW": "heure de Taipei", "tz.US": "heure de New York",
   "ms.open": v => `${v.flag} ${v.m} : <b class="pos">ouvert</b> · ferme à ${v.close} ${v.tz}${v.local}`,
