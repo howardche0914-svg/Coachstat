@@ -26,7 +26,7 @@ I18N.es = {
   "l.sections": "Secciones de aprendizaje", "l.lessons": "Lecciones", "l.vocab": "Vocabulario",
   "l.title": "Lo básico de la bolsa", "l.progress": "Tu progreso", "l.progressAria": "Lecciones completadas",
   "v.search": "Buscar palabras…", "v.cats": "Categorías de palabras",
-  footer: "StockPilot AI · simulador para practicar · precios y noticias simulados", "footer.back": "volver a CoachStat",
+  footer: "StockPilot AI · simulador para practicar · precios y noticias simulados",
 
   "mkt.US": "EE. UU.", "mkt.TW": "Taiwán",
   "limit.up": "LÍMITE ARRIBA", "limit.down": "LÍMITE ABAJO",

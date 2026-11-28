@@ -26,7 +26,7 @@ I18N.fr = {
   "l.sections": "Rubriques d’apprentissage", "l.lessons": "Leçons", "l.vocab": "Vocabulaire",
   "l.title": "Les bases de la Bourse", "l.progress": "Votre progression", "l.progressAria": "Leçons terminées",
   "v.search": "Chercher un mot…", "v.cats": "Catégories de mots",
-  footer: "StockPilot AI · simulateur d’entraînement · prix et actualités simulés", "footer.back": "retour à CoachStat",
+  footer: "StockPilot AI · simulateur d’entraînement · prix et actualités simulés",
 
   "mkt.US": "États-Unis", "mkt.TW": "Taïwan",
   "limit.up": "LIMITE HAUTE", "limit.down": "LIMITE BASSE",

@@ -26,7 +26,7 @@ I18N.ar = {
   "l.sections": "أقسام التعلّم", "l.lessons": "الدروس", "l.vocab": "المصطلحات",
   "l.title": "أساسيات سوق الأسهم", "l.progress": "تقدّمك", "l.progressAria": "الدروس المكتملة",
   "v.search": "ابحث عن كلمة…", "v.cats": "فئات الكلمات",
-  footer: "StockPilot AI · بيئة تدريب على التداول · الأسعار والأخبار محاكاة", "footer.back": "العودة إلى CoachStat",
+  footer: "StockPilot AI · بيئة تدريب على التداول · الأسعار والأخبار محاكاة",
 
   "mkt.US": "أمريكا", "mkt.TW": "تايوان",
   "limit.up": "الحد الأعلى", "limit.down": "الحد الأدنى",

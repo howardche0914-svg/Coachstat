@@ -30,7 +30,7 @@ const I18N = {
     "l.sections": "Learn sections", "l.lessons": "Lessons", "l.vocab": "Vocabulary",
     "l.title": "Stock market basics", "l.progress": "Your progress", "l.progressAria": "Lessons completed",
     "v.search": "Search words…", "v.cats": "Word categories",
-    footer: "StockPilot AI · a practice trading sandbox · prices and news are simulated", "footer.back": "back to CoachStat",
+    footer: "StockPilot AI · a practice trading sandbox · prices and news are simulated",
 
     // market + detail
     "mkt.US": "US", "mkt.TW": "Taiwan",
@@ -264,7 +264,7 @@ const I18N = {
     "l.sections": "學習分類", "l.lessons": "課程", "l.vocab": "詞彙表",
     "l.title": "股市入門", "l.progress": "你的進度", "l.progressAria": "已完成的課程",
     "v.search": "搜尋詞彙…", "v.cats": "詞彙分類",
-    footer: "StockPilot AI · 模擬交易練習 · 價格和新聞皆為模擬", "footer.back": "回到 CoachStat",
+    footer: "StockPilot AI · 模擬交易練習 · 價格和新聞皆為模擬",
 
     "mkt.US": "美股", "mkt.TW": "台股",
     "limit.up": "漲停", "limit.down": "跌停",
