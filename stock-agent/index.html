@@ -626,6 +626,27 @@
   @media (max-width: 560px) { .ch-compare { grid-template-columns: 1fr; } .ch-wrap { padding: 12px 16px 32px; } .ch-grid { grid-template-columns: 1fr; } }
   .ch-wrap .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .ch-news .time { display: block; margin: 0 0 2px; }
+
+  /* ============ Top bar: keep it on one row on laptop screens ============ */
+  @media (max-width: 1440px) {
+    .topbar .badge { display: none; }            /* the warning banner right below says the same */
+    .tabs button { padding: 6px 11px; }
+    .zone-seg button { padding: 5px 9px; }
+  }
+
+  /* ============ Orders + favorites ============ */
+  .ord-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+  .ord-row input { width: 110px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--baseline); background: var(--surface); color: var(--ink); font: inherit; }
+  .ord-hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  .ord-box { margin-top: 12px; border-top: 1px solid var(--grid); padding-top: 10px; }
+  .ord-box h3 { margin: 0 0 6px; font-size: 13px; }
+  .ord-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+  .ord-list li { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .ord-tag { font-size: 11px; font-weight: 600; color: var(--ink-2); background: var(--page); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; }
+  .fav-btn { border: 0; background: transparent; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 2px; }
+  .fav-btn.on, .fav-star { color: #eda100; }
+  .fav-star { margin-inline-end: 3px; }
 </style>
 </head>
 <body>
@@ -680,6 +701,7 @@
     <div class="card">
       <div class="detail-head">
         <h2 id="dSym">—</h2>
+        <button type="button" class="fav-btn" id="favBtn" aria-label="Add to favorites">☆</button>
         <span id="dName" style="color:var(--muted)"></span>
         <span class="big-px" id="dPx"></span>
         <span class="big-chg" id="dChg"></span>
@@ -716,6 +738,17 @@
         <p class="coach-note" data-i18n="coach.note"></p>
       </div>
 
+      <div class="ord-row">
+        <label for="ordType" data-i18n="ord.type">Order type</label>
+        <select id="ordType" class="mkt-select">
+          <option value="market" data-i18n="ord.market">Market</option>
+          <option value="limit" data-i18n="ord.limit">Limit</option>
+          <option value="stop" data-i18n="ord.stop">Stop-loss</option>
+        </select>
+        <label for="ordPx" id="ordPxLabel" data-i18n="ord.px" hidden>Price</label>
+        <input type="number" id="ordPx" min="0" step="any" hidden />
+      </div>
+      <p class="ord-hint" id="ordHint"></p>
       <div class="trade">
         <input type="number" id="qty" min="1" step="1" value="10" aria-label="Number of shares" data-i18n-aria="qty.label" />
         <button class="btn btn-buy" id="buyBtn" data-i18n="btn.buy">Buy</button>
@@ -723,6 +756,10 @@
         <span style="font-size:13px;color:var(--muted)" id="tradeCost"></span>
       </div>
       <div class="trade-msg" id="tradeMsg"></div>
+      <div class="ord-box" id="ordBox" hidden>
+        <h3 data-i18n="ord.open">Open orders</h3>
+        <ul class="ord-list" id="ordList"></ul>
+      </div>
     </div>
 
     <div class="card">
@@ -1346,8 +1383,8 @@ const GLOSSARY = [
   ["basics", "Portfolio", "All the investments you own, plus cash.", "Her portfolio has 6 stocks and some cash.",
    "投資組合", "你擁有的所有投資加上現金。", "她的投資組合有 6 檔股票和一些現金。"],
 
-  ["trading", "Market order", "An order to buy or sell right away at the current price.", "Every trade in StockPilot is a market order.",
-   "市價單", "以當下價格立即買進或賣出的委託。", "StockPilot 裡的每筆交易都是市價單。"],
+  ["trading", "Market order", "An order to buy or sell right away at the current price.", "In StockPilot, pressing Buy with “Market” selected places a market order.",
+   "市價單", "以當下價格立即買進或賣出的委託。", "在 StockPilot 選擇「市價」再按買進，就是下市價單。"],
   ["trading", "Limit order", "An order that only goes through at your chosen price or better.", "A limit order to buy at $95 won't fill while the price is $100.",
    "限價單", "只在你指定的價格或更好的價格成交的委託。", "股價 100 元時，95 元的限價買單不會成交。"],
   ["trading", "Stop-loss", "A plan or order to sell if the price falls to a set level, to limit a loss.", "Buying at $100 with an 8% stop-loss means selling at $92.",
@@ -1902,7 +1939,7 @@ const NEW_LESSONS = [
         </ul>
         <p>You don't have to sell everything at once, either. Selling <b>part</b> of a position is a common way to lock in some profit or lower your risk.</p>
         ${key("market = now, limit = your price, stop = an automatic exit.")}
-        ${live(`Every trade in StockPilot is a market order. ${d.s} is <b>${d.p}</b> right now, so a market order for 10 shares would cost about <b>${d.p10}</b>.`)}`,
+        ${live(`In StockPilot you can use all three: pick Market, Limit or Stop-loss above the Buy and Sell buttons. ${d.s} is <b>${d.p}</b> right now, so a market order for 10 shares would cost about <b>${d.p10}</b>.`)}`,
       q: "You want to buy a stock, but only if it drops to $95. It is $100 now. Which order fits?",
       opts: ["A limit order at $95", "A market order", "A stop order at $105"],
       why: "A limit order at $95 only goes through at $95 or lower.",
@@ -1918,7 +1955,7 @@ const NEW_LESSONS = [
         </ul>
         <p>你也不一定要一次全部賣掉。賣出<b>部分</b>持股，是鎖住部分獲利或降低風險的常見做法。</p>
         ${key("市價單＝現在成交，限價單＝你的價格，停損單＝自動出場。")}
-        ${live(`StockPilot 裡的每筆交易都是市價單。${d.s} 現在是 <b>${d.p}</b>，所以用市價單買 10 股約需 <b>${d.p10}</b>。`)}`,
+        ${live(`在 StockPilot 裡三種都能用：在「買進」「賣出」按鈕上方選擇市價、限價或停損。${d.s} 現在是 <b>${d.p}</b>，所以用市價單買 10 股約需 <b>${d.p10}</b>。`)}`,
       q: "你想買一檔股票，但只在它跌到 $95 時才買。現在是 $100。哪一種委託適合？",
       opts: ["$95 的限價單", "市價單", "$105 的停損單"],
       why: "$95 的限價單只會在 $95 或更低時成交。",
@@ -2857,7 +2894,7 @@ addLanguage("es", {
         </ul>
         <p>Tampoco tienes que venderlo todo de una vez. Vender <b>parte</b> de una posición es una forma común de asegurar algo de beneficio o reducir el riesgo.</p>
         ${key("mercado = ahora, limitada = tu precio, stop = una salida automática.")}
-        ${live(`Todas las operaciones de StockPilot son órdenes de mercado. ${d.s} está a <b>${d.p}</b> ahora, así que una orden de mercado de 10 acciones costaría unos <b>${d.p10}</b>.`)}`,
+        ${live(`En StockPilot puedes usar las tres: elige Mercado, Limitada o Stop-loss encima de los botones Comprar y Vender. ${d.s} está a <b>${d.p}</b> ahora, así que una orden de mercado de 10 acciones costaría unos <b>${d.p10}</b>.`)}`,
       quiz: [
         ["Quieres comprar una acción, pero solo si baja a $95. Ahora está a $100. ¿Qué orden encaja?", ["Una orden limitada a $95", "Una orden de mercado", "Una orden stop a $105"], "Una orden limitada a $95 solo se ejecuta a $95 o menos."],
         ["¿Cuál es el principal riesgo de una orden limitada?", ["Que nunca se ejecute si el precio no llega a tu límite", "Que siempre se ejecute a peor precio", "Que solo sirva para acciones de Taiwán"], "Tú controlas el precio, pero si la acción nunca llega, no pasa nada."],
@@ -3290,7 +3327,7 @@ addLanguage("es", {
     ["ETF (fondo cotizado)", "Un fondo que tiene muchas acciones y cotiza como una sola.", "El 0050 tiene unas 50 de las mayores empresas de Taiwán."],
     ["Índice", "Un número que sigue a un grupo de acciones para mostrar cómo va el mercado.", "El S&P 500 sigue a 500 grandes empresas de EE. UU."],
     ["Cartera", "Todas las inversiones que tienes, más el efectivo.", "Su cartera tiene 6 acciones y algo de efectivo."],
-    ["Orden de mercado", "Una orden para comprar o vender ya, al precio actual.", "Todas las operaciones de StockPilot son órdenes de mercado."],
+    ["Orden de mercado", "Una orden para comprar o vender ya, al precio actual.", "En StockPilot, pulsar Comprar con «Mercado» elegido envía una orden de mercado."],
     ["Orden limitada", "Una orden que solo se ejecuta a tu precio o a uno mejor.", "Una orden limitada de compra a $95 no se ejecuta mientras el precio esté en $100."],
     ["Stop-loss", "Un plan u orden para vender si el precio cae a un nivel fijado, para limitar una pérdida.", "Comprar a $100 con un stop-loss del 8% significa vender a $92."],
     ["Recoger beneficios", "Vender parte o toda una acción ganadora para asegurar la ganancia.", "Tras subir un 20%, vendió la mitad para recoger beneficios."],
@@ -3634,7 +3671,7 @@ addLanguage("fr", {
         </ul>
         <p>Rien n’oblige non plus à tout vendre d’un coup. Vendre <b>une partie</b> d’une position est une façon courante de sécuriser un gain ou de réduire son risque.</p>
         ${key("au marché = maintenant, limité = votre prix, stop = une sortie automatique.")}
-        ${live(`Chaque transaction dans StockPilot est un ordre au marché. ${d.s} vaut <b>${d.p}</b> en ce moment : un ordre au marché de 10 actions coûterait environ <b>${d.p10}</b>.`)}`,
+        ${live(`Dans StockPilot, vous pouvez utiliser les trois : choisissez Au marché, À cours limité ou Stop-loss au-dessus des boutons Acheter et Vendre. ${d.s} vaut <b>${d.p}</b> en ce moment : un ordre au marché de 10 actions coûterait environ <b>${d.p10}</b>.`)}`,
       quiz: [
         ["Vous voulez acheter une action, mais seulement si elle baisse à 95 $. Elle vaut 100 $. Quel ordre convient ?", ["Un ordre à cours limité à 95 $", "Un ordre au marché", "Un ordre stop à 105 $"], "Un ordre à cours limité à 95 $ ne s’exécute qu’à 95 $ ou moins."],
         ["Quel est le principal risque d’un ordre à cours limité ?", ["Il peut ne jamais s’exécuter si le prix n’atteint pas votre limite", "Il s’exécute toujours à un moins bon prix", "Il ne marche que pour les actions taïwanaises"], "Vous maîtrisez le prix, mais si l’action n’y arrive jamais, il ne se passe rien."],
@@ -4067,7 +4104,7 @@ addLanguage("fr", {
     ["ETF (fonds indiciel coté)", "Un fonds qui détient beaucoup d’actions et se négocie comme une seule.", "Le 0050 détient environ 50 des plus grandes entreprises de Taïwan."],
     ["Indice", "Un nombre qui suit un groupe d’actions pour montrer comment va le marché.", "Le S&P 500 suit 500 grandes entreprises américaines."],
     ["Portefeuille", "Tous vos placements, plus vos liquidités.", "Son portefeuille compte 6 actions et un peu de liquidités."],
-    ["Ordre au marché", "Un ordre d’achat ou de vente immédiat au prix actuel.", "Chaque transaction dans StockPilot est un ordre au marché."],
+    ["Ordre au marché", "Un ordre d’achat ou de vente immédiat au prix actuel.", "Dans StockPilot, appuyer sur Acheter avec « Au marché » sélectionné passe un ordre au marché."],
     ["Ordre à cours limité", "Un ordre qui ne s’exécute qu’à votre prix ou mieux.", "Un ordre d’achat limité à 95 $ ne s’exécute pas tant que le prix est à 100 $."],
     ["Stop-loss", "Un plan ou un ordre de vente si le prix tombe à un niveau fixé, pour limiter une perte.", "Acheter à 100 $ avec un stop-loss de 8 % signifie vendre à 92 $."],
     ["Prise de bénéfices", "Vendre tout ou partie d’une action gagnante pour sécuriser le gain.", "Après une hausse de 20 %, il a vendu la moitié pour prendre ses bénéfices."],
@@ -4411,7 +4448,7 @@ addLanguage("hi", {
         </ul>
         <p>सब कुछ एक साथ बेचना भी ज़रूरी नहीं। पोज़िशन का <b>कुछ हिस्सा</b> बेचना मुनाफ़ा पक्का करने या जोखिम घटाने का आम तरीका है।</p>
         ${key("मार्केट = अभी, लिमिट = आपकी कीमत, स्टॉप = अपने-आप बाहर निकलना।")}
-        ${live(`StockPilot में हर ट्रेड मार्केट ऑर्डर है। ${d.s} अभी <b>${d.p}</b> है, तो 10 शेयरों का मार्केट ऑर्डर लगभग <b>${d.p10}</b> का होगा।`)}`,
+        ${live(`StockPilot में आप तीनों इस्तेमाल कर सकते हैं: ख़रीदें और बेचें बटन के ऊपर मार्केट, लिमिट या स्टॉप-लॉस चुनें। ${d.s} अभी <b>${d.p}</b> है, तो 10 शेयरों का मार्केट ऑर्डर लगभग <b>${d.p10}</b> का होगा।`)}`,
       quiz: [
         ["आप एक शेयर ख़रीदना चाहते हैं, पर सिर्फ़ तब जब वह $95 तक गिरे। अभी वह $100 है। कौन-सा ऑर्डर सही है?", ["$95 पर लिमिट ऑर्डर", "मार्केट ऑर्डर", "$105 पर स्टॉप ऑर्डर"], "$95 का लिमिट ऑर्डर सिर्फ़ $95 या उससे कम पर पूरा होता है।"],
         ["लिमिट ऑर्डर का मुख्य जोखिम क्या है?", ["अगर कीमत आपकी सीमा तक न पहुँचे तो वह कभी पूरा न हो", "वह हमेशा बदतर कीमत पर पूरा होता है", "वह सिर्फ़ ताइवान के शेयरों के लिए है"], "कीमत आपके हाथ में है, पर अगर शेयर वहाँ तक कभी न पहुँचे तो कुछ नहीं होता।"],
@@ -4844,7 +4881,7 @@ addLanguage("hi", {
     ["ETF (एक्सचेंज ट्रेडेड फ़ंड)", "एक फ़ंड जो कई शेयर रखता है और एक शेयर की तरह ट्रेड होता है।", "0050 में ताइवान की लगभग 50 सबसे बड़ी कंपनियाँ हैं।"],
     ["सूचकांक (इंडेक्स)", "एक संख्या जो शेयरों के समूह को ट्रैक करके बताती है कि बाज़ार कैसा कर रहा है।", "S&P 500 अमेरिका की 500 बड़ी कंपनियों को ट्रैक करता है।"],
     ["पोर्टफ़ोलियो", "आपके सारे निवेश, नकद के साथ।", "उसके पोर्टफ़ोलियो में 6 शेयर और कुछ नकद है।"],
-    ["मार्केट ऑर्डर", "मौजूदा कीमत पर तुरंत ख़रीदने या बेचने का ऑर्डर।", "StockPilot में हर ट्रेड मार्केट ऑर्डर है।"],
+    ["मार्केट ऑर्डर", "मौजूदा कीमत पर तुरंत ख़रीदने या बेचने का ऑर्डर।", "StockPilot में “मार्केट” चुनकर ख़रीदें दबाने से मार्केट ऑर्डर लगता है।"],
     ["लिमिट ऑर्डर", "ऐसा ऑर्डर जो सिर्फ़ आपकी कीमत या उससे बेहतर पर पूरा होता है।", "$95 का ख़रीद लिमिट ऑर्डर कीमत $100 रहने तक पूरा नहीं होगा।"],
     ["स्टॉप-लॉस", "नुकसान सीमित करने के लिए, कीमत तय स्तर तक गिरने पर बेचने की योजना या ऑर्डर।", "$100 पर ख़रीदकर 8% स्टॉप-लॉस का मतलब है $92 पर बेचना।"],
     ["मुनाफ़ा वसूली", "मुनाफ़ा पक्का करने के लिए जीतते शेयर का कुछ या पूरा हिस्सा बेचना।", "20% बढ़त के बाद उसने आधा बेचकर मुनाफ़ा वसूला।"],
@@ -5188,7 +5225,7 @@ addLanguage("ar", {
         </ul>
         <p>ولا يلزمك بيع كل شيء دفعة واحدة. بيع <b>جزء</b> من المركز طريقة شائعة لتثبيت الربح أو خفض المخاطر.</p>
         ${key("السوق = الآن، المحدد = سعرك، الإيقاف = خروج تلقائي.")}
-        ${live(`كل صفقة في StockPilot هي أمر سوق. سعر ${d.s} الآن <b>${d.p}</b>، لذا سيكلف أمر سوق لـ 10 أسهم نحو <b>${d.p10}</b>.`)}`,
+        ${live(`في StockPilot يمكنك استخدام الأنواع الثلاثة: اختر السوق أو محدد السعر أو وقف الخسارة فوق زري الشراء والبيع. سعر ${d.s} الآن <b>${d.p}</b>، لذا سيكلف أمر سوق لـ 10 أسهم نحو <b>${d.p10}</b>.`)}`,
       quiz: [
         ["تريد شراء سهم، لكن فقط إذا انخفض إلى $95. سعره الآن $100. أي أمر يناسبك؟", ["أمر محدد السعر عند $95", "أمر سوق", "أمر إيقاف عند $105"], "الأمر المحدد عند $95 لا يُنفَّذ إلا عند $95 أو أقل."],
         ["ما الخطر الرئيسي في الأمر محدد السعر؟", ["قد لا يُنفَّذ أبدًا إذا لم يصل السعر إلى حدك", "يُنفَّذ دائمًا بسعر أسوأ", "يعمل فقط مع الأسهم التايوانية"], "أنت تتحكم في السعر، لكن إن لم يصل السهم إليه أبدًا فلن يحدث شيء."],
@@ -5621,7 +5658,7 @@ addLanguage("ar", {
     ["الصندوق المتداول (ETF)", "صندوق يملك أسهمًا كثيرة ويُتداول كسهم واحد.", "يضم 0050 نحو 50 من أكبر شركات تايوان."],
     ["المؤشر", "رقم يتتبع مجموعة من الأسهم ليُظهر أداء السوق.", "يتتبع مؤشر S&P 500 خمسمئة شركة أمريكية كبيرة."],
     ["المحفظة", "كل استثماراتك، بالإضافة إلى النقد.", "تضم محفظتها 6 أسهم وبعض النقد."],
-    ["أمر السوق", "أمر بالشراء أو البيع فورًا بالسعر الحالي.", "كل صفقة في StockPilot هي أمر سوق."],
+    ["أمر السوق", "أمر بالشراء أو البيع فورًا بالسعر الحالي.", "في StockPilot، الضغط على شراء مع اختيار «السوق» ينفذ أمر سوق."],
     ["الأمر محدد السعر", "أمر لا يُنفَّذ إلا بسعرك أو أفضل.", "أمر شراء محدد عند $95 لن يُنفَّذ ما دام السعر $100."],
     ["وقف الخسارة", "خطة أو أمر بالبيع إذا انخفض السعر إلى مستوى محدد، للحد من الخسارة.", "الشراء بسعر $100 مع وقف خسارة 8% يعني البيع عند $92."],
     ["جني الأرباح", "بيع جزء من سهم رابح أو كله لتثبيت الربح.", "بعد ارتفاع 20% باع نصفه لجني الأرباح."],
@@ -5965,7 +6002,7 @@ addLanguage("bn", {
         </ul>
         <p>সব একবারে বেচারও দরকার নেই। পজিশনের <b>একটি অংশ</b> বেচা লাভ নিশ্চিত করা বা ঝুঁকি কমানোর একটি সাধারণ উপায়।</p>
         ${key("মার্কেট = এখনই, লিমিট = আপনার দাম, স্টপ = নিজে থেকে বের হওয়া।")}
-        ${live(`StockPilot-এ প্রতিটি ট্রেড মার্কেট অর্ডার। ${d.s} এখন <b>${d.p}</b>, তাই 10টি শেয়ারের মার্কেট অর্ডারের খরচ প্রায় <b>${d.p10}</b>।`)}`,
+        ${live(`StockPilot-এ তিনটিই ব্যবহার করতে পারেন: কিনুন ও বেচুন বোতামের উপরে মার্কেট, লিমিট বা স্টপ-লস বেছে নিন। ${d.s} এখন <b>${d.p}</b>, তাই 10টি শেয়ারের মার্কেট অর্ডারের খরচ প্রায় <b>${d.p10}</b>।`)}`,
       quiz: [
         ["আপনি একটি শেয়ার কিনতে চান, কিন্তু শুধু যদি দাম $95-এ নামে। এখন এটি $100। কোন অর্ডার মানানসই?", ["$95-এ লিমিট অর্ডার", "মার্কেট অর্ডার", "$105-এ স্টপ অর্ডার"], "$95-এর লিমিট অর্ডার শুধু $95 বা তার কমে পূরণ হয়।"],
         ["লিমিট অর্ডারের প্রধান ঝুঁকি কী?", ["দাম আপনার সীমায় না পৌঁছালে কখনো পূরণ নাও হতে পারে", "এটি সবসময় খারাপ দামে পূরণ হয়", "এটি শুধু তাইওয়ানের শেয়ারে কাজ করে"], "দাম আপনার হাতে, কিন্তু শেয়ার সেখানে না পৌঁছালে কিছুই হয় না।"],
@@ -6398,7 +6435,7 @@ addLanguage("bn", {
     ["ETF (এক্সচেঞ্জ-ট্রেডেড ফান্ড)", "যে ফান্ড অনেক শেয়ার রাখে এবং একটি শেয়ারের মতো কেনাবেচা হয়।", "0050-এ তাইওয়ানের প্রায় 50টি বড় কোম্পানি আছে।"],
     ["সূচক (ইনডেক্স)", "একদল শেয়ার অনুসরণ করে বাজার কেমন চলছে দেখানো একটি সংখ্যা।", "S&P 500 যুক্তরাষ্ট্রের 500টি বড় কোম্পানি অনুসরণ করে।"],
     ["পোর্টফোলিও", "আপনার সব বিনিয়োগ, নগদসহ।", "তার পোর্টফোলিওতে 6টি শেয়ার আর কিছু নগদ আছে।"],
-    ["মার্কেট অর্ডার", "বর্তমান দামে সঙ্গে সঙ্গে কেনা বা বেচার অর্ডার।", "StockPilot-এ প্রতিটি ট্রেড মার্কেট অর্ডার।"],
+    ["মার্কেট অর্ডার", "বর্তমান দামে সঙ্গে সঙ্গে কেনা বা বেচার অর্ডার।", "StockPilot-এ “মার্কেট” বেছে কিনুন চাপলে মার্কেট অর্ডার হয়।"],
     ["লিমিট অর্ডার", "যে অর্ডার শুধু আপনার দামে বা তার চেয়ে ভালোতে পূরণ হয়।", "$95-এর কেনার লিমিট অর্ডার দাম $100 থাকা পর্যন্ত পূরণ হবে না।"],
     ["স্টপ-লস", "ক্ষতি সীমিত করতে দাম নির্দিষ্ট স্তরে নামলে বেচার পরিকল্পনা বা অর্ডার।", "$100-এ কিনে 8% স্টপ-লস মানে $92-এ বেচা।"],
     ["লাভ তোলা", "লাভ নিশ্চিত করতে জিততে থাকা শেয়ারের কিছু বা সবটা বেচা।", "20% বাড়ার পর সে অর্ধেক বেচে লাভ তুলল।"],
@@ -6679,6 +6716,153 @@ Object.assign(TS_MAP, { "烏": "乌", "蘭": "兰", "藥": "药", "嚴": "严", 
 TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"], ["好市多", "开市客"], ["那斯达克", "纳斯达克"],
   ["空中巴士", "空客"], ["艾司摩尔", "阿斯麦"], ["东京威力科创", "东京电子"], ["利雅德", "利雅得"], ["日圆", "日元"],
   ["波克夏", "伯克希尔"], ["辉达", "英伟达"]);
+
+/* ============ Limit/stop-loss orders, favorites, cloud save: texts in every language ============ */
+(() => {
+  const TX = {
+    en: {
+      "ord.type": "Order type", "ord.market": "Market (now)", "ord.limit": "Limit", "ord.stop": "Stop-loss", "ord.px": "Price",
+      "ord.hint.market": "Buys or sells right now at the current price.",
+      "ord.hint.limit": "Buy waits until the price drops to your price or lower. Sell waits until it rises to your price or higher.",
+      "ord.hint.stop": "Sells automatically if the price falls to your stop price, to limit a loss. Stop-loss orders only sell.",
+      "ord.open": "Open orders", "ord.cancel": "Cancel",
+      "ord.buyLimit": v => `Buy ${v.n} ${v.sym} at ${v.px} or lower`,
+      "ord.sellLimit": v => `Sell ${v.n} ${v.sym} at ${v.px} or higher`,
+      "ord.stopSell": v => `Stop-loss: sell ${v.n} ${v.sym} if it falls to ${v.px}`,
+      "ord.placed": "Order placed. It fills automatically when the price is reached.",
+      "ord.filled": "Order filled:",
+      "ord.failed": v => `An order for ${v.sym} was cancelled: ${v.why}`,
+      "ord.badPx": "Enter a price above zero.",
+      "ord.stopAbove": "A stop-loss price must be below the current price.",
+      "ord.stopBuy": "Stop-loss orders can only sell.",
+      "ord.noShares": "You need to own these shares to place a sell order.",
+      "ord.tagLimit": "🎯 Limit order", "ord.tagStop": "🛑 Stop-loss order",
+      "fav.title": "Favorites", "fav.add": "Add to favorites", "fav.remove": "Remove from favorites",
+      "fav.none": "No favorites yet. Open a stock and tap ☆ next to its name.",
+    },
+    zh: {
+      "ord.type": "委託方式", "ord.market": "市價（立即）", "ord.limit": "限價", "ord.stop": "停損", "ord.px": "價格",
+      "ord.hint.market": "以現在的價格立刻買進或賣出。",
+      "ord.hint.limit": "買進：等價格跌到你的價格或更低才成交。賣出：等價格漲到你的價格或更高才成交。",
+      "ord.hint.stop": "價格跌到你設定的停損價時自動賣出，用來限制虧損。停損單只能賣出。",
+      "ord.open": "未成交委託", "ord.cancel": "取消",
+      "ord.buyLimit": v => `以 ${v.px} 或更低價格買進 ${v.n} 股 ${v.sym}`,
+      "ord.sellLimit": v => `以 ${v.px} 或更高價格賣出 ${v.n} 股 ${v.sym}`,
+      "ord.stopSell": v => `停損：${v.sym} 跌到 ${v.px} 時賣出 ${v.n} 股`,
+      "ord.placed": "委託已送出，價格到了就會自動成交。",
+      "ord.filled": "委託成交：",
+      "ord.failed": v => `${v.sym} 的一筆委託已取消：${v.why}`,
+      "ord.badPx": "請輸入大於零的價格。",
+      "ord.stopAbove": "停損價必須低於目前價格。",
+      "ord.stopBuy": "停損單只能賣出。",
+      "ord.noShares": "你必須持有這些股票，才能下賣出委託。",
+      "ord.tagLimit": "🎯 限價單", "ord.tagStop": "🛑 停損單",
+      "fav.title": "我的最愛", "fav.add": "加入我的最愛", "fav.remove": "從我的最愛移除",
+      "fav.none": "還沒有最愛的股票。打開一檔股票，點名稱旁邊的 ☆。",
+    },
+    es: {
+      "ord.type": "Tipo de orden", "ord.market": "Mercado (ahora)", "ord.limit": "Limitada", "ord.stop": "Stop-loss", "ord.px": "Precio",
+      "ord.hint.market": "Compra o vende ahora mismo al precio actual.",
+      "ord.hint.limit": "Comprar espera a que el precio baje a tu precio o menos. Vender espera a que suba a tu precio o más.",
+      "ord.hint.stop": "Vende automáticamente si el precio cae a tu precio stop, para limitar una pérdida. Las órdenes stop-loss solo venden.",
+      "ord.open": "Órdenes pendientes", "ord.cancel": "Cancelar",
+      "ord.buyLimit": v => `Comprar ${v.n} ${v.sym} a ${v.px} o menos`,
+      "ord.sellLimit": v => `Vender ${v.n} ${v.sym} a ${v.px} o más`,
+      "ord.stopSell": v => `Stop-loss: vender ${v.n} ${v.sym} si cae a ${v.px}`,
+      "ord.placed": "Orden enviada. Se ejecuta sola cuando el precio llegue.",
+      "ord.filled": "Orden ejecutada:",
+      "ord.failed": v => `Se canceló una orden de ${v.sym}: ${v.why}`,
+      "ord.badPx": "Escribe un precio mayor que cero.",
+      "ord.stopAbove": "El precio stop-loss debe estar por debajo del precio actual.",
+      "ord.stopBuy": "Las órdenes stop-loss solo pueden vender.",
+      "ord.noShares": "Necesitas tener estas acciones para poner una orden de venta.",
+      "ord.tagLimit": "🎯 Orden limitada", "ord.tagStop": "🛑 Orden stop-loss",
+      "fav.title": "Favoritas", "fav.add": "Añadir a favoritas", "fav.remove": "Quitar de favoritas",
+      "fav.none": "Aún no tienes favoritas. Abre una acción y toca ☆ junto a su nombre.",
+    },
+    fr: {
+      "ord.type": "Type d’ordre", "ord.market": "Au marché (maintenant)", "ord.limit": "À cours limité", "ord.stop": "Stop-loss", "ord.px": "Prix",
+      "ord.hint.market": "Achète ou vend tout de suite au prix actuel.",
+      "ord.hint.limit": "Achat : attend que le prix baisse jusqu’à votre prix ou moins. Vente : attend qu’il monte jusqu’à votre prix ou plus.",
+      "ord.hint.stop": "Vend automatiquement si le prix tombe à votre prix stop, pour limiter une perte. Un stop-loss ne fait que vendre.",
+      "ord.open": "Ordres en attente", "ord.cancel": "Annuler",
+      "ord.buyLimit": v => `Acheter ${v.n} ${v.sym} à ${v.px} ou moins`,
+      "ord.sellLimit": v => `Vendre ${v.n} ${v.sym} à ${v.px} ou plus`,
+      "ord.stopSell": v => `Stop-loss : vendre ${v.n} ${v.sym} s’il tombe à ${v.px}`,
+      "ord.placed": "Ordre passé. Il s’exécute tout seul quand le prix est atteint.",
+      "ord.filled": "Ordre exécuté :",
+      "ord.failed": v => `Un ordre sur ${v.sym} a été annulé : ${v.why}`,
+      "ord.badPx": "Entrez un prix supérieur à zéro.",
+      "ord.stopAbove": "Le prix du stop-loss doit être inférieur au prix actuel.",
+      "ord.stopBuy": "Un stop-loss ne peut que vendre.",
+      "ord.noShares": "Vous devez détenir ces actions pour passer un ordre de vente.",
+      "ord.tagLimit": "🎯 Ordre à cours limité", "ord.tagStop": "🛑 Ordre stop-loss",
+      "fav.title": "Favoris", "fav.add": "Ajouter aux favoris", "fav.remove": "Retirer des favoris",
+      "fav.none": "Pas encore de favoris. Ouvrez une action et touchez ☆ à côté de son nom.",
+    },
+    hi: {
+      "ord.type": "ऑर्डर का प्रकार", "ord.market": "मार्केट (अभी)", "ord.limit": "लिमिट", "ord.stop": "स्टॉप-लॉस", "ord.px": "कीमत",
+      "ord.hint.market": "अभी की कीमत पर तुरंत ख़रीदता या बेचता है।",
+      "ord.hint.limit": "ख़रीद तब तक रुकती है जब तक कीमत आपकी कीमत या उससे नीचे न आ जाए। बिक्री तब तक रुकती है जब तक कीमत आपकी कीमत या उससे ऊपर न चली जाए।",
+      "ord.hint.stop": "कीमत आपकी स्टॉप कीमत तक गिरते ही नुकसान सीमित करने के लिए अपने-आप बेच देता है। स्टॉप-लॉस सिर्फ़ बेचता है।",
+      "ord.open": "बाक़ी ऑर्डर", "ord.cancel": "रद्द करें",
+      "ord.buyLimit": v => `${v.sym} के ${v.n} शेयर ${v.px} या कम पर ख़रीदें`,
+      "ord.sellLimit": v => `${v.sym} के ${v.n} शेयर ${v.px} या ज़्यादा पर बेचें`,
+      "ord.stopSell": v => `स्टॉप-लॉस: ${v.sym} ${v.px} तक गिरे तो ${v.n} शेयर बेचें`,
+      "ord.placed": "ऑर्डर दे दिया। कीमत पहुँचते ही यह अपने-आप पूरा होगा।",
+      "ord.filled": "ऑर्डर पूरा:",
+      "ord.failed": v => `${v.sym} का एक ऑर्डर रद्द हुआ: ${v.why}`,
+      "ord.badPx": "शून्य से ज़्यादा कीमत डालें।",
+      "ord.stopAbove": "स्टॉप-लॉस कीमत मौजूदा कीमत से नीचे होनी चाहिए।",
+      "ord.stopBuy": "स्टॉप-लॉस ऑर्डर सिर्फ़ बेच सकते हैं।",
+      "ord.noShares": "बेचने का ऑर्डर देने के लिए ये शेयर आपके पास होने चाहिए।",
+      "ord.tagLimit": "🎯 लिमिट ऑर्डर", "ord.tagStop": "🛑 स्टॉप-लॉस ऑर्डर",
+      "fav.title": "पसंदीदा", "fav.add": "पसंदीदा में जोड़ें", "fav.remove": "पसंदीदा से हटाएँ",
+      "fav.none": "अभी कोई पसंदीदा नहीं। कोई शेयर खोलें और उसके नाम के पास ☆ दबाएँ।",
+    },
+    ar: {
+      "ord.type": "نوع الأمر", "ord.market": "السوق (الآن)", "ord.limit": "محدد السعر", "ord.stop": "وقف الخسارة", "ord.px": "السعر",
+      "ord.hint.market": "يشتري أو يبيع فورًا بالسعر الحالي.",
+      "ord.hint.limit": "الشراء ينتظر حتى ينخفض السعر إلى سعرك أو أقل. البيع ينتظر حتى يرتفع إلى سعرك أو أعلى.",
+      "ord.hint.stop": "يبيع تلقائيًا إذا انخفض السعر إلى سعر الإيقاف للحد من الخسارة. أوامر وقف الخسارة تبيع فقط.",
+      "ord.open": "الأوامر المعلقة", "ord.cancel": "إلغاء",
+      "ord.buyLimit": v => `شراء ${v.n} من ${v.sym} بسعر ${v.px} أو أقل`,
+      "ord.sellLimit": v => `بيع ${v.n} من ${v.sym} بسعر ${v.px} أو أعلى`,
+      "ord.stopSell": v => `وقف الخسارة: بيع ${v.n} من ${v.sym} إذا انخفض إلى ${v.px}`,
+      "ord.placed": "تم إرسال الأمر. سيُنفذ تلقائيًا عند الوصول إلى السعر.",
+      "ord.filled": "تم تنفيذ الأمر:",
+      "ord.failed": v => `أُلغي أمر على ${v.sym}: ${v.why}`,
+      "ord.badPx": "أدخل سعرًا أكبر من صفر.",
+      "ord.stopAbove": "يجب أن يكون سعر وقف الخسارة أقل من السعر الحالي.",
+      "ord.stopBuy": "أوامر وقف الخسارة تبيع فقط.",
+      "ord.noShares": "يجب أن تملك هذه الأسهم لتضع أمر بيع.",
+      "ord.tagLimit": "🎯 أمر محدد السعر", "ord.tagStop": "🛑 أمر وقف خسارة",
+      "fav.title": "المفضلة", "fav.add": "إضافة إلى المفضلة", "fav.remove": "إزالة من المفضلة",
+      "fav.none": "لا توجد أسهم مفضلة بعد. افتح سهمًا واضغط ☆ بجانب اسمه.",
+    },
+    bn: {
+      "ord.type": "অর্ডারের ধরন", "ord.market": "মার্কেট (এখনই)", "ord.limit": "লিমিট", "ord.stop": "স্টপ-লস", "ord.px": "দাম",
+      "ord.hint.market": "এখনকার দামে সঙ্গে সঙ্গে কেনে বা বেচে।",
+      "ord.hint.limit": "কেনা অপেক্ষা করে যতক্ষণ না দাম আপনার দামে বা তার নিচে নামে। বেচা অপেক্ষা করে যতক্ষণ না দাম আপনার দামে বা তার উপরে ওঠে।",
+      "ord.hint.stop": "দাম আপনার স্টপ দামে নামলে ক্ষতি সীমিত করতে নিজে থেকে বেচে দেয়। স্টপ-লস শুধু বেচে।",
+      "ord.open": "বাকি অর্ডার", "ord.cancel": "বাতিল",
+      "ord.buyLimit": v => `${v.px} বা কম দামে ${v.sym}-এর ${v.n}টি শেয়ার কিনুন`,
+      "ord.sellLimit": v => `${v.px} বা বেশি দামে ${v.sym}-এর ${v.n}টি শেয়ার বেচুন`,
+      "ord.stopSell": v => `স্টপ-লস: ${v.sym} ${v.px}-এ নামলে ${v.n}টি শেয়ার বেচুন`,
+      "ord.placed": "অর্ডার দেওয়া হয়েছে। দাম পৌঁছালে নিজে থেকে পূরণ হবে।",
+      "ord.filled": "অর্ডার পূরণ:",
+      "ord.failed": v => `${v.sym}-এর একটি অর্ডার বাতিল হয়েছে: ${v.why}`,
+      "ord.badPx": "শূন্যের বেশি দাম লিখুন।",
+      "ord.stopAbove": "স্টপ-লসের দাম বর্তমান দামের নিচে হতে হবে।",
+      "ord.stopBuy": "স্টপ-লস অর্ডার শুধু বেচতে পারে।",
+      "ord.noShares": "বেচার অর্ডার দিতে এই শেয়ারগুলো আপনার কাছে থাকতে হবে।",
+      "ord.tagLimit": "🎯 লিমিট অর্ডার", "ord.tagStop": "🛑 স্টপ-লস অর্ডার",
+      "fav.title": "প্রিয়", "fav.add": "প্রিয়তে যোগ করুন", "fav.remove": "প্রিয় থেকে সরান",
+      "fav.none": "এখনো কোনো প্রিয় শেয়ার নেই। একটি শেয়ার খুলে নামের পাশে ☆ চাপুন।",
+    },
+  };
+  for (const [lg, tx] of Object.entries(TX)) if (I18N[lg]) Object.assign(I18N[lg], tx);
+})();
 
 /* ============ StockPilot Plus + History challenges: texts in every language ============ */
 // UI keys are merged into I18N[lang]; challenge stories live in I18N[lang].chs.
@@ -7771,7 +7955,7 @@ const LEARN_KEY = "stockpilot-learn-v1";
 const zoneKeys = z => ({ s: `stockpilot-${z}-state`, m: `stockpilot-${z}-market` });
 let zone = load(ZONE_KEY);
 if (!ZONES.includes(zone)) zone = "practice";
-const freshState = () => ({ cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "fast", dayStartTotal: null });
+const freshState = () => ({ cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], orders: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "fast", dayStartTotal: null });
 const freshSess = () => Object.fromEntries(MKS.map(mk => [mk, { date: null, open: false }]));
 const freshSim = () => ({ day: 1, tick: 0, ticks: 0, sess: freshSess() });
 let state = freshState(), sim = freshSim();
@@ -7784,7 +7968,7 @@ function loadZone(z) {
   state = freshState();
   if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
   state.mode = z === "real" ? "real" : "fast";
-  for (const key of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[key])) state[key] = [];
+  for (const key of ["history", "aiFeed", "news", "journal", "orders"]) if (!Array.isArray(state[key])) state[key] = [];
   for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
 
   sim = freshSim();
@@ -7836,7 +8020,7 @@ const $ = id => document.getElementById(id);
 // keep signs and currency symbols on the correct side in right-to-left languages
 const ltr = s => RTL.includes(lang) ? "\u2066" + s + "\u2069" : s;
 const fmt$ = n => ltr(n.toLocaleString("en-US", { style: "currency", currency: "USD" }));
-const fmtPct = n => ltr((n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%");
+const fmtPct = n => ltr((n >= 0 ? "+" : "−") + Math.abs(n * 100).toFixed(2) + "%");
 const pct0 = x => (x * 100).toFixed(0) + "%";
 const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
@@ -8046,7 +8230,7 @@ function drawChart(sym, wrapId, big) {
   for (let g = 0; g <= 4; g++) {
     const v = min + span * g / 4, yy = y(v);
     grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
-    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="${big ? 12 : 11}" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${c}${v.toFixed(v < 100 ? 1 : 0)}</text>`;
+    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="${big ? 12 : 11}" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${ltr(c + v.toLocaleString("en-US", { maximumFractionDigits: v < 100 ? 1 : 0, minimumFractionDigits: v < 100 ? 1 : 0 }))}</text>`;
   }
   const last = a.length - 1;
   for (let k = 0; k <= 3; k++) {
@@ -8159,9 +8343,10 @@ function closeZoom() {
 // market filter menu: rebuilt only when the language changes, so an open menu is never reset
 function renderMktOptions() {
   const sel = $("mktSel");
-  sel.innerHTML = [`<option value="ALL">${t("wl.all")} (${STOCKS.length})</option>`]
+  const nFav = Object.keys(learn.favs || {}).filter(s => market[s]).length;
+  sel.innerHTML = [`<option value="ALL">${t("wl.all")} (${STOCKS.length})</option>`, `<option value="FAV">★ ${t("fav.title")} (${nFav})</option>`]
     .concat(MKS.map(mk => `<option value="${mk}">${MARKETS[mk].flag} ${t("mkt." + mk)} (${poolOf(mk).length})</option>`)).join("");
-  sel.value = MARKETS[state.mktFilter] ? state.mktFilter : "ALL";
+  sel.value = MARKETS[state.mktFilter] || state.mktFilter === "FAV" ? state.mktFilter : "ALL";
 }
 let wlQuery = "";
 const matchesQuery = s => {
@@ -8170,29 +8355,54 @@ const matchesQuery = s => {
   return [s.sym, s.name, s.short, s.zh, s.zhShort, toS(s.zh), s.ar || "", nameOf(s.sym)].some(x => x.toLowerCase().includes(q));
 };
 function renderWatchlist() {
-  if ($("mktSel").value !== (MARKETS[state.mktFilter] ? state.mktFilter : "ALL")) $("mktSel").value = MARKETS[state.mktFilter] ? state.mktFilter : "ALL";
+  const want = MARKETS[state.mktFilter] || state.mktFilter === "FAV" ? state.mktFilter : "ALL";
+  if ($("mktSel").value !== want) $("mktSel").value = want;
   document.querySelectorAll("[data-zone]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.zone === zone)));
   $("simClock").innerHTML = state.mode === "real"
     ? `${(MARKETS[state.mktFilter] ? [state.mktFilter] : MKS).map(marketLine).join("")}<span class="mhint">${t("mode.realHint")}</span>`
     : `${t("clock", { d: sim.day, time: simTime(sim.tick) })} · ${t("mode.fastHint")}`;
-  const list = STOCKS.filter(s => (state.mktFilter === "ALL" || s.mkt === state.mktFilter) && matchesQuery(s));
-  if (!list.length) { $("watchlist").innerHTML = `<p class="empty wl-none">${t("wl.none")}</p>`; return; }
-  $("watchlist").innerHTML = list.map(s => {
-    const chg = dayChange(s.sym), lim = atLimit(s.sym);
-    return `<button class="stock-row${s.sym === selected ? " active" : ""}" data-sym="${s.sym}">
-      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt !== "US" ? `<span class="mkt-tag">${s.mkt}</span>` : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : ""}
+  const favs = learn.favs || {};
+  const list = STOCKS.filter(s => (state.mktFilter === "ALL" || s.mkt === state.mktFilter || (state.mktFilter === "FAV" && favs[s.sym])) && matchesQuery(s));
+  list.sort((a, b) => (favs[b.sym] ? 1 : 0) - (favs[a.sym] ? 1 : 0));   // stable: favorites first, then the usual order
+  const wl = $("watchlist");
+  if (!list.length) { wl.innerHTML = `<p class="empty wl-none">${state.mktFilter === "FAV" && !wlQuery ? t("fav.none") : t("wl.none")}</p>`; wlSig = ""; return; }
+  // Rebuild the rows only when the list itself changes; on a normal tick just update prices (much lighter with 77 stocks).
+  const sig = [lang, ...list.map(s => s.sym + (favs[s.sym] ? "*" : ""))].join("|");
+  if (sig !== wlSig || !wl.querySelector(".stock-row")) {
+    wl.innerHTML = list.map(s => `<button class="stock-row" data-sym="${s.sym}">
+      <span style="min-width:0"><span class="sym">${favs[s.sym] ? '<span class="fav-star" aria-hidden="true">★</span>' : ""}${s.sym}</span>${s.mkt !== "US" ? `<span class="mkt-tag">${s.mkt}</span>` : ""}<span class="lim"></span>
       <span class="name">${nameOf(s.sym)}</span></span>
-      ${sparkline(s.sym)}
-      <span class="right"><span class="px">${fmtP(s.sym, price(s.sym))}</span><br>
-      <span class="chg ${chg >= 0 ? "pos" : "neg"}">${fmtPct(chg)}</span></span>
-    </button>`;
-  }).join("");
+      <span class="spark"></span>
+      <span class="right"><span class="px"></span><br><span class="chg"></span></span>
+    </button>`).join("");
+    wlSig = sig;
+  }
+  for (const row of wl.querySelectorAll(".stock-row")) {
+    const sym = row.dataset.sym, chg = dayChange(sym), lim = atLimit(sym);
+    row.classList.toggle("active", sym === selected);
+    const limHtml = lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : "";
+    const le = row.querySelector(".lim"); if (le.innerHTML !== limHtml) le.innerHTML = limHtml;
+    row.querySelector(".spark").innerHTML = sparkline(sym);
+    row.querySelector(".px").textContent = fmtP(sym, price(sym));
+    const ce = row.querySelector(".chg"); ce.textContent = fmtPct(chg); ce.className = "chg " + (chg >= 0 ? "pos" : "neg");
+  }
+}
+let wlSig = "";
+function toggleFav(sym) {
+  learn.favs = learn.favs || {};
+  if (learn.favs[sym]) delete learn.favs[sym]; else learn.favs[sym] = true;
+  saveLearn(); renderMktOptions(); renderAll();
 }
 
 function renderDetail() {
   const s = market[selected];
   const p = price(selected), chg = dayChange(selected);
   $("dSym").textContent = s.sym;
+  const fav = !!(learn.favs || {})[selected];
+  $("favBtn").textContent = fav ? "★" : "☆";
+  $("favBtn").classList.toggle("on", fav);
+  $("favBtn").setAttribute("aria-label", t(fav ? "fav.remove" : "fav.add"));
+  $("favBtn").title = t(fav ? "fav.remove" : "fav.add");
   $("dName").textContent = nameOf(selected);
   $("dPx").textContent = fmtP(selected, p);
   const chgEl = $("dChg");
@@ -8297,7 +8507,7 @@ function renderFeeds() {
 }
 
 function renderAll() {
-  renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds();
+  renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds(); renderOrders();
   const mine = state.journal.filter(e => e.by === "you").length;
   $("journalCount").textContent = mine ? String(mine) : "";
   save();
@@ -8305,7 +8515,7 @@ function renderAll() {
 }
 
 /* ============ Trading ============ */
-function trade(sym, shares, side, byAI = false) {
+function trade(sym, shares, side, byAI = false, ord = null) {
   const p = price(sym), pu = usd(sym);
   const msgEl = $("tradeMsg");
   if (!(shares >= 1)) return false;
@@ -8338,12 +8548,72 @@ function trade(sym, shares, side, byAI = false) {
   state.history.unshift({ ...stampNow(), side, shares, sym, px: p, ai: byAI });
   state.history = state.history.slice(0, 100);
   const j = recordTrade({ sym, side, shares, byAI, pre, px: p, pu });
+  if (ord) j.ord = ord;
   if (!byAI) {
-    msgEl.innerHTML = `${t("msg.done", { verb: t("verb." + side), n: shares, sym, px: fmtP(sym, p) })} ${t("msg.journal")} ` +
+    msgEl.innerHTML = `${ord ? t("ord.filled") + " " : ""}${t("msg.done", { verb: t("verb." + side), n: shares, sym, px: fmtP(sym, p) })} ${t("msg.journal")} ` +
       `<span class="grade grade-${j.grade}">${t("g." + j.grade)}</span> <button type="button" class="lesson-link" data-goto="journal">${t("msg.why")}</button>`;
     msgEl.className = "trade-msg";
   }
   return true;
+}
+
+/* ============ Limit and stop-loss orders ============ */
+// An order waits in state.orders until its price is reached, then fills like a market order.
+// Limit buy: price <= limit. Limit sell: price >= limit. Stop-loss (sell only): price <= stop.
+const ordType = () => $("ordType").value;
+function ordLabel(o) {
+  const v = { n: o.qty, sym: o.sym, px: fmtP(o.sym, o.px) };
+  return o.type === "stop" ? t("ord.stopSell", v) : t(o.side === "buy" ? "ord.buyLimit" : "ord.sellLimit", v);
+}
+function defaultOrdPx(type) {
+  const p = price(selected), h = state.holdings[selected];
+  if (type === "stop") return roundPx(selected, h ? Math.min(p, h.avgCost * mktOf(selected).perUSD) * 0.92 : p * 0.92);
+  return roundPx(selected, p);
+}
+function syncOrderForm(resetPx) {
+  const ty = ordType();
+  $("ordPx").hidden = ty === "market";
+  $("ordPxLabel").hidden = ty === "market";
+  if (resetPx && ty !== "market") $("ordPx").value = defaultOrdPx(ty);
+  $("buyBtn").disabled = ty === "stop";
+  $("buyBtn").title = ty === "stop" ? t("ord.stopBuy") : "";
+  $("ordHint").textContent = t("ord.hint." + ty);
+}
+function placeOrder(side) {
+  const ty = ordType(), qty = parseInt($("qty").value || "0", 10), px = parseFloat($("ordPx").value), msg = $("tradeMsg");
+  const fail = k => { msg.textContent = t(k); msg.className = "trade-msg neg"; return false; };
+  if (!(qty >= 1)) return false;
+  if (!(px > 0)) return fail("ord.badPx");
+  if (ty === "stop" && side === "buy") return fail("ord.stopBuy");
+  if (ty === "stop" && px >= price(selected)) return fail("ord.stopAbove");
+  if (side === "sell" && !(state.holdings[selected] && state.holdings[selected].shares >= qty)) return fail("ord.noShares");
+  state.orders = state.orders || [];
+  state.orders.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 6), sym: selected, side, type: ty, qty, px: roundPx(selected, px) });
+  if (ty === "stop") setFlag("stopOrder");
+  msg.textContent = t("ord.placed"); msg.className = "trade-msg";
+  save(); renderOrders();
+  return true;
+}
+function checkOrders() {
+  if (!state.orders || !state.orders.length) return;
+  const keep = [];
+  for (const o of state.orders) {
+    if (!market[o.sym] || !canTrade(o.sym)) { if (market[o.sym]) keep.push(o); continue; }
+    const p = price(o.sym);
+    const hit = o.type === "stop" ? p <= o.px : o.side === "buy" ? p <= o.px : p >= o.px;
+    if (!hit) { keep.push(o); continue; }
+    const h = state.holdings[o.sym];
+    const why = o.side === "buy" ? (o.qty * usd(o.sym) > state.cash ? "msg.nocash" : null) : (!h || h.shares < o.qty ? "msg.noshares" : null);
+    if (why) { $("tradeMsg").textContent = t("ord.failed", { sym: o.sym, why: t(why) }); $("tradeMsg").className = "trade-msg neg"; continue; }
+    trade(o.sym, o.qty, o.side, false, o.type);
+  }
+  state.orders = keep;
+}
+function renderOrders() {
+  const os = state.orders || [];
+  $("ordBox").hidden = !os.length;
+  $("ordList").innerHTML = os.map(o => `<li><span>${o.type === "stop" ? "🛑" : "🎯"} ${ordLabel(o)}</span>
+    <button type="button" class="btn btn-ghost btn-sm" data-ordcancel="${o.id}">${t("ord.cancel")}</button></li>`).join("");
 }
 
 /* ============ AI auto-pilot ============ */
@@ -8591,6 +8861,7 @@ function setZone(z) {
 function tick() {
   sim.ticks = (sim.ticks || 0) + 1;
   if (state.mode === "real") tickReal(); else tickFast();
+  checkOrders();
   runAutoPilot();
   saveMarket();
   renderAll();
@@ -8737,7 +9008,7 @@ function renderJournal() {
         <span class="side-pill side-${e.side}">${t("rec." + (e.side === "buy" ? "BUY" : "SELL"))}</span>
         <b>${t("shares", { n: e.shares })} ${e.sym}</b> @ ${fmtP(e.sym, e.px)}
         <span class="time">${e.ts ? fmtTs(e.ts) : (e.t || stampText(e.day, e.tick))}</span>
-        <span class="who">${t("who." + e.by)}</span>
+        <span class="who">${t("who." + e.by)}</span>${e.ord ? ` <span class="ord-tag">${t(e.ord === "stop" ? "ord.tagStop" : "ord.tagLimit")}</span>` : ""}
         <span class="grade grade-${g}">${t("g." + g)}</span>
       </div>
       <div class="j-seen"><b>${t("seen." + e.by)}</b> ${seen}</div>
@@ -8756,9 +9027,11 @@ function renderJournal() {
 // Each visual draws one 640×360 SVG scene. CSS classes (a-pop, a-fade, a-draw,
 // a-grow, a-tilt, a-slide, a-drop, a-bob) animate it; delays are inline.
 const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const NUM_RUN = /\d{1,2}:\d{2}(?:\s?[–-]\s?\d{1,2}:\d{2})?|(?:NT\$|HK\$|SAR |[$€¥₹])?[−+\-]?\d[\d,.]*%?(?:\s?(?:→|←)\s?(?:NT\$|HK\$|[$€¥₹])?[−+\-]?\d[\d,.]*%?)?/g;
+const isoNums = s => RTL.includes(lang) ? String(s).replace(NUM_RUN, m => "\u2066" + m + "\u2069") : s;
 const dl = d => d != null ? ` style="animation-delay:${d}s"` : "";
 function tx(x, y, s, o = {}) {
-  return `<text x="${x}" y="${y}" text-anchor="${o.a || "middle"}" font-size="${o.size || 22}" font-weight="${o.w || 600}" fill="${o.fill || "var(--ink)"}"${o.cls ? ` class="${o.cls}"` : ""}${dl(o.d)}>${esc(s)}</text>`;
+  return `<text x="${x}" y="${y}" text-anchor="${o.a || "middle"}" font-size="${o.size || 22}" font-weight="${o.w || 600}" fill="${o.fill || "var(--ink)"}"${o.cls ? ` class="${o.cls}"` : ""}${dl(o.d)}>${esc(isoNums(s))}</text>`;
 }
 const textW = (s, size) => [...String(s)].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? size : size * 0.56), 0);
 function tagBox(cx, cy, s, color, d) {
@@ -9452,8 +9725,10 @@ function showView(v) {
 }
 
 /* ============ Wire up ============ */
-$("buyBtn").addEventListener("click", () => { if (trade(selected, parseInt($("qty").value || "0", 10), "buy")) renderAll(); });
-$("sellBtn").addEventListener("click", () => { if (trade(selected, parseInt($("qty").value || "0", 10), "sell")) renderAll(); });
+$("buyBtn").addEventListener("click", () => { if (ordType() !== "market") { placeOrder("buy"); return; } if (trade(selected, parseInt($("qty").value || "0", 10), "buy")) renderAll(); });
+$("sellBtn").addEventListener("click", () => { if (ordType() !== "market") { placeOrder("sell"); return; } if (trade(selected, parseInt($("qty").value || "0", 10), "sell")) renderAll(); });
+$("ordType").addEventListener("change", () => syncOrderForm(true));
+$("favBtn").addEventListener("click", () => toggleFav(selected));
 $("qty").addEventListener("input", updateTradeCost);
 $("autoPilot").addEventListener("change", e => {
   state.autoPilot = e.target.checked;
@@ -9484,6 +9759,7 @@ $("langSel").addEventListener("change", e => {
   store(LANG_KEY, lang);
   applyStatic();
   renderMktOptions();
+  syncOrderForm(false);
   $("tradeMsg").textContent = "";
   renderAll();
   showView(currentView);
@@ -9493,7 +9769,7 @@ $("vocabSearch").addEventListener("input", () => { fc = null; renderVocab(); });
 $("mktSel").addEventListener("change", e => {
   state.mktFilter = e.target.value; save();
   const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
-  if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
+  if (MARKETS[state.mktFilter] && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
   renderAll();
 });
 $("stockSearch").addEventListener("input", e => { wlQuery = e.target.value.trim(); renderWatchlist(); });
@@ -9513,12 +9789,14 @@ document.addEventListener("click", e => {
   if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
   if ((b = el("[data-pane]"))) { learn.pane = b.dataset.pane; saveLearn(); renderLearn(); return; }
   if ((b = el("[data-vcat]"))) { learn.vcat = b.dataset.vcat; saveLearn(); renderVocab(); return; }
+  if ((b = el("[data-ordcancel]"))) { state.orders = (state.orders || []).filter(o => o.id !== b.dataset.ordcancel); save(); renderOrders(); return; }
   if ((b = el(".lesson-btn"))) { openLesson(b.dataset.id, true); return; }
   if ((b = el("[data-sym]")) && market[b.dataset.sym]) {
     selected = b.dataset.sym;
     noteViewed(selected);
     if (b.classList.contains("news-sym")) setFlag("newsClick");
-    if (state.mktFilter !== "ALL" && state.mktFilter !== market[selected].mkt) state.mktFilter = "ALL";
+    if (MARKETS[state.mktFilter] && state.mktFilter !== market[selected].mkt) state.mktFilter = "ALL";
+    if (ordType() !== "market") syncOrderForm(true);
     renderAll();
     if (b.classList.contains("news-sym")) $("dSym").scrollIntoView({ block: "center" });
   }
@@ -9539,6 +9817,7 @@ initPlus();
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
 renderMktOptions();
+syncOrderForm(false);
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);

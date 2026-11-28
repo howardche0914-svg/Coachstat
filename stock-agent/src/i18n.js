@@ -500,8 +500,8 @@ const GLOSSARY = [
   ["basics", "Portfolio", "All the investments you own, plus cash.", "Her portfolio has 6 stocks and some cash.",
    "投資組合", "你擁有的所有投資加上現金。", "她的投資組合有 6 檔股票和一些現金。"],
 
-  ["trading", "Market order", "An order to buy or sell right away at the current price.", "Every trade in StockPilot is a market order.",
-   "市價單", "以當下價格立即買進或賣出的委託。", "StockPilot 裡的每筆交易都是市價單。"],
+  ["trading", "Market order", "An order to buy or sell right away at the current price.", "In StockPilot, pressing Buy with “Market” selected places a market order.",
+   "市價單", "以當下價格立即買進或賣出的委託。", "在 StockPilot 選擇「市價」再按買進，就是下市價單。"],
   ["trading", "Limit order", "An order that only goes through at your chosen price or better.", "A limit order to buy at $95 won't fill while the price is $100.",
    "限價單", "只在你指定的價格或更好的價格成交的委託。", "股價 100 元時，95 元的限價買單不會成交。"],
   ["trading", "Stop-loss", "A plan or order to sell if the price falls to a set level, to limit a loss.", "Buying at $100 with an 8% stop-loss means selling at $92.",

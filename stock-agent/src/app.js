@@ -240,7 +240,7 @@ const LEARN_KEY = "stockpilot-learn-v1";
 const zoneKeys = z => ({ s: `stockpilot-${z}-state`, m: `stockpilot-${z}-market` });
 let zone = load(ZONE_KEY);
 if (!ZONES.includes(zone)) zone = "practice";
-const freshState = () => ({ cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "fast", dayStartTotal: null });
+const freshState = () => ({ cash: START_CASH, holdings: {}, history: [], aiFeed: [], news: [], journal: [], orders: [], jFilter: "you", autoPilot: false, mktFilter: "ALL", chartRange: "3m", mode: "fast", dayStartTotal: null });
 const freshSess = () => Object.fromEntries(MKS.map(mk => [mk, { date: null, open: false }]));
 const freshSim = () => ({ day: 1, tick: 0, ticks: 0, sess: freshSess() });
 let state = freshState(), sim = freshSim();
@@ -253,7 +253,7 @@ function loadZone(z) {
   state = freshState();
   if (saved && typeof saved.cash === "number") state = { ...state, ...saved };
   state.mode = z === "real" ? "real" : "fast";
-  for (const key of ["history", "aiFeed", "news", "journal"]) if (!Array.isArray(state[key])) state[key] = [];
+  for (const key of ["history", "aiFeed", "news", "journal", "orders"]) if (!Array.isArray(state[key])) state[key] = [];
   for (const sym of Object.keys(state.holdings)) if (!market[sym]) delete state.holdings[sym];
 
   sim = freshSim();
@@ -305,7 +305,7 @@ const $ = id => document.getElementById(id);
 // keep signs and currency symbols on the correct side in right-to-left languages
 const ltr = s => RTL.includes(lang) ? "\u2066" + s + "\u2069" : s;
 const fmt$ = n => ltr(n.toLocaleString("en-US", { style: "currency", currency: "USD" }));
-const fmtPct = n => ltr((n >= 0 ? "+" : "") + (n * 100).toFixed(2) + "%");
+const fmtPct = n => ltr((n >= 0 ? "+" : "−") + Math.abs(n * 100).toFixed(2) + "%");
 const pct0 = x => (x * 100).toFixed(0) + "%";
 const colored = (x, txt) => `<b class="${x >= 0 ? "pos" : "neg"}">${txt}</b>`;
 const mktOf = sym => MARKETS[market[sym].mkt];
@@ -515,7 +515,7 @@ function drawChart(sym, wrapId, big) {
   for (let g = 0; g <= 4; g++) {
     const v = min + span * g / 4, yy = y(v);
     grid += `<line x1="${padL}" y1="${yy}" x2="${W - padR}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`;
-    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="${big ? 12 : 11}" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${c}${v.toFixed(v < 100 ? 1 : 0)}</text>`;
+    labels += `<text x="${padL - 8}" y="${yy + 4}" text-anchor="end" font-size="${big ? 12 : 11}" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${ltr(c + v.toLocaleString("en-US", { maximumFractionDigits: v < 100 ? 1 : 0, minimumFractionDigits: v < 100 ? 1 : 0 }))}</text>`;
   }
   const last = a.length - 1;
   for (let k = 0; k <= 3; k++) {
@@ -628,9 +628,10 @@ function closeZoom() {
 // market filter menu: rebuilt only when the language changes, so an open menu is never reset
 function renderMktOptions() {
   const sel = $("mktSel");
-  sel.innerHTML = [`<option value="ALL">${t("wl.all")} (${STOCKS.length})</option>`]
+  const nFav = Object.keys(learn.favs || {}).filter(s => market[s]).length;
+  sel.innerHTML = [`<option value="ALL">${t("wl.all")} (${STOCKS.length})</option>`, `<option value="FAV">★ ${t("fav.title")} (${nFav})</option>`]
     .concat(MKS.map(mk => `<option value="${mk}">${MARKETS[mk].flag} ${t("mkt." + mk)} (${poolOf(mk).length})</option>`)).join("");
-  sel.value = MARKETS[state.mktFilter] ? state.mktFilter : "ALL";
+  sel.value = MARKETS[state.mktFilter] || state.mktFilter === "FAV" ? state.mktFilter : "ALL";
 }
 let wlQuery = "";
 const matchesQuery = s => {
@@ -639,29 +640,54 @@ const matchesQuery = s => {
   return [s.sym, s.name, s.short, s.zh, s.zhShort, toS(s.zh), s.ar || "", nameOf(s.sym)].some(x => x.toLowerCase().includes(q));
 };
 function renderWatchlist() {
-  if ($("mktSel").value !== (MARKETS[state.mktFilter] ? state.mktFilter : "ALL")) $("mktSel").value = MARKETS[state.mktFilter] ? state.mktFilter : "ALL";
+  const want = MARKETS[state.mktFilter] || state.mktFilter === "FAV" ? state.mktFilter : "ALL";
+  if ($("mktSel").value !== want) $("mktSel").value = want;
   document.querySelectorAll("[data-zone]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.zone === zone)));
   $("simClock").innerHTML = state.mode === "real"
     ? `${(MARKETS[state.mktFilter] ? [state.mktFilter] : MKS).map(marketLine).join("")}<span class="mhint">${t("mode.realHint")}</span>`
     : `${t("clock", { d: sim.day, time: simTime(sim.tick) })} · ${t("mode.fastHint")}`;
-  const list = STOCKS.filter(s => (state.mktFilter === "ALL" || s.mkt === state.mktFilter) && matchesQuery(s));
-  if (!list.length) { $("watchlist").innerHTML = `<p class="empty wl-none">${t("wl.none")}</p>`; return; }
-  $("watchlist").innerHTML = list.map(s => {
-    const chg = dayChange(s.sym), lim = atLimit(s.sym);
-    return `<button class="stock-row${s.sym === selected ? " active" : ""}" data-sym="${s.sym}">
-      <span style="min-width:0"><span class="sym">${s.sym}</span>${s.mkt !== "US" ? `<span class="mkt-tag">${s.mkt}</span>` : ""}${lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : ""}
+  const favs = learn.favs || {};
+  const list = STOCKS.filter(s => (state.mktFilter === "ALL" || s.mkt === state.mktFilter || (state.mktFilter === "FAV" && favs[s.sym])) && matchesQuery(s));
+  list.sort((a, b) => (favs[b.sym] ? 1 : 0) - (favs[a.sym] ? 1 : 0));   // stable: favorites first, then the usual order
+  const wl = $("watchlist");
+  if (!list.length) { wl.innerHTML = `<p class="empty wl-none">${state.mktFilter === "FAV" && !wlQuery ? t("fav.none") : t("wl.none")}</p>`; wlSig = ""; return; }
+  // Rebuild the rows only when the list itself changes; on a normal tick just update prices (much lighter with 77 stocks).
+  const sig = [lang, ...list.map(s => s.sym + (favs[s.sym] ? "*" : ""))].join("|");
+  if (sig !== wlSig || !wl.querySelector(".stock-row")) {
+    wl.innerHTML = list.map(s => `<button class="stock-row" data-sym="${s.sym}">
+      <span style="min-width:0"><span class="sym">${favs[s.sym] ? '<span class="fav-star" aria-hidden="true">★</span>' : ""}${s.sym}</span>${s.mkt !== "US" ? `<span class="mkt-tag">${s.mkt}</span>` : ""}<span class="lim"></span>
       <span class="name">${nameOf(s.sym)}</span></span>
-      ${sparkline(s.sym)}
-      <span class="right"><span class="px">${fmtP(s.sym, price(s.sym))}</span><br>
-      <span class="chg ${chg >= 0 ? "pos" : "neg"}">${fmtPct(chg)}</span></span>
-    </button>`;
-  }).join("");
+      <span class="spark"></span>
+      <span class="right"><span class="px"></span><br><span class="chg"></span></span>
+    </button>`).join("");
+    wlSig = sig;
+  }
+  for (const row of wl.querySelectorAll(".stock-row")) {
+    const sym = row.dataset.sym, chg = dayChange(sym), lim = atLimit(sym);
+    row.classList.toggle("active", sym === selected);
+    const limHtml = lim ? `<span class="limit-tag ${lim > 0 ? "limit-up" : "limit-down"}">${t(lim > 0 ? "limit.up" : "limit.down")}</span>` : "";
+    const le = row.querySelector(".lim"); if (le.innerHTML !== limHtml) le.innerHTML = limHtml;
+    row.querySelector(".spark").innerHTML = sparkline(sym);
+    row.querySelector(".px").textContent = fmtP(sym, price(sym));
+    const ce = row.querySelector(".chg"); ce.textContent = fmtPct(chg); ce.className = "chg " + (chg >= 0 ? "pos" : "neg");
+  }
+}
+let wlSig = "";
+function toggleFav(sym) {
+  learn.favs = learn.favs || {};
+  if (learn.favs[sym]) delete learn.favs[sym]; else learn.favs[sym] = true;
+  saveLearn(); renderMktOptions(); renderAll();
 }
 
 function renderDetail() {
   const s = market[selected];
   const p = price(selected), chg = dayChange(selected);
   $("dSym").textContent = s.sym;
+  const fav = !!(learn.favs || {})[selected];
+  $("favBtn").textContent = fav ? "★" : "☆";
+  $("favBtn").classList.toggle("on", fav);
+  $("favBtn").setAttribute("aria-label", t(fav ? "fav.remove" : "fav.add"));
+  $("favBtn").title = t(fav ? "fav.remove" : "fav.add");
   $("dName").textContent = nameOf(selected);
   $("dPx").textContent = fmtP(selected, p);
   const chgEl = $("dChg");
@@ -766,7 +792,7 @@ function renderFeeds() {
 }
 
 function renderAll() {
-  renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds();
+  renderWatchlist(); renderDetail(); renderPortfolio(); renderFeeds(); renderOrders();
   const mine = state.journal.filter(e => e.by === "you").length;
   $("journalCount").textContent = mine ? String(mine) : "";
   save();
@@ -774,7 +800,7 @@ function renderAll() {
 }
 
 /* ============ Trading ============ */
-function trade(sym, shares, side, byAI = false) {
+function trade(sym, shares, side, byAI = false, ord = null) {
   const p = price(sym), pu = usd(sym);
   const msgEl = $("tradeMsg");
   if (!(shares >= 1)) return false;
@@ -807,12 +833,72 @@ function trade(sym, shares, side, byAI = false) {
   state.history.unshift({ ...stampNow(), side, shares, sym, px: p, ai: byAI });
   state.history = state.history.slice(0, 100);
   const j = recordTrade({ sym, side, shares, byAI, pre, px: p, pu });
+  if (ord) j.ord = ord;
   if (!byAI) {
-    msgEl.innerHTML = `${t("msg.done", { verb: t("verb." + side), n: shares, sym, px: fmtP(sym, p) })} ${t("msg.journal")} ` +
+    msgEl.innerHTML = `${ord ? t("ord.filled") + " " : ""}${t("msg.done", { verb: t("verb." + side), n: shares, sym, px: fmtP(sym, p) })} ${t("msg.journal")} ` +
       `<span class="grade grade-${j.grade}">${t("g." + j.grade)}</span> <button type="button" class="lesson-link" data-goto="journal">${t("msg.why")}</button>`;
     msgEl.className = "trade-msg";
   }
   return true;
+}
+
+/* ============ Limit and stop-loss orders ============ */
+// An order waits in state.orders until its price is reached, then fills like a market order.
+// Limit buy: price <= limit. Limit sell: price >= limit. Stop-loss (sell only): price <= stop.
+const ordType = () => $("ordType").value;
+function ordLabel(o) {
+  const v = { n: o.qty, sym: o.sym, px: fmtP(o.sym, o.px) };
+  return o.type === "stop" ? t("ord.stopSell", v) : t(o.side === "buy" ? "ord.buyLimit" : "ord.sellLimit", v);
+}
+function defaultOrdPx(type) {
+  const p = price(selected), h = state.holdings[selected];
+  if (type === "stop") return roundPx(selected, h ? Math.min(p, h.avgCost * mktOf(selected).perUSD) * 0.92 : p * 0.92);
+  return roundPx(selected, p);
+}
+function syncOrderForm(resetPx) {
+  const ty = ordType();
+  $("ordPx").hidden = ty === "market";
+  $("ordPxLabel").hidden = ty === "market";
+  if (resetPx && ty !== "market") $("ordPx").value = defaultOrdPx(ty);
+  $("buyBtn").disabled = ty === "stop";
+  $("buyBtn").title = ty === "stop" ? t("ord.stopBuy") : "";
+  $("ordHint").textContent = t("ord.hint." + ty);
+}
+function placeOrder(side) {
+  const ty = ordType(), qty = parseInt($("qty").value || "0", 10), px = parseFloat($("ordPx").value), msg = $("tradeMsg");
+  const fail = k => { msg.textContent = t(k); msg.className = "trade-msg neg"; return false; };
+  if (!(qty >= 1)) return false;
+  if (!(px > 0)) return fail("ord.badPx");
+  if (ty === "stop" && side === "buy") return fail("ord.stopBuy");
+  if (ty === "stop" && px >= price(selected)) return fail("ord.stopAbove");
+  if (side === "sell" && !(state.holdings[selected] && state.holdings[selected].shares >= qty)) return fail("ord.noShares");
+  state.orders = state.orders || [];
+  state.orders.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 6), sym: selected, side, type: ty, qty, px: roundPx(selected, px) });
+  if (ty === "stop") setFlag("stopOrder");
+  msg.textContent = t("ord.placed"); msg.className = "trade-msg";
+  save(); renderOrders();
+  return true;
+}
+function checkOrders() {
+  if (!state.orders || !state.orders.length) return;
+  const keep = [];
+  for (const o of state.orders) {
+    if (!market[o.sym] || !canTrade(o.sym)) { if (market[o.sym]) keep.push(o); continue; }
+    const p = price(o.sym);
+    const hit = o.type === "stop" ? p <= o.px : o.side === "buy" ? p <= o.px : p >= o.px;
+    if (!hit) { keep.push(o); continue; }
+    const h = state.holdings[o.sym];
+    const why = o.side === "buy" ? (o.qty * usd(o.sym) > state.cash ? "msg.nocash" : null) : (!h || h.shares < o.qty ? "msg.noshares" : null);
+    if (why) { $("tradeMsg").textContent = t("ord.failed", { sym: o.sym, why: t(why) }); $("tradeMsg").className = "trade-msg neg"; continue; }
+    trade(o.sym, o.qty, o.side, false, o.type);
+  }
+  state.orders = keep;
+}
+function renderOrders() {
+  const os = state.orders || [];
+  $("ordBox").hidden = !os.length;
+  $("ordList").innerHTML = os.map(o => `<li><span>${o.type === "stop" ? "🛑" : "🎯"} ${ordLabel(o)}</span>
+    <button type="button" class="btn btn-ghost btn-sm" data-ordcancel="${o.id}">${t("ord.cancel")}</button></li>`).join("");
 }
 
 /* ============ AI auto-pilot ============ */
@@ -1060,6 +1146,7 @@ function setZone(z) {
 function tick() {
   sim.ticks = (sim.ticks || 0) + 1;
   if (state.mode === "real") tickReal(); else tickFast();
+  checkOrders();
   runAutoPilot();
   saveMarket();
   renderAll();
@@ -1206,7 +1293,7 @@ function renderJournal() {
         <span class="side-pill side-${e.side}">${t("rec." + (e.side === "buy" ? "BUY" : "SELL"))}</span>
         <b>${t("shares", { n: e.shares })} ${e.sym}</b> @ ${fmtP(e.sym, e.px)}
         <span class="time">${e.ts ? fmtTs(e.ts) : (e.t || stampText(e.day, e.tick))}</span>
-        <span class="who">${t("who." + e.by)}</span>
+        <span class="who">${t("who." + e.by)}</span>${e.ord ? ` <span class="ord-tag">${t(e.ord === "stop" ? "ord.tagStop" : "ord.tagLimit")}</span>` : ""}
         <span class="grade grade-${g}">${t("g." + g)}</span>
       </div>
       <div class="j-seen"><b>${t("seen." + e.by)}</b> ${seen}</div>
@@ -1225,9 +1312,11 @@ function renderJournal() {
 // Each visual draws one 640×360 SVG scene. CSS classes (a-pop, a-fade, a-draw,
 // a-grow, a-tilt, a-slide, a-drop, a-bob) animate it; delays are inline.
 const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const NUM_RUN = /\d{1,2}:\d{2}(?:\s?[–-]\s?\d{1,2}:\d{2})?|(?:NT\$|HK\$|SAR |[$€¥₹])?[−+\-]?\d[\d,.]*%?(?:\s?(?:→|←)\s?(?:NT\$|HK\$|[$€¥₹])?[−+\-]?\d[\d,.]*%?)?/g;
+const isoNums = s => RTL.includes(lang) ? String(s).replace(NUM_RUN, m => "\u2066" + m + "\u2069") : s;
 const dl = d => d != null ? ` style="animation-delay:${d}s"` : "";
 function tx(x, y, s, o = {}) {
-  return `<text x="${x}" y="${y}" text-anchor="${o.a || "middle"}" font-size="${o.size || 22}" font-weight="${o.w || 600}" fill="${o.fill || "var(--ink)"}"${o.cls ? ` class="${o.cls}"` : ""}${dl(o.d)}>${esc(s)}</text>`;
+  return `<text x="${x}" y="${y}" text-anchor="${o.a || "middle"}" font-size="${o.size || 22}" font-weight="${o.w || 600}" fill="${o.fill || "var(--ink)"}"${o.cls ? ` class="${o.cls}"` : ""}${dl(o.d)}>${esc(isoNums(s))}</text>`;
 }
 const textW = (s, size) => [...String(s)].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? size : size * 0.56), 0);
 function tagBox(cx, cy, s, color, d) {
@@ -1921,8 +2010,10 @@ function showView(v) {
 }
 
 /* ============ Wire up ============ */
-$("buyBtn").addEventListener("click", () => { if (trade(selected, parseInt($("qty").value || "0", 10), "buy")) renderAll(); });
-$("sellBtn").addEventListener("click", () => { if (trade(selected, parseInt($("qty").value || "0", 10), "sell")) renderAll(); });
+$("buyBtn").addEventListener("click", () => { if (ordType() !== "market") { placeOrder("buy"); return; } if (trade(selected, parseInt($("qty").value || "0", 10), "buy")) renderAll(); });
+$("sellBtn").addEventListener("click", () => { if (ordType() !== "market") { placeOrder("sell"); return; } if (trade(selected, parseInt($("qty").value || "0", 10), "sell")) renderAll(); });
+$("ordType").addEventListener("change", () => syncOrderForm(true));
+$("favBtn").addEventListener("click", () => toggleFav(selected));
 $("qty").addEventListener("input", updateTradeCost);
 $("autoPilot").addEventListener("change", e => {
   state.autoPilot = e.target.checked;
@@ -1953,6 +2044,7 @@ $("langSel").addEventListener("change", e => {
   store(LANG_KEY, lang);
   applyStatic();
   renderMktOptions();
+  syncOrderForm(false);
   $("tradeMsg").textContent = "";
   renderAll();
   showView(currentView);
@@ -1962,7 +2054,7 @@ $("vocabSearch").addEventListener("input", () => { fc = null; renderVocab(); });
 $("mktSel").addEventListener("change", e => {
   state.mktFilter = e.target.value; save();
   const first = STOCKS.find(s => state.mktFilter === "ALL" || s.mkt === state.mktFilter);
-  if (state.mktFilter !== "ALL" && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
+  if (MARKETS[state.mktFilter] && market[selected].mkt !== state.mktFilter && first) selected = first.sym;
   renderAll();
 });
 $("stockSearch").addEventListener("input", e => { wlQuery = e.target.value.trim(); renderWatchlist(); });
@@ -1982,12 +2074,14 @@ document.addEventListener("click", e => {
   if ((b = el("[data-jfilter]"))) { state.jFilter = b.dataset.jfilter; save(); renderJournal(); return; }
   if ((b = el("[data-pane]"))) { learn.pane = b.dataset.pane; saveLearn(); renderLearn(); return; }
   if ((b = el("[data-vcat]"))) { learn.vcat = b.dataset.vcat; saveLearn(); renderVocab(); return; }
+  if ((b = el("[data-ordcancel]"))) { state.orders = (state.orders || []).filter(o => o.id !== b.dataset.ordcancel); save(); renderOrders(); return; }
   if ((b = el(".lesson-btn"))) { openLesson(b.dataset.id, true); return; }
   if ((b = el("[data-sym]")) && market[b.dataset.sym]) {
     selected = b.dataset.sym;
     noteViewed(selected);
     if (b.classList.contains("news-sym")) setFlag("newsClick");
-    if (state.mktFilter !== "ALL" && state.mktFilter !== market[selected].mkt) state.mktFilter = "ALL";
+    if (MARKETS[state.mktFilter] && state.mktFilter !== market[selected].mkt) state.mktFilter = "ALL";
+    if (ordType() !== "market") syncOrderForm(true);
     renderAll();
     if (b.classList.contains("news-sym")) $("dSym").scrollIntoView({ block: "center" });
   }
@@ -2008,6 +2102,7 @@ initPlus();
 $("autoPilot").checked = state.autoPilot;
 applyStatic();
 renderMktOptions();
+syncOrderForm(false);
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);

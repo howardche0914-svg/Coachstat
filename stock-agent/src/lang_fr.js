@@ -304,7 +304,7 @@ addLanguage("fr", {
         </ul>
         <p>Rien n’oblige non plus à tout vendre d’un coup. Vendre <b>une partie</b> d’une position est une façon courante de sécuriser un gain ou de réduire son risque.</p>
         ${key("au marché = maintenant, limité = votre prix, stop = une sortie automatique.")}
-        ${live(`Chaque transaction dans StockPilot est un ordre au marché. ${d.s} vaut <b>${d.p}</b> en ce moment : un ordre au marché de 10 actions coûterait environ <b>${d.p10}</b>.`)}`,
+        ${live(`Dans StockPilot, vous pouvez utiliser les trois : choisissez Au marché, À cours limité ou Stop-loss au-dessus des boutons Acheter et Vendre. ${d.s} vaut <b>${d.p}</b> en ce moment : un ordre au marché de 10 actions coûterait environ <b>${d.p10}</b>.`)}`,
       quiz: [
         ["Vous voulez acheter une action, mais seulement si elle baisse à 95 $. Elle vaut 100 $. Quel ordre convient ?", ["Un ordre à cours limité à 95 $", "Un ordre au marché", "Un ordre stop à 105 $"], "Un ordre à cours limité à 95 $ ne s’exécute qu’à 95 $ ou moins."],
         ["Quel est le principal risque d’un ordre à cours limité ?", ["Il peut ne jamais s’exécuter si le prix n’atteint pas votre limite", "Il s’exécute toujours à un moins bon prix", "Il ne marche que pour les actions taïwanaises"], "Vous maîtrisez le prix, mais si l’action n’y arrive jamais, il ne se passe rien."],
@@ -737,7 +737,7 @@ addLanguage("fr", {
     ["ETF (fonds indiciel coté)", "Un fonds qui détient beaucoup d’actions et se négocie comme une seule.", "Le 0050 détient environ 50 des plus grandes entreprises de Taïwan."],
     ["Indice", "Un nombre qui suit un groupe d’actions pour montrer comment va le marché.", "Le S&P 500 suit 500 grandes entreprises américaines."],
     ["Portefeuille", "Tous vos placements, plus vos liquidités.", "Son portefeuille compte 6 actions et un peu de liquidités."],
-    ["Ordre au marché", "Un ordre d’achat ou de vente immédiat au prix actuel.", "Chaque transaction dans StockPilot est un ordre au marché."],
+    ["Ordre au marché", "Un ordre d’achat ou de vente immédiat au prix actuel.", "Dans StockPilot, appuyer sur Acheter avec « Au marché » sélectionné passe un ordre au marché."],
     ["Ordre à cours limité", "Un ordre qui ne s’exécute qu’à votre prix ou mieux.", "Un ordre d’achat limité à 95 $ ne s’exécute pas tant que le prix est à 100 $."],
     ["Stop-loss", "Un plan ou un ordre de vente si le prix tombe à un niveau fixé, pour limiter une perte.", "Acheter à 100 $ avec un stop-loss de 8 % signifie vendre à 92 $."],
     ["Prise de bénéfices", "Vendre tout ou partie d’une action gagnante pour sécuriser le gain.", "Après une hausse de 20 %, il a vendu la moitié pour prendre ses bénéfices."],

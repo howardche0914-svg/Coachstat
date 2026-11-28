@@ -304,7 +304,7 @@ addLanguage("es", {
         </ul>
         <p>Tampoco tienes que venderlo todo de una vez. Vender <b>parte</b> de una posición es una forma común de asegurar algo de beneficio o reducir el riesgo.</p>
         ${key("mercado = ahora, limitada = tu precio, stop = una salida automática.")}
-        ${live(`Todas las operaciones de StockPilot son órdenes de mercado. ${d.s} está a <b>${d.p}</b> ahora, así que una orden de mercado de 10 acciones costaría unos <b>${d.p10}</b>.`)}`,
+        ${live(`En StockPilot puedes usar las tres: elige Mercado, Limitada o Stop-loss encima de los botones Comprar y Vender. ${d.s} está a <b>${d.p}</b> ahora, así que una orden de mercado de 10 acciones costaría unos <b>${d.p10}</b>.`)}`,
       quiz: [
         ["Quieres comprar una acción, pero solo si baja a $95. Ahora está a $100. ¿Qué orden encaja?", ["Una orden limitada a $95", "Una orden de mercado", "Una orden stop a $105"], "Una orden limitada a $95 solo se ejecuta a $95 o menos."],
         ["¿Cuál es el principal riesgo de una orden limitada?", ["Que nunca se ejecute si el precio no llega a tu límite", "Que siempre se ejecute a peor precio", "Que solo sirva para acciones de Taiwán"], "Tú controlas el precio, pero si la acción nunca llega, no pasa nada."],
@@ -737,7 +737,7 @@ addLanguage("es", {
     ["ETF (fondo cotizado)", "Un fondo que tiene muchas acciones y cotiza como una sola.", "El 0050 tiene unas 50 de las mayores empresas de Taiwán."],
     ["Índice", "Un número que sigue a un grupo de acciones para mostrar cómo va el mercado.", "El S&P 500 sigue a 500 grandes empresas de EE. UU."],
     ["Cartera", "Todas las inversiones que tienes, más el efectivo.", "Su cartera tiene 6 acciones y algo de efectivo."],
-    ["Orden de mercado", "Una orden para comprar o vender ya, al precio actual.", "Todas las operaciones de StockPilot son órdenes de mercado."],
+    ["Orden de mercado", "Una orden para comprar o vender ya, al precio actual.", "En StockPilot, pulsar Comprar con «Mercado» elegido envía una orden de mercado."],
     ["Orden limitada", "Una orden que solo se ejecuta a tu precio o a uno mejor.", "Una orden limitada de compra a $95 no se ejecuta mientras el precio esté en $100."],
     ["Stop-loss", "Un plan u orden para vender si el precio cae a un nivel fijado, para limitar una pérdida.", "Comprar a $100 con un stop-loss del 8% significa vender a $92."],
     ["Recoger beneficios", "Vender parte o toda una acción ganadora para asegurar la ganancia.", "Tras subir un 20%, vendió la mitad para recoger beneficios."],

@@ -253,3 +253,24 @@
   @media (max-width: 560px) { .ch-compare { grid-template-columns: 1fr; } .ch-wrap { padding: 12px 16px 32px; } .ch-grid { grid-template-columns: 1fr; } }
   .ch-wrap .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
   .ch-news .time { display: block; margin: 0 0 2px; }
+
+  /* ============ Top bar: keep it on one row on laptop screens ============ */
+  @media (max-width: 1440px) {
+    .topbar .badge { display: none; }            /* the warning banner right below says the same */
+    .tabs button { padding: 6px 11px; }
+    .zone-seg button { padding: 5px 9px; }
+  }
+
+  /* ============ Orders + favorites ============ */
+  .ord-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+  .ord-row input { width: 110px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--baseline); background: var(--surface); color: var(--ink); font: inherit; }
+  .ord-hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+  .ord-box { margin-top: 12px; border-top: 1px solid var(--grid); padding-top: 10px; }
+  .ord-box h3 { margin: 0 0 6px; font-size: 13px; }
+  .ord-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+  .ord-list li { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .ord-tag { font-size: 11px; font-weight: 600; color: var(--ink-2); background: var(--page); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; }
+  .fav-btn { border: 0; background: transparent; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 2px; }
+  .fav-btn.on, .fav-star { color: #eda100; }
+  .fav-star { margin-inline-end: 3px; }

@@ -21,7 +21,7 @@ const NEW_LESSONS = [
         </ul>
         <p>You don't have to sell everything at once, either. Selling <b>part</b> of a position is a common way to lock in some profit or lower your risk.</p>
         ${key("market = now, limit = your price, stop = an automatic exit.")}
-        ${live(`Every trade in StockPilot is a market order. ${d.s} is <b>${d.p}</b> right now, so a market order for 10 shares would cost about <b>${d.p10}</b>.`)}`,
+        ${live(`In StockPilot you can use all three: pick Market, Limit or Stop-loss above the Buy and Sell buttons. ${d.s} is <b>${d.p}</b> right now, so a market order for 10 shares would cost about <b>${d.p10}</b>.`)}`,
       q: "You want to buy a stock, but only if it drops to $95. It is $100 now. Which order fits?",
       opts: ["A limit order at $95", "A market order", "A stop order at $105"],
       why: "A limit order at $95 only goes through at $95 or lower.",
@@ -37,7 +37,7 @@ const NEW_LESSONS = [
         </ul>
         <p>你也不一定要一次全部賣掉。賣出<b>部分</b>持股，是鎖住部分獲利或降低風險的常見做法。</p>
         ${key("市價單＝現在成交，限價單＝你的價格，停損單＝自動出場。")}
-        ${live(`StockPilot 裡的每筆交易都是市價單。${d.s} 現在是 <b>${d.p}</b>，所以用市價單買 10 股約需 <b>${d.p10}</b>。`)}`,
+        ${live(`在 StockPilot 裡三種都能用：在「買進」「賣出」按鈕上方選擇市價、限價或停損。${d.s} 現在是 <b>${d.p}</b>，所以用市價單買 10 股約需 <b>${d.p10}</b>。`)}`,
       q: "你想買一檔股票，但只在它跌到 $95 時才買。現在是 $100。哪一種委託適合？",
       opts: ["$95 的限價單", "市價單", "$105 的停損單"],
       why: "$95 的限價單只會在 $95 或更低時成交。",

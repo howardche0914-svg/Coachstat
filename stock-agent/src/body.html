@@ -50,6 +50,7 @@
     <div class="card">
       <div class="detail-head">
         <h2 id="dSym">—</h2>
+        <button type="button" class="fav-btn" id="favBtn" aria-label="Add to favorites">☆</button>
         <span id="dName" style="color:var(--muted)"></span>
         <span class="big-px" id="dPx"></span>
         <span class="big-chg" id="dChg"></span>
@@ -86,6 +87,17 @@
         <p class="coach-note" data-i18n="coach.note"></p>
       </div>
 
+      <div class="ord-row">
+        <label for="ordType" data-i18n="ord.type">Order type</label>
+        <select id="ordType" class="mkt-select">
+          <option value="market" data-i18n="ord.market">Market</option>
+          <option value="limit" data-i18n="ord.limit">Limit</option>
+          <option value="stop" data-i18n="ord.stop">Stop-loss</option>
+        </select>
+        <label for="ordPx" id="ordPxLabel" data-i18n="ord.px" hidden>Price</label>
+        <input type="number" id="ordPx" min="0" step="any" hidden />
+      </div>
+      <p class="ord-hint" id="ordHint"></p>
       <div class="trade">
         <input type="number" id="qty" min="1" step="1" value="10" aria-label="Number of shares" data-i18n-aria="qty.label" />
         <button class="btn btn-buy" id="buyBtn" data-i18n="btn.buy">Buy</button>
@@ -93,6 +105,10 @@
         <span style="font-size:13px;color:var(--muted)" id="tradeCost"></span>
       </div>
       <div class="trade-msg" id="tradeMsg"></div>
+      <div class="ord-box" id="ordBox" hidden>
+        <h3 data-i18n="ord.open">Open orders</h3>
+        <ul class="ord-list" id="ordList"></ul>
+      </div>
     </div>
 
     <div class="card">
