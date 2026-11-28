@@ -274,3 +274,5 @@
   .fav-btn { border: 0; background: transparent; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 2px; }
   .fav-btn.on, .fav-star { color: #eda100; }
   .fav-star { margin-inline-end: 3px; }
+  .cloud-status { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .cloud-status:empty { display: none; }

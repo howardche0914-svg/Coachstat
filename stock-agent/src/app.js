@@ -1,6 +1,6 @@
 /* ============ Language ============ */
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
-function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); cloudTouch(k); } catch (e) { /* storage unavailable */ } }
 const LANG_KEY = "stockpilot-lang";
 const LANGS = ["en", "zh", "zhs", "es", "fr", "hi", "ar", "bn"];
 const RTL = ["ar"];
@@ -291,11 +291,15 @@ function saveMarket() {
 }
 function save() { store(zoneKeys(zone).s, state); }
 
-let learn = blankLearn();
-const savedLearn = load(LEARN_KEY);
-if (savedLearn && typeof savedLearn.done === "object") learn = { ...learn, ...savedLearn };
-for (const k of ["done", "quiz", "watched", "missions", "perfect", "badges", "flags"]) if (!learn[k] || typeof learn[k] !== "object") learn[k] = {};
-if (!learn.streak || typeof learn.streak !== "object") learn.streak = { n: 0, last: null };
+function readLearn() {
+  let l = blankLearn();
+  const saved = load(LEARN_KEY);
+  if (saved && typeof saved.done === "object") l = { ...l, ...saved };
+  for (const k of ["done", "quiz", "watched", "missions", "perfect", "badges", "flags"]) if (!l[k] || typeof l[k] !== "object") l[k] = {};
+  if (!l.streak || typeof l.streak !== "object") l.streak = { n: 0, last: null };
+  return l;
+}
+let learn = readLearn();
 function saveLearn() { store(LEARN_KEY, learn); }
 
 let selected = STOCKS[0].sym;
@@ -2045,6 +2049,7 @@ $("langSel").addEventListener("change", e => {
   applyStatic();
   renderMktOptions();
   syncOrderForm(false);
+  renderCloud();
   $("tradeMsg").textContent = "";
   renderAll();
   showView(currentView);
@@ -2106,3 +2111,4 @@ syncOrderForm(false);
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);
+initCloud();

@@ -2,6 +2,8 @@
 (() => {
   const TX = {
     en: {
+      "cloud.on": "☁️ Progress is saved to your Claude account, so it follows you to your other devices.", "cloud.local": "💾 Progress is saved in this browser only.",
+      "cloud.error": "⚠️ Could not save to your account just now. Progress is still saved in this browser, and the app will try again.", "cloud.restored": "☁️ Loaded your saved progress from your account.",
       "ord.type": "Order type", "ord.market": "Market (now)", "ord.limit": "Limit", "ord.stop": "Stop-loss", "ord.px": "Price",
       "ord.hint.market": "Buys or sells right now at the current price.",
       "ord.hint.limit": "Buy waits until the price drops to your price or lower. Sell waits until it rises to your price or higher.",
@@ -22,6 +24,8 @@
       "fav.none": "No favorites yet. Open a stock and tap ☆ next to its name.",
     },
     zh: {
+      "cloud.on": "☁️ 進度已存到你的 Claude 帳號，換裝置也能接著玩。", "cloud.local": "💾 進度只存在這個瀏覽器裡。",
+      "cloud.error": "⚠️ 暫時無法存到你的帳號。進度仍存在這個瀏覽器裡，稍後會再試一次。", "cloud.restored": "☁️ 已從你的帳號載入儲存的進度。",
       "ord.type": "委託方式", "ord.market": "市價（立即）", "ord.limit": "限價", "ord.stop": "停損", "ord.px": "價格",
       "ord.hint.market": "以現在的價格立刻買進或賣出。",
       "ord.hint.limit": "買進：等價格跌到你的價格或更低才成交。賣出：等價格漲到你的價格或更高才成交。",
@@ -42,6 +46,8 @@
       "fav.none": "還沒有最愛的股票。打開一檔股票，點名稱旁邊的 ☆。",
     },
     es: {
+      "cloud.on": "☁️ Tu progreso se guarda en tu cuenta de Claude y te sigue a tus otros dispositivos.", "cloud.local": "💾 Tu progreso solo se guarda en este navegador.",
+      "cloud.error": "⚠️ Ahora no se pudo guardar en tu cuenta. El progreso sigue guardado en este navegador y se volverá a intentar.", "cloud.restored": "☁️ Se cargó el progreso guardado en tu cuenta.",
       "ord.type": "Tipo de orden", "ord.market": "Mercado (ahora)", "ord.limit": "Limitada", "ord.stop": "Stop-loss", "ord.px": "Precio",
       "ord.hint.market": "Compra o vende ahora mismo al precio actual.",
       "ord.hint.limit": "Comprar espera a que el precio baje a tu precio o menos. Vender espera a que suba a tu precio o más.",
@@ -62,6 +68,8 @@
       "fav.none": "Aún no tienes favoritas. Abre una acción y toca ☆ junto a su nombre.",
     },
     fr: {
+      "cloud.on": "☁️ Votre progression est enregistrée dans votre compte Claude et vous suit sur vos autres appareils.", "cloud.local": "💾 La progression est enregistrée uniquement dans ce navigateur.",
+      "cloud.error": "⚠️ Impossible d’enregistrer dans votre compte pour le moment. La progression reste enregistrée dans ce navigateur et l’app réessaiera.", "cloud.restored": "☁️ Progression enregistrée chargée depuis votre compte.",
       "ord.type": "Type d’ordre", "ord.market": "Au marché (maintenant)", "ord.limit": "À cours limité", "ord.stop": "Stop-loss", "ord.px": "Prix",
       "ord.hint.market": "Achète ou vend tout de suite au prix actuel.",
       "ord.hint.limit": "Achat : attend que le prix baisse jusqu’à votre prix ou moins. Vente : attend qu’il monte jusqu’à votre prix ou plus.",
@@ -82,6 +90,8 @@
       "fav.none": "Pas encore de favoris. Ouvrez une action et touchez ☆ à côté de son nom.",
     },
     hi: {
+      "cloud.on": "☁️ प्रगति आपके Claude खाते में सहेजी जाती है, इसलिए दूसरे डिवाइस पर भी मिलती है।", "cloud.local": "💾 प्रगति सिर्फ़ इस ब्राउज़र में सहेजी गई है।",
+      "cloud.error": "⚠️ अभी आपके खाते में सहेज नहीं पाए। प्रगति इस ब्राउज़र में सुरक्षित है, ऐप फिर कोशिश करेगा।", "cloud.restored": "☁️ आपके खाते से सहेजी गई प्रगति लोड हुई।",
       "ord.type": "ऑर्डर का प्रकार", "ord.market": "मार्केट (अभी)", "ord.limit": "लिमिट", "ord.stop": "स्टॉप-लॉस", "ord.px": "कीमत",
       "ord.hint.market": "अभी की कीमत पर तुरंत ख़रीदता या बेचता है।",
       "ord.hint.limit": "ख़रीद तब तक रुकती है जब तक कीमत आपकी कीमत या उससे नीचे न आ जाए। बिक्री तब तक रुकती है जब तक कीमत आपकी कीमत या उससे ऊपर न चली जाए।",
@@ -102,6 +112,8 @@
       "fav.none": "अभी कोई पसंदीदा नहीं। कोई शेयर खोलें और उसके नाम के पास ☆ दबाएँ।",
     },
     ar: {
+      "cloud.on": "☁️ يُحفظ تقدمك في حسابك على Claude، لذا يرافقك على أجهزتك الأخرى.", "cloud.local": "💾 يُحفظ التقدم في هذا المتصفح فقط.",
+      "cloud.error": "⚠️ تعذّر الحفظ في حسابك الآن. ما زال التقدم محفوظًا في هذا المتصفح، وسيحاول التطبيق مجددًا.", "cloud.restored": "☁️ تم تحميل تقدمك المحفوظ من حسابك.",
       "ord.type": "نوع الأمر", "ord.market": "السوق (الآن)", "ord.limit": "محدد السعر", "ord.stop": "وقف الخسارة", "ord.px": "السعر",
       "ord.hint.market": "يشتري أو يبيع فورًا بالسعر الحالي.",
       "ord.hint.limit": "الشراء ينتظر حتى ينخفض السعر إلى سعرك أو أقل. البيع ينتظر حتى يرتفع إلى سعرك أو أعلى.",
@@ -122,6 +134,8 @@
       "fav.none": "لا توجد أسهم مفضلة بعد. افتح سهمًا واضغط ☆ بجانب اسمه.",
     },
     bn: {
+      "cloud.on": "☁️ অগ্রগতি আপনার Claude অ্যাকাউন্টে সংরক্ষিত হয়, তাই অন্য ডিভাইসেও পাবেন।", "cloud.local": "💾 অগ্রগতি শুধু এই ব্রাউজারে সংরক্ষিত।",
+      "cloud.error": "⚠️ এখন আপনার অ্যাকাউন্টে সংরক্ষণ করা গেল না। অগ্রগতি এই ব্রাউজারে আছে, অ্যাপ আবার চেষ্টা করবে।", "cloud.restored": "☁️ আপনার অ্যাকাউন্ট থেকে সংরক্ষিত অগ্রগতি লোড হয়েছে।",
       "ord.type": "অর্ডারের ধরন", "ord.market": "মার্কেট (এখনই)", "ord.limit": "লিমিট", "ord.stop": "স্টপ-লস", "ord.px": "দাম",
       "ord.hint.market": "এখনকার দামে সঙ্গে সঙ্গে কেনে বা বেচে।",
       "ord.hint.limit": "কেনা অপেক্ষা করে যতক্ষণ না দাম আপনার দামে বা তার নিচে নামে। বেচা অপেক্ষা করে যতক্ষণ না দাম আপনার দামে বা তার উপরে ওঠে।",

@@ -647,6 +647,8 @@
   .fav-btn { border: 0; background: transparent; font-size: 22px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 2px; }
   .fav-btn.on, .fav-star { color: #eda100; }
   .fav-star { margin-inline-end: 3px; }
+  .cloud-status { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .cloud-status:empty { display: none; }
 </style>
 </head>
 <body>
@@ -877,6 +879,7 @@
 <footer>
   <span data-i18n="footer">StockPilot AI · a practice trading sandbox · prices and news are simulated</span> ·
   <a href="../index.html" data-i18n="footer.back">back to CoachStat</a>
+  <div class="cloud-status" id="cloudStatus" role="status"></div>
 </footer>
 
 <script>
@@ -6721,6 +6724,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
 (() => {
   const TX = {
     en: {
+      "cloud.on": "☁️ Progress is saved to your Claude account, so it follows you to your other devices.", "cloud.local": "💾 Progress is saved in this browser only.",
+      "cloud.error": "⚠️ Could not save to your account just now. Progress is still saved in this browser, and the app will try again.", "cloud.restored": "☁️ Loaded your saved progress from your account.",
       "ord.type": "Order type", "ord.market": "Market (now)", "ord.limit": "Limit", "ord.stop": "Stop-loss", "ord.px": "Price",
       "ord.hint.market": "Buys or sells right now at the current price.",
       "ord.hint.limit": "Buy waits until the price drops to your price or lower. Sell waits until it rises to your price or higher.",
@@ -6741,6 +6746,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
       "fav.none": "No favorites yet. Open a stock and tap ☆ next to its name.",
     },
     zh: {
+      "cloud.on": "☁️ 進度已存到你的 Claude 帳號，換裝置也能接著玩。", "cloud.local": "💾 進度只存在這個瀏覽器裡。",
+      "cloud.error": "⚠️ 暫時無法存到你的帳號。進度仍存在這個瀏覽器裡，稍後會再試一次。", "cloud.restored": "☁️ 已從你的帳號載入儲存的進度。",
       "ord.type": "委託方式", "ord.market": "市價（立即）", "ord.limit": "限價", "ord.stop": "停損", "ord.px": "價格",
       "ord.hint.market": "以現在的價格立刻買進或賣出。",
       "ord.hint.limit": "買進：等價格跌到你的價格或更低才成交。賣出：等價格漲到你的價格或更高才成交。",
@@ -6761,6 +6768,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
       "fav.none": "還沒有最愛的股票。打開一檔股票，點名稱旁邊的 ☆。",
     },
     es: {
+      "cloud.on": "☁️ Tu progreso se guarda en tu cuenta de Claude y te sigue a tus otros dispositivos.", "cloud.local": "💾 Tu progreso solo se guarda en este navegador.",
+      "cloud.error": "⚠️ Ahora no se pudo guardar en tu cuenta. El progreso sigue guardado en este navegador y se volverá a intentar.", "cloud.restored": "☁️ Se cargó el progreso guardado en tu cuenta.",
       "ord.type": "Tipo de orden", "ord.market": "Mercado (ahora)", "ord.limit": "Limitada", "ord.stop": "Stop-loss", "ord.px": "Precio",
       "ord.hint.market": "Compra o vende ahora mismo al precio actual.",
       "ord.hint.limit": "Comprar espera a que el precio baje a tu precio o menos. Vender espera a que suba a tu precio o más.",
@@ -6781,6 +6790,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
       "fav.none": "Aún no tienes favoritas. Abre una acción y toca ☆ junto a su nombre.",
     },
     fr: {
+      "cloud.on": "☁️ Votre progression est enregistrée dans votre compte Claude et vous suit sur vos autres appareils.", "cloud.local": "💾 La progression est enregistrée uniquement dans ce navigateur.",
+      "cloud.error": "⚠️ Impossible d’enregistrer dans votre compte pour le moment. La progression reste enregistrée dans ce navigateur et l’app réessaiera.", "cloud.restored": "☁️ Progression enregistrée chargée depuis votre compte.",
       "ord.type": "Type d’ordre", "ord.market": "Au marché (maintenant)", "ord.limit": "À cours limité", "ord.stop": "Stop-loss", "ord.px": "Prix",
       "ord.hint.market": "Achète ou vend tout de suite au prix actuel.",
       "ord.hint.limit": "Achat : attend que le prix baisse jusqu’à votre prix ou moins. Vente : attend qu’il monte jusqu’à votre prix ou plus.",
@@ -6801,6 +6812,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
       "fav.none": "Pas encore de favoris. Ouvrez une action et touchez ☆ à côté de son nom.",
     },
     hi: {
+      "cloud.on": "☁️ प्रगति आपके Claude खाते में सहेजी जाती है, इसलिए दूसरे डिवाइस पर भी मिलती है।", "cloud.local": "💾 प्रगति सिर्फ़ इस ब्राउज़र में सहेजी गई है।",
+      "cloud.error": "⚠️ अभी आपके खाते में सहेज नहीं पाए। प्रगति इस ब्राउज़र में सुरक्षित है, ऐप फिर कोशिश करेगा।", "cloud.restored": "☁️ आपके खाते से सहेजी गई प्रगति लोड हुई।",
       "ord.type": "ऑर्डर का प्रकार", "ord.market": "मार्केट (अभी)", "ord.limit": "लिमिट", "ord.stop": "स्टॉप-लॉस", "ord.px": "कीमत",
       "ord.hint.market": "अभी की कीमत पर तुरंत ख़रीदता या बेचता है।",
       "ord.hint.limit": "ख़रीद तब तक रुकती है जब तक कीमत आपकी कीमत या उससे नीचे न आ जाए। बिक्री तब तक रुकती है जब तक कीमत आपकी कीमत या उससे ऊपर न चली जाए।",
@@ -6821,6 +6834,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
       "fav.none": "अभी कोई पसंदीदा नहीं। कोई शेयर खोलें और उसके नाम के पास ☆ दबाएँ।",
     },
     ar: {
+      "cloud.on": "☁️ يُحفظ تقدمك في حسابك على Claude، لذا يرافقك على أجهزتك الأخرى.", "cloud.local": "💾 يُحفظ التقدم في هذا المتصفح فقط.",
+      "cloud.error": "⚠️ تعذّر الحفظ في حسابك الآن. ما زال التقدم محفوظًا في هذا المتصفح، وسيحاول التطبيق مجددًا.", "cloud.restored": "☁️ تم تحميل تقدمك المحفوظ من حسابك.",
       "ord.type": "نوع الأمر", "ord.market": "السوق (الآن)", "ord.limit": "محدد السعر", "ord.stop": "وقف الخسارة", "ord.px": "السعر",
       "ord.hint.market": "يشتري أو يبيع فورًا بالسعر الحالي.",
       "ord.hint.limit": "الشراء ينتظر حتى ينخفض السعر إلى سعرك أو أقل. البيع ينتظر حتى يرتفع إلى سعرك أو أعلى.",
@@ -6841,6 +6856,8 @@ TS_WORDS.push(["沙乌地", "沙特"], ["娇生", "强生"], ["耐吉", "耐克"
       "fav.none": "لا توجد أسهم مفضلة بعد. افتح سهمًا واضغط ☆ بجانب اسمه.",
     },
     bn: {
+      "cloud.on": "☁️ অগ্রগতি আপনার Claude অ্যাকাউন্টে সংরক্ষিত হয়, তাই অন্য ডিভাইসেও পাবেন।", "cloud.local": "💾 অগ্রগতি শুধু এই ব্রাউজারে সংরক্ষিত।",
+      "cloud.error": "⚠️ এখন আপনার অ্যাকাউন্টে সংরক্ষণ করা গেল না। অগ্রগতি এই ব্রাউজারে আছে, অ্যাপ আবার চেষ্টা করবে।", "cloud.restored": "☁️ আপনার অ্যাকাউন্ট থেকে সংরক্ষিত অগ্রগতি লোড হয়েছে।",
       "ord.type": "অর্ডারের ধরন", "ord.market": "মার্কেট (এখনই)", "ord.limit": "লিমিট", "ord.stop": "স্টপ-লস", "ord.px": "দাম",
       "ord.hint.market": "এখনকার দামে সঙ্গে সঙ্গে কেনে বা বেচে।",
       "ord.hint.limit": "কেনা অপেক্ষা করে যতক্ষণ না দাম আপনার দামে বা তার নিচে নামে। বেচা অপেক্ষা করে যতক্ষণ না দাম আপনার দামে বা তার উপরে ওঠে।",
@@ -7713,9 +7730,105 @@ function initPlus() {
   $("challengeView").addEventListener("change", e => { if (e.target.id === "chAuto" && game) game.autoPause = e.target.checked; });
 }
 
+/* ============ Cloud save: keep progress in the viewer's own Claude account ============ */
+// Progress is always saved in this browser (localStorage). When the page runs as a claude.ai
+// artifact and the viewer is signed in, the same saves are copied to a private place in the
+// viewer's account (db path data/users/<id>/..., which nobody else can read, not even the
+// artifact's owner), so progress follows them to other devices.
+// Each saved key carries the time it last changed; on load, a newer copy in the account wins.
+const SYNC_META = "stockpilot-sync";
+const syncKeys = () => [LANG_KEY, ZONE_KEY, LEARN_KEY, ...ZONES.flatMap(z => [zoneKeys(z).s, zoneKeys(z).m])];
+let cloud = { state: "pending", db: null, uid: null, dirty: new Set(), early: new Set(), timer: null, busy: false };
+function syncMeta() { try { return JSON.parse(localStorage.getItem(SYNC_META)) || { t: {} }; } catch (e) { return { t: {} }; } }
+function setSyncTime(k, ms) { try { const m = syncMeta(); m.t[k] = ms; localStorage.setItem(SYNC_META, JSON.stringify(m)); } catch (e) { /* storage unavailable */ } }
+// called by store() after every local save
+function cloudTouch(k) {
+  if (!syncKeys().includes(k)) return;
+  if (cloud.state === "pending") { cloud.early.add(k); return; }   // decided after the first download
+  setSyncTime(k, Date.now());
+  if (cloud.state === "on" || cloud.state === "error") cloud.dirty.add(k);
+}
+function renderCloud() {
+  const el = $("cloudStatus");
+  if (!el) return;
+  el.textContent = cloud.state === "on" ? t("cloud.on") : cloud.state === "error" ? t("cloud.error") : cloud.state === "pending" ? "" : t("cloud.local");
+}
+async function cloudPush() {
+  if (cloud.busy || !cloud.db || !cloud.dirty.size) return;
+  cloud.busy = true;
+  const meta = syncMeta();
+  try {
+    for (const k of [...cloud.dirty]) {
+      cloud.dirty.delete(k);
+      const raw = localStorage.getItem(k);
+      if (raw == null) continue;
+      await cloud.db.doc(`data/users/${cloud.uid}/${k}`).set({ v: JSON.parse(raw), t: meta.t[k] || Date.now() });   // one write at a time
+    }
+    if (cloud.state === "error") cloud.state = "on";
+  } catch (e) {
+    cloud.state = "error";
+    if (!e || e.code !== "invalid_argument") for (const k of syncKeys()) cloud.dirty.add(k);   // try again later (a too-big save cannot succeed)
+  }
+  cloud.busy = false;
+  renderCloud();
+}
+async function initCloud() {
+  let db = null, user = null;
+  try {
+    if (window.claude && typeof window.claude.use === "function") [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+  } catch (e) { db = null; }
+  const uid = db && user ? await user.id().catch(() => null) : null;
+  if (!uid) { cloud.state = "local"; finishEarly(); renderCloud(); return; }
+  cloud.db = db; cloud.uid = uid;
+  const meta = syncMeta();
+  let pulled = false;
+  try {
+    for (const k of syncKeys()) {
+      const snap = await db.doc(`data/users/${uid}/${k}`).get();
+      const d = snap.exists ? snap.data() : null;
+      if (d && typeof d.t === "number" && d.t > (meta.t[k] || 0) && d.v !== undefined) {
+        localStorage.setItem(k, JSON.stringify(d.v));
+        setSyncTime(k, d.t);
+        cloud.early.delete(k);
+        pulled = true;
+      } else if (localStorage.getItem(k) != null && (!d || (meta.t[k] || 0) > (d.t || 0))) {
+        if (!meta.t[k]) setSyncTime(k, Date.now());
+        cloud.dirty.add(k);
+      }
+    }
+    cloud.state = "on";
+  } catch (e) { cloud.state = "error"; }
+  finishEarly();
+  if (pulled) applyCloudSave();
+  renderCloud();
+  cloud.timer = setInterval(cloudPush, 30000);
+  const flush = () => { if (document.visibilityState === "hidden") cloudPush(); };
+  document.addEventListener("visibilitychange", flush);
+  window.addEventListener("pagehide", () => cloudPush());
+  cloudPush();
+}
+// saves made before the first download count as real changes for the keys the account did not replace
+function finishEarly() {
+  for (const k of cloud.early) { setSyncTime(k, Date.now()); if (cloud.state === "on" || cloud.state === "error") cloud.dirty.add(k); }
+  cloud.early.clear();
+}
+// a newer copy came from the account: reload everything from it
+function applyCloudSave() {
+  const l = load(LANG_KEY);
+  if (LANGS.includes(l)) lang = l;
+  const z = load(ZONE_KEY);
+  if (ZONES.includes(z)) zone = z;
+  learn = readLearn();
+  loadZone(zone);
+  $("autoPilot").checked = state.autoPilot;
+  applyStatic(); renderMktOptions(); syncOrderForm(false);
+  renderAll(); renderXP(); showView(currentView);
+  toast(t("cloud.restored"));
+}
+
 /* ============ Language ============ */
 function load(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
-function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+function store(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); cloudTouch(k); } catch (e) { /* storage unavailable */ } }
 const LANG_KEY = "stockpilot-lang";
 const LANGS = ["en", "zh", "zhs", "es", "fr", "hi", "ar", "bn"];
 const RTL = ["ar"];
@@ -8006,11 +8119,15 @@ function saveMarket() {
 }
 function save() { store(zoneKeys(zone).s, state); }
 
-let learn = blankLearn();
-const savedLearn = load(LEARN_KEY);
-if (savedLearn && typeof savedLearn.done === "object") learn = { ...learn, ...savedLearn };
-for (const k of ["done", "quiz", "watched", "missions", "perfect", "badges", "flags"]) if (!learn[k] || typeof learn[k] !== "object") learn[k] = {};
-if (!learn.streak || typeof learn.streak !== "object") learn.streak = { n: 0, last: null };
+function readLearn() {
+  let l = blankLearn();
+  const saved = load(LEARN_KEY);
+  if (saved && typeof saved.done === "object") l = { ...l, ...saved };
+  for (const k of ["done", "quiz", "watched", "missions", "perfect", "badges", "flags"]) if (!l[k] || typeof l[k] !== "object") l[k] = {};
+  if (!l.streak || typeof l.streak !== "object") l.streak = { n: 0, last: null };
+  return l;
+}
+let learn = readLearn();
 function saveLearn() { store(LEARN_KEY, learn); }
 
 let selected = STOCKS[0].sym;
@@ -9760,6 +9877,7 @@ $("langSel").addEventListener("change", e => {
   applyStatic();
   renderMktOptions();
   syncOrderForm(false);
+  renderCloud();
   $("tradeMsg").textContent = "";
   renderAll();
   showView(currentView);
@@ -9821,6 +9939,7 @@ syncOrderForm(false);
 renderAll();
 showView(location.hash.slice(1) || "trade");
 setInterval(tick, TICK_MS);
+initCloud();
 </script>
 </body>
 </html>
